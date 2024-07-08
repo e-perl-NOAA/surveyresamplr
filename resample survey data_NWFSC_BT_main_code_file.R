@@ -3,10 +3,6 @@
 ####
 #######################################################################################################################################
 
-#updated r, needed to reinstall rtools
-#set the path
-#Sys.setenv(PATH = paste(Sys.getenv("PATH"), "C:/RBuildtools/4.0", sep = ";"))
-
 ####clear environment
 rm(list=ls())
 
@@ -22,7 +18,7 @@ lingcod_n = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Lingco
 lingcod_s = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Lingcod_south"
 longnose = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Longnose_skate"
 pop = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Pacific_ocean_perch"
-dogfish = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Pacific_spint_dogfish"
+dogfish = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Pacific_spiny_dogfish"
 petrale = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Petrale_sole"
 rex = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Rex_sole"
 sablefish = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Sablefish"
@@ -31,15 +27,13 @@ widow = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Widow_rock
 yellowtail = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Yellowtail_rockfish"
 figures = "C:/Users/Derek.Bolser/Documents/Resample survey data/Figures"
 
-####install nwfsc survey and assessment packages for case study. problems... update packages
-#### copied file from personal comupter due to github install issues
-#set the PAT
+#set the PAT if needed for package installation
 #Sys.setenv(GITHUB_PAT = "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")
 
 #remotes::install_github("pfmc-assessments/nwfscSurvey")
 #remotes::install_github("pfmc-assessments/indexwc")
 
-#update Matrix package
+#load packages
 library(nwfscSurvey)
 library(sampling)
 library(tidyverse)
@@ -216,6 +210,20 @@ bind_fit_check<-function(x){
   return(y)
 }
 
+#read in files that contain specified character strings. To bring in fit and index files. 
+pull_files <- function(directory, string) {
+  # List all files in the directory
+  files <- list.files(directory, pattern = "\\.rds$", full.names = TRUE)
+  
+  # Filter files that contain the search string
+  filtered_files <- files[grepl(string, files)]
+  
+  # Read all filtered files into a list of data frames
+  data_list <- data_list <- setNames(lapply(filtered_files, readRDS), basename(filtered_files))
+  
+  return(data_list)
+}
+
 ####specific functions for filtering by latitude and depth
 #remove south of 33.5 lat
 lat_filter_335<-function(x){
@@ -299,7 +307,7 @@ arrowtooth_sdm_fn<- function(x,y){
 
 #setup parallel backend to use many processors
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(arrowtooth)
@@ -311,23 +319,8 @@ arrowtooth_sdms<-foreach(i = seq_along(arrowtooth_dfs), .combine = 'list',.packa
 
 stopCluster(cl)
 
-#####read in .rds if already fit
-fit_0.1.arrowtooth_flounder<-readRDS('fit_0.1.arrowtooth flounder.rds')
-fit_0.2.arrowtooth_flounder<-readRDS('fit_0.2.arrowtooth flounder.rds')
-fit_0.3.arrowtooth_flounder<-readRDS('fit_0.3.arrowtooth flounder.rds')
-fit_0.4.arrowtooth_flounder<-readRDS('fit_0.4.arrowtooth flounder.rds')
-fit_0.5.arrowtooth_flounder<-readRDS('fit_0.5.arrowtooth flounder.rds')
-fit_0.6.arrowtooth_flounder<-readRDS('fit_0.6.arrowtooth flounder.rds')
-fit_0.7.arrowtooth_flounder<-readRDS('fit_0.7.arrowtooth flounder.rds')
-fit_0.8.arrowtooth_flounder<-readRDS('fit_0.8.arrowtooth flounder.rds')
-fit_0.9.arrowtooth_flounder<-readRDS('fit_0.9.arrowtooth flounder.rds')
-fit_1.arrowtooth_flounder<-readRDS('fit_1.arrowtooth flounder.rds')
-
-arrowtooth_sdms<-list(fit_0.1.arrowtooth_flounder,fit_0.2.arrowtooth_flounder,fit_0.3.arrowtooth_flounder,fit_0.4.arrowtooth_flounder,
-                         fit_0.5.arrowtooth_flounder,fit_0.6.arrowtooth_flounder,fit_0.7.arrowtooth_flounder,fit_0.8.arrowtooth_flounder,
-                         fit_0.9.arrowtooth_flounder,fit_1.arrowtooth_flounder)
-
-names(arrowtooth_sdms)<-arrowtooth_names
+#####read in fit files
+arrowtooth_sdms<-pull_files(arrowtooth,"fit")
 
 #extract outputs
 arrowtooth_fits<-lapply(arrowtooth_sdms, fit_df_fn)
@@ -341,7 +334,7 @@ arrowtooth_fit_check_df<- bind_fit_check(arrowtooth_fit_check)
 
 #arrowtooth_indices requires parallel processing for efficiency
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(arrowtooth)
@@ -353,23 +346,8 @@ arrowtooth_indices<-foreach(i = seq_along(arrowtooth_dfs), .combine = 'list',.pa
 
 stopCluster(cl)
 
-#####read in .rds if already fit
-index_0.1.arrowtooth_flounder<-readRDS('index_0.1.arrowtooth flounder.rds')
-index_0.2.arrowtooth_flounder<-readRDS('index_0.2.arrowtooth flounder.rds')
-index_0.3.arrowtooth_flounder<-readRDS('index_0.3.arrowtooth flounder.rds')
-index_0.4.arrowtooth_flounder<-readRDS('index_0.4.arrowtooth flounder.rds')
-index_0.5.arrowtooth_flounder<-readRDS('index_0.5.arrowtooth flounder.rds')
-index_0.6.arrowtooth_flounder<-readRDS('index_0.6.arrowtooth flounder.rds')
-index_0.7.arrowtooth_flounder<-readRDS('index_0.7.arrowtooth flounder.rds')
-index_0.8.arrowtooth_flounder<-readRDS('index_0.8.arrowtooth flounder.rds')
-index_0.9.arrowtooth_flounder<-readRDS('index_0.9.arrowtooth flounder.rds')
-index_1.arrowtooth_flounder<-readRDS('index_1.arrowtooth flounder.rds')
-
-arrowtooth_indices<-list(index_0.1.arrowtooth_flounder,index_0.2.arrowtooth_flounder,index_0.3.arrowtooth_flounder,index_0.4.arrowtooth_flounder,
-                      index_0.5.arrowtooth_flounder,index_0.6.arrowtooth_flounder,index_0.7.arrowtooth_flounder,index_0.8.arrowtooth_flounder,
-                      index_0.9.arrowtooth_flounder,index_1.arrowtooth_flounder)
-
-names(arrowtooth_indices)<-arrowtooth_names
+#####read in index files
+arrowtooth_indices<-pull_files(arrowtooth,"index")
 
 arrowtooth_indices_df<- bind_fn(arrowtooth_indices)
 
@@ -410,10 +388,9 @@ bocaccio_sdm_fn<- function(x,y){
   return(fit) 
 }
 
-#bocaccio_sdms<-lapply(bocaccio_dfs,bocaccio_sdm_fn)
 #setup parallel backend to use many processors
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(bocaccio)
@@ -426,27 +403,7 @@ bocaccio_sdms<-foreach(i = seq_along(bocaccio_dfs), .combine = 'list',.packages 
 stopCluster(cl)
 
 #####read in .rds if already fit
-#fit_0.1.bocaccio<-readRDS('fit_0.1.bocaccio.rds')
-fit_0.2.bocaccio<-readRDS('fit_0.2.bocaccio.rds')
-fit_0.3.bocaccio<-readRDS('fit_0.3.bocaccio.rds')
-fit_0.4.bocaccio<-readRDS('fit_0.4.bocaccio.rds')
-fit_0.5.bocaccio<-readRDS('fit_0.5.bocaccio.rds')
-fit_0.6.bocaccio<-readRDS('fit_0.6.bocaccio.rds')
-fit_0.7.bocaccio<-readRDS('fit_0.7.bocaccio.rds')
-fit_0.8.bocaccio<-readRDS('fit_0.8.bocaccio.rds')
-fit_0.9.bocaccio<-readRDS('fit_0.9.bocaccio.rds')
-fit_1.bocaccio<-readRDS('fit_1.bocaccio.rds')
-
-#0.1 effort bocaccio model did not fit
-bocaccio_sdms<-list(#fit_0.1.bocaccio,
-                    fit_0.2.bocaccio,fit_0.3.bocaccio,fit_0.4.bocaccio,
-                      fit_0.5.bocaccio,fit_0.6.bocaccio,fit_0.7.bocaccio,fit_0.8.bocaccio,
-                      fit_0.9.bocaccio,fit_1.bocaccio)
-
-#fix names vector
-bocaccio_names<-bocaccio_names[2:10]
-
-names(bocaccio_sdms)<-bocaccio_names
+bocaccio_sdms<-pull_files(bocaccio,"fit")
 
 #extract outputs
 bocaccio_fits<-lapply(bocaccio_sdms, fit_df_fn)
@@ -459,12 +416,8 @@ bocaccio_fit_check<- lapply(bocaccio_sdms, fit_check_fn)
 bocaccio_fit_check_df<- bind_fit_check(bocaccio_fit_check)
 
 #bocaccio_indices requires parallel processing for efficiency
-#remove df for which there were problems with the fit
-bocaccio_dfs<-bocaccio_dfs[2:10]
-bocaccio_files<-bocaccio_files[2:10]
-
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(bocaccio)
@@ -476,26 +429,9 @@ bocaccio_indices<-foreach(i = seq_along(bocaccio_dfs), .combine = 'list',.packag
 
 stopCluster(cl)
 
-#####read in .rds if already fit
-#index_0.1.bocaccio<-readRDS('index_0.1.bocaccio.rds')
-index_0.2.bocaccio<-readRDS('index_0.2.bocaccio.rds')
-index_0.3.bocaccio<-readRDS('index_0.3.bocaccio.rds')
-index_0.4.bocaccio<-readRDS('index_0.4.bocaccio.rds')
-index_0.5.bocaccio<-readRDS('index_0.5.bocaccio.rds')
-index_0.6.bocaccio<-readRDS('index_0.6.bocaccio.rds')
-index_0.7.bocaccio<-readRDS('index_0.7.bocaccio.rds')
-index_0.8.bocaccio<-readRDS('index_0.8.bocaccio.rds')
-index_0.9.bocaccio<-readRDS('index_0.9.bocaccio.rds')
-index_1.bocaccio<-readRDS('index_1.bocaccio.rds')
+#####read in index files
+bocaccio_indices<-pull_files(bocaccio,"index")
 
-bocaccio_indices<-list(#index_0.1.bocaccio,
-                       index_0.2.bocaccio,index_0.3.bocaccio,index_0.4.bocaccio,
-                         index_0.5.bocaccio,index_0.6.bocaccio,index_0.7.bocaccio,index_0.8.bocaccio,
-                         index_0.9.bocaccio,index_1.bocaccio)
-
-names(bocaccio_indices)<-bocaccio_names
-
-#bocaccio_indices<- map2(bocaccio_sdms, bocaccio_dfs, index_fn)
 bocaccio_indices_df<- bind_fn(bocaccio_indices)
 
 setwd(bocaccio)
@@ -536,11 +472,9 @@ canary_sdm_fn<- function(x,y){
   
 }
 
-#canary_sdms<-lapply(canary_dfs,canary_sdm_fn)
-
 #setup parallel backend to use many processors
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(canary)
@@ -553,26 +487,7 @@ canary_sdms<-foreach(i = seq_along(canary_dfs), .combine = 'list',.packages = c(
 stopCluster(cl)
 
 #####read in .rds if already fit
-fit_0.1.canary<-readRDS('fit_0.1.canary rockfish.rds')
-fit_0.2.canary<-readRDS('fit_0.2.canary rockfish.rds')
-fit_0.3.canary<-readRDS('fit_0.3.canary rockfish.rds')
-fit_0.4.canary<-readRDS('fit_0.4.canary rockfish.rds')
-fit_0.5.canary<-readRDS('fit_0.5.canary rockfish.rds')
-fit_0.6.canary<-readRDS('fit_0.6.canary rockfish.rds')
-fit_0.7.canary<-readRDS('fit_0.7.canary rockfish.rds')
-fit_0.8.canary<-readRDS('fit_0.8.canary rockfish.rds')
-fit_0.9.canary<-readRDS('fit_0.9.canary rockfish.rds')
-fit_1.canary<-readRDS('fit_1.canary rockfish.rds')
-
-#make a list
-canary_sdms<-list(fit_0.1.canary,
-  fit_0.2.canary,fit_0.3.canary,fit_0.4.canary,
-  fit_0.5.canary,fit_0.6.canary,fit_0.7.canary,fit_0.8.canary,
-  fit_0.9.canary,fit_1.canary)
-
-#fix names vector if some models didn't fit
-#canary_names<-canary_names[2:10]
-names(canary_sdms)<-canary_names
+canary_sdms<-pull_files(canary,"fit")
 
 #extract outputs
 canary_fits<-lapply(canary_sdms, fit_df_fn)
@@ -584,14 +499,9 @@ canary_pars_df<- bind_fn(canary_pars)
 canary_fit_check<- lapply(canary_sdms, fit_check_fn)
 canary_fit_check_df<- bind_fit_check(canary_fit_check)
 
-#canary_indices<- map2(canary_sdms, canary_dfs, index_fn)
 #canary_indices requires parallel processing for efficiency
-#remove df for which there were problems with the fit
-#canary_dfs<-canary_dfs[2:10]
-#canary_files<-canary_files[2:10]
-
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(canary)
@@ -604,23 +514,7 @@ canary_indices<-foreach(i = seq_along(canary_dfs), .combine = 'list',.packages =
 stopCluster(cl)
 
 #####read in .rds if already fit
-index_0.1.canary<-readRDS('index_0.1.canary rockfish.rds')
-index_0.2.canary<-readRDS('index_0.2.canary rockfish.rds')
-index_0.3.canary<-readRDS('index_0.3.canary rockfish.rds')
-index_0.4.canary<-readRDS('index_0.4.canary rockfish.rds')
-index_0.5.canary<-readRDS('index_0.5.canary rockfish.rds')
-index_0.6.canary<-readRDS('index_0.6.canary rockfish.rds')
-index_0.7.canary<-readRDS('index_0.7.canary rockfish.rds')
-index_0.8.canary<-readRDS('index_0.8.canary rockfish.rds')
-index_0.9.canary<-readRDS('index_0.9.canary rockfish.rds')
-index_1.canary<-readRDS('index_1.canary rockfish.rds')
-
-canary_indices<-list(index_0.1.canary,
-  index_0.2.canary,index_0.3.canary,index_0.4.canary,
-  index_0.5.canary,index_0.6.canary,index_0.7.canary,index_0.8.canary,
-  index_0.9.canary,index_1.canary)
-
-names(canary_indices)<-canary_names
+canary_indices<-pull_files(canary,"index")
 
 canary_indices_df<- bind_fn(canary_indices)
 
@@ -664,10 +558,9 @@ darkblotched_sdm_fn<- function(x,y){
   
 }
 
-#darkblotched_sdms<-lapply(darkblotched_dfs,darkblotched_sdm_fn)
 #setup parallel backend to use many processors
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(darkblotched)
@@ -680,26 +573,7 @@ darkblotched_sdms<-foreach(i = seq_along(darkblotched_dfs), .combine = 'list',.p
 stopCluster(cl)
 
 #####read in .rds if already fit
-fit_0.1.darkblotched<-readRDS('fit_0.1.darkblotched rockfish.rds')
-fit_0.2.darkblotched<-readRDS('fit_0.2.darkblotched rockfish.rds')
-fit_0.3.darkblotched<-readRDS('fit_0.3.darkblotched rockfish.rds')
-fit_0.4.darkblotched<-readRDS('fit_0.4.darkblotched rockfish.rds')
-fit_0.5.darkblotched<-readRDS('fit_0.5.darkblotched rockfish.rds')
-fit_0.6.darkblotched<-readRDS('fit_0.6.darkblotched rockfish.rds')
-fit_0.7.darkblotched<-readRDS('fit_0.7.darkblotched rockfish.rds')
-fit_0.8.darkblotched<-readRDS('fit_0.8.darkblotched rockfish.rds')
-fit_0.9.darkblotched<-readRDS('fit_0.9.darkblotched rockfish.rds')
-fit_1.darkblotched<-readRDS('fit_1.darkblotched rockfish.rds')
-
-#make a list
-darkblotched_sdms<-list(fit_0.1.darkblotched,
-                  fit_0.2.darkblotched,fit_0.3.darkblotched,fit_0.4.darkblotched,
-                  fit_0.5.darkblotched,fit_0.6.darkblotched,fit_0.7.darkblotched,fit_0.8.darkblotched,
-                  fit_0.9.darkblotched,fit_1.darkblotched)
-
-#fix names vector if some models didn't fit
-#darkblotched_names<-darkblotched_names[2:10]
-names(darkblotched_sdms)<-darkblotched_names
+darkblotched_sdms<-pull_files(darkblotched,"fit")
 
 #extract outputs
 darkblotched_fits<-lapply(darkblotched_sdms, fit_df_fn)
@@ -711,14 +585,9 @@ darkblotched_pars_df<- bind_fn(darkblotched_pars)
 darkblotched_fit_check<- lapply(darkblotched_sdms, fit_check_fn)
 darkblotched_fit_check_df<- bind_fit_check(darkblotched_fit_check)
 
-#darkblotched_indices<- map2(darkblotched_sdms, darkblotched_dfs, index_fn)
 #darkblotched_indices requires parallel processing for efficiency
-#remove df for which there were problems with the fit
-#darkblotched_dfs<-darkblotched_dfs[2:10]
-#darkblotched_files<-darkblotched_files[2:10]
-
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(darkblotched)
@@ -731,24 +600,7 @@ darkblotched_indices<-foreach(i = seq_along(darkblotched_dfs), .combine = 'list'
 stopCluster(cl)
 
 #####read in .rds if already fit
-index_0.1.darkblotched<-readRDS('index_0.1.darkblotched rockfish.rds')
-index_0.2.darkblotched<-readRDS('index_0.2.darkblotched rockfish.rds')
-index_0.3.darkblotched<-readRDS('index_0.3.darkblotched rockfish.rds')
-index_0.4.darkblotched<-readRDS('index_0.4.darkblotched rockfish.rds')
-index_0.5.darkblotched<-readRDS('index_0.5.darkblotched rockfish.rds')
-index_0.6.darkblotched<-readRDS('index_0.6.darkblotched rockfish.rds')
-index_0.7.darkblotched<-readRDS('index_0.7.darkblotched rockfish.rds')
-index_0.8.darkblotched<-readRDS('index_0.8.darkblotched rockfish.rds')
-index_0.9.darkblotched<-readRDS('index_0.9.darkblotched rockfish.rds')
-index_1.darkblotched<-readRDS('index_1.darkblotched rockfish.rds')
-
-darkblotched_indices<-list(index_0.1.darkblotched,
-                     index_0.2.darkblotched,index_0.3.darkblotched,index_0.4.darkblotched,
-                     index_0.5.darkblotched,index_0.6.darkblotched,index_0.7.darkblotched,index_0.8.darkblotched,
-                     index_0.9.darkblotched,index_1.darkblotched)
-
-names(darkblotched_indices)<-darkblotched_names
-#darkblotched_indices<- map2(darkblotched_sdms, darkblotched_dfs, index_fn)
+darkblotched_indices<-pull_files(darkblotched,"index")
 darkblotched_indices_df<- bind_fn(darkblotched_indices)
 
 setwd(darkblotched)
@@ -786,10 +638,9 @@ dover_sdm_fn<- function(x,y){
   return(fit)
 }
 
-#dover_sdms<-lapply(dover_dfs,dover_sdm_fn)
 #setup parallel backend to use many processors
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(dover)
@@ -802,26 +653,7 @@ dover_sdms<-foreach(i = seq_along(dover_dfs), .combine = 'list',.packages = c('f
 stopCluster(cl)
 
 #####read in .rds if already fit
-fit_0.1.dover<-readRDS('fit_0.1.Dover sole.rds')
-fit_0.2.dover<-readRDS('fit_0.2.Dover sole.rds')
-fit_0.3.dover<-readRDS('fit_0.3.Dover sole.rds')
-fit_0.4.dover<-readRDS('fit_0.4.Dover sole.rds')
-fit_0.5.dover<-readRDS('fit_0.5.Dover sole.rds')
-fit_0.6.dover<-readRDS('fit_0.6.Dover sole.rds')
-fit_0.7.dover<-readRDS('fit_0.7.Dover sole.rds')
-fit_0.8.dover<-readRDS('fit_0.8.Dover sole.rds')
-fit_0.9.dover<-readRDS('fit_0.9.Dover sole.rds')
-fit_1.dover<-readRDS('fit_1.Dover sole.rds')
-
-#make a list
-dover_sdms<-list(fit_0.1.dover,
-                        fit_0.2.dover,fit_0.3.dover,fit_0.4.dover,
-                        fit_0.5.dover,fit_0.6.dover,fit_0.7.dover,fit_0.8.dover,
-                        fit_0.9.dover,fit_1.dover)
-
-#fix names vector if some models didn't fit
-#dover_names<-dover_names[2:10]
-names(dover_sdms)<-dover_names
+dover_sdms<-pull_files(dover,"fit")
 
 #extract outputs
 dover_fits<-lapply(dover_sdms, fit_df_fn)
@@ -834,12 +666,8 @@ dover_fit_check<- lapply(dover_sdms, fit_check_fn)
 dover_fit_check_df<- bind_fit_check(dover_fit_check)
 
 #dover_indices requires parallel processing for efficiency
-#remove df for which there were problems with the fit
-#dover_dfs<-dover_dfs[2:10]
-#dover_files<-dover_files[2:10]
-
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(dover)
@@ -852,24 +680,7 @@ dover_indices<-foreach(i = seq_along(dover_dfs), .combine = 'list',.packages = c
 stopCluster(cl)
 
 #####read in .rds if already fit
-index_0.1.dover<-readRDS('index_0.1.Dover sole.rds')
-index_0.2.dover<-readRDS('index_0.2.Dover sole.rds')
-index_0.3.dover<-readRDS('index_0.3.Dover sole.rds')
-index_0.4.dover<-readRDS('index_0.4.Dover sole.rds')
-index_0.5.dover<-readRDS('index_0.5.Dover sole.rds')
-index_0.6.dover<-readRDS('index_0.6.Dover sole.rds')
-index_0.7.dover<-readRDS('index_0.7.Dover sole.rds')
-index_0.8.dover<-readRDS('index_0.8.Dover sole.rds')
-index_0.9.dover<-readRDS('index_0.9.Dover sole.rds')
-index_1.dover<-readRDS('index_1.Dover sole.rds')
-
-dover_indices<-list(index_0.1.dover,
-                           index_0.2.dover,index_0.3.dover,index_0.4.dover,
-                           index_0.5.dover,index_0.6.dover,index_0.7.dover,index_0.8.dover,
-                           index_0.9.dover,index_1.dover)
-
-names(dover_indices)<-dover_names
-#dover_indices<- map2(dover_sdms, dover_dfs, index_fn)
+dover_indices<-pull_files(dover,"index")
 dover_indices_df<- bind_fn(dover_indices)
 
 setwd(dover)
@@ -913,11 +724,9 @@ lingcod_n_sdm_fn<- function(x,y){
   return(fit)
 }
 
-#lingcod_n_sdms<-lapply(lingcod_n_dfs,lingcod_n_sdm_fn)
-
 #setup parallel backend to use many processors
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(lingcod_n)
@@ -930,26 +739,7 @@ lingcod_n_sdms<-foreach(i = seq_along(lingcod_n_dfs), .combine = 'list',.package
 stopCluster(cl)
 
 #####read in .rds if already fit
-fit_0.1.lingcod_n<-readRDS('fit_0.1.lingcod_n.rds')
-fit_0.2.lingcod_n<-readRDS('fit_0.2.lingcod_n.rds')
-fit_0.3.lingcod_n<-readRDS('fit_0.3.lingcod_n.rds')
-fit_0.4.lingcod_n<-readRDS('fit_0.4.lingcod_n.rds')
-fit_0.5.lingcod_n<-readRDS('fit_0.5.lingcod_n.rds')
-fit_0.6.lingcod_n<-readRDS('fit_0.6.lingcod_n.rds')
-fit_0.7.lingcod_n<-readRDS('fit_0.7.lingcod_n.rds')
-fit_0.8.lingcod_n<-readRDS('fit_0.8.lingcod_n.rds')
-fit_0.9.lingcod_n<-readRDS('fit_0.9.lingcod_n.rds')
-fit_1.lingcod_n<-readRDS('fit_1.lingcod_n.rds')
-
-#make a list
-lingcod_n_sdms<-list(fit_0.1.lingcod_n,
-                 fit_0.2.lingcod_n,fit_0.3.lingcod_n,fit_0.4.lingcod_n,
-                 fit_0.5.lingcod_n,fit_0.6.lingcod_n,fit_0.7.lingcod_n,fit_0.8.lingcod_n,
-                 fit_0.9.lingcod_n,fit_1.lingcod_n)
-
-#fix names vector if some models didn't fit
-#lingcod_n_names<-lingcod_n_names[2:10]
-names(lingcod_n_sdms)<-lingcod_n_names
+lingcod_n_sdms<-pull_files(lingcod_n,"fit")
 
 #extract outputs
 lingcod_n_fits<-lapply(lingcod_n_sdms, fit_df_fn)
@@ -962,12 +752,8 @@ lingcod_n_fit_check<- lapply(lingcod_n_sdms, fit_check_fn)
 lingcod_n_fit_check_df<- bind_fit_check(lingcod_n_fit_check)
 
 #lingcod_n_indices requires parallel processing for efficiency
-#remove df for which there were problems with the fit
-#lingcod_n_dfs<-lingcod_n_dfs[2:10]
-#lingcod_n_files<-lingcod_n_files[2:10]
-
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(lingcod_n)
@@ -979,29 +765,8 @@ lingcod_n_indices<-foreach(i = seq_along(lingcod_n_dfs), .combine = 'list',.pack
 
 stopCluster(cl)
 
-#lingcod_n_indices <- foreach(x = lingcod_n_sdms, y = lingcod_n_dfs, .combine = 'list',.packages = 'sdmTMB') %dopar% {
-#  index_fn(x,y)
-#} 
-
 #####read in .rds if already fit
-index_0.1.lingcod_n<-readRDS('index_0.1.lingcod_n.rds')
-index_0.2.lingcod_n<-readRDS('index_0.2.lingcod_n.rds')
-index_0.3.lingcod_n<-readRDS('index_0.3.lingcod_n.rds')
-index_0.4.lingcod_n<-readRDS('index_0.4.lingcod_n.rds')
-index_0.5.lingcod_n<-readRDS('index_0.5.lingcod_n.rds')
-index_0.6.lingcod_n<-readRDS('index_0.6.lingcod_n.rds')
-index_0.7.lingcod_n<-readRDS('index_0.7.lingcod_n.rds')
-index_0.8.lingcod_n<-readRDS('index_0.8.lingcod_n.rds')
-index_0.9.lingcod_n<-readRDS('index_0.9.lingcod_n.rds')
-index_1.lingcod_n<-readRDS('index_1.lingcod_n.rds')
-
-lingcod_n_indices<-list(index_0.1.lingcod_n,
-                    index_0.2.lingcod_n,index_0.3.lingcod_n,index_0.4.lingcod_n,
-                    index_0.5.lingcod_n,index_0.6.lingcod_n,index_0.7.lingcod_n,index_0.8.lingcod_n,
-                    index_0.9.lingcod_n,index_1.lingcod_n)
-
-names(lingcod_n_indices)<-lingcod_n_names
-#lingcod_n_indices<- map2(lingcod_n_sdms, lingcod_n_dfs, index_fn)
+lingcod_n_indices<-pull_files(lingcod_n,"index")
 lingcod_n_indices_df<- bind_fn(lingcod_n_indices)
 
 setwd(lingcod_n)
@@ -1045,11 +810,9 @@ lingcod_s_sdm_fn<- function(x,y){
   return(fit)
 }
 
-#lingcod_s_sdms<-lapply(lingcod_s_dfs,lingcod_s_sdm_fn)
-
 #setup parallel backend to use many processors
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(lingcod_s)
@@ -1062,28 +825,7 @@ lingcod_s_sdms<-foreach(i = seq_along(lingcod_s_dfs), .combine = 'list',.package
 stopCluster(cl)
 
 #####read in .rds if already fit
-#fit_0.1.lingcod_s<-readRDS('fit_0.1.lingcod_s.rds')
-#fit_0.2.lingcod_s<-readRDS('fit_0.2.lingcod_s.rds')
-#fit_0.3.lingcod_s<-readRDS('fit_0.3.lingcod_s.rds')
-#fit_0.4.lingcod_s<-readRDS('fit_0.4.lingcod_s.rds')
-#fit_0.5.lingcod_s<-readRDS('fit_0.5.lingcod_s.rds')
-#fit_0.6.lingcod_s<-readRDS('fit_0.6.lingcod_s.rds')
-fit_0.7.lingcod_s<-readRDS('fit_0.7.lingcod_s.rds')
-fit_0.8.lingcod_s<-readRDS('fit_0.8.lingcod_s.rds')
-#fit_0.9.lingcod_s<-readRDS('fit_0.9.lingcod_s.rds')
-fit_1.lingcod_s<-readRDS('fit_1.lingcod_s.rds')
-
-#make a list
-lingcod_s_sdms<-list(#fit_0.1.lingcod_s,
-  #fit_0.2.lingcod_s,fit_0.3.lingcod_s,fit_0.4.lingcod_s,
-  #fit_0.5.lingcod_s,fit_0.6.lingcod_s,
-  fit_0.7.lingcod_s,fit_0.8.lingcod_s,
-  #fit_0.9.lingcod_s,
-  fit_1.lingcod_s)
-
-#fix names vector if some models didn't fit
-lingcod_s_names<-lingcod_s_names[c(7,8,10)]
-names(lingcod_s_sdms)<-lingcod_s_names
+lingcod_s_sdms<-pull_files(lingcod_s,"fit")
 
 #extract outputs
 lingcod_s_fits<-lapply(lingcod_s_sdms, fit_df_fn)
@@ -1096,12 +838,8 @@ lingcod_s_fit_check<- lapply(lingcod_s_sdms, fit_check_fn)
 lingcod_s_fit_check_df<- bind_fit_check(lingcod_s_fit_check)
 
 #lingcod_s_indices requires parallel processing for efficiency
-#remove df for which there were problems with the fit
-lingcod_s_dfs<-lingcod_s_dfs[c(7,8,10)]
-lingcod_s_files<-lingcod_s_files[c(7,8,10)]
-
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(lingcod_s)
@@ -1113,32 +851,8 @@ lingcod_s_indices<-foreach(i = seq_along(lingcod_s_dfs), .combine = 'list',.pack
 
 stopCluster(cl)
 
-#lingcod_s_indices <- foreach(x = lingcod_s_sdms, y = lingcod_s_dfs, .combine = 'list',.packages = 'sdmTMB') %dopar% {
-#  index_fn(x,y)
-#} 
-
 #####read in .rds if already fit
-#index_0.1.lingcod_s<-readRDS('index_0.1.lingcod_s.rds')
-#index_0.2.lingcod_s<-readRDS('index_0.2.lingcod_s.rds')
-#index_0.3.lingcod_s<-readRDS('index_0.3.lingcod_s.rds')
-#index_0.4.lingcod_s<-readRDS('index_0.4.lingcod_s.rds')
-#index_0.5.lingcod_s<-readRDS('index_0.5.lingcod_s.rds')
-#index_0.6.lingcod_s<-readRDS('index_0.6.lingcod_s.rds')
-index_0.7.lingcod_s<-readRDS('index_0.7.lingcod_s.rds')
-index_0.8.lingcod_s<-readRDS('index_0.8.lingcod_s.rds')
-#index_0.9.lingcod_s<-readRDS('index_0.9.lingcod_s.rds')
-index_1.lingcod_s<-readRDS('index_1.lingcod_s.rds')
-
-lingcod_s_indices<-list(#index_0.1.lingcod_s,
-                        #index_0.2.lingcod_s,index_0.3.lingcod_s,index_0.4.lingcod_s,
-                        #index_0.5.lingcod_s,index_0.6.lingcod_s,
-                        index_0.7.lingcod_s,index_0.8.lingcod_s,
-                        #index_0.9.lingcod_s,
-                        index_1.lingcod_s)
-
-names(lingcod_s_indices)<-lingcod_s_names
-
-#lingcod_s_indices<- map2(lingcod_s_sdms, lingcod_s_dfs, index_fn)
+lingcod_s_indices<-pull_files(lingcod_s,"index")
 lingcod_s_indices_df<- bind_fn(lingcod_s_indices)
 
 setwd(lingcod_s)
@@ -1176,10 +890,9 @@ longnose_sdm_fn<- function(x,y){
   return(fit)
 }
 
-#longnose_sdms<-lapply(longnose_dfs,longnose_sdm_fn)
 #setup parallel backend to use many processors
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(longnose)
@@ -1192,26 +905,7 @@ longnose_sdms<-foreach(i = seq_along(longnose_dfs), .combine = 'list',.packages 
 stopCluster(cl)
 
 #####read in .rds if already fit
-fit_0.1.longnose<-readRDS('fit_0.1.longnose skate.rds')
-fit_0.2.longnose<-readRDS('fit_0.2.longnose skate.rds')
-fit_0.3.longnose<-readRDS('fit_0.3.longnose skate.rds')
-fit_0.4.longnose<-readRDS('fit_0.4.longnose skate.rds')
-fit_0.5.longnose<-readRDS('fit_0.5.longnose skate.rds')
-fit_0.6.longnose<-readRDS('fit_0.6.longnose skate.rds')
-fit_0.7.longnose<-readRDS('fit_0.7.longnose skate.rds')
-fit_0.8.longnose<-readRDS('fit_0.8.longnose skate.rds')
-fit_0.9.longnose<-readRDS('fit_0.9.longnose skate.rds')
-fit_1.longnose<-readRDS('fit_1.longnose skate.rds')
-
-#make a list
-longnose_sdms<-list(fit_0.1.longnose,
-                     fit_0.2.longnose,fit_0.3.longnose,fit_0.4.longnose,
-                     fit_0.5.longnose,fit_0.6.longnose,fit_0.7.longnose,fit_0.8.longnose,
-                     fit_0.9.longnose,fit_1.longnose)
-
-#fix names vector if some models didn't fit
-#longnose_names<-longnose_names[2:10]
-names(longnose_sdms)<-longnose_names
+longnose_sdms<-pull_files(longnose,"fit")
 
 #extract outputs
 longnose_fits<-lapply(longnose_sdms, fit_df_fn)
@@ -1224,12 +918,8 @@ longnose_fit_check<- lapply(longnose_sdms, fit_check_fn)
 longnose_fit_check_df<- bind_fit_check(longnose_fit_check)
 
 #longnose_indices requires parallel processing for efficiency
-#remove df for which there were problems with the fit
-#longnose_dfs<-longnose_dfs[2:10]
-#longnose_files<-longnose_files[2:10]
-
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(longnose)
@@ -1242,25 +932,7 @@ longnose_indices<-foreach(i = seq_along(longnose_dfs), .combine = 'list',.packag
 stopCluster(cl)
 
 #####read in .rds if already fit
-index_0.1.longnose<-readRDS('index_0.1.longnose skate.rds')
-index_0.2.longnose<-readRDS('index_0.2.longnose skate.rds')
-index_0.3.longnose<-readRDS('index_0.3.longnose skate.rds')
-index_0.4.longnose<-readRDS('index_0.4.longnose skate.rds')
-index_0.5.longnose<-readRDS('index_0.5.longnose skate.rds')
-index_0.6.longnose<-readRDS('index_0.6.longnose skate.rds')
-index_0.7.longnose<-readRDS('index_0.7.longnose skate.rds')
-index_0.8.longnose<-readRDS('index_0.8.longnose skate.rds')
-index_0.9.longnose<-readRDS('index_0.9.longnose skate.rds')
-index_1.longnose<-readRDS('index_1.longnose skate.rds')
-
-longnose_indices<-list(index_0.1.longnose,
-                        index_0.2.longnose,index_0.3.longnose,index_0.4.longnose,
-                        index_0.5.longnose,index_0.6.longnose,index_0.7.longnose,index_0.8.longnose,
-                        index_0.9.longnose,index_1.longnose)
-
-names(longnose_indices)<-longnose_names
-
-#longnose_indices<- map2(longnose_sdms, longnose_dfs, index_fn)
+longnose_indices<-pull_files(longnose,"index")
 longnose_indices_df<- bind_fn(longnose_indices)
 
 setwd(longnose)
@@ -1302,10 +974,9 @@ pop_sdm_fn<- function(x,y){
   return(fit)
 }
 
-#pop_sdms<-lapply(pop_dfs,pop_sdm_fn)
 #setup parallel backend to use many processors
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(pop)
@@ -1318,26 +989,7 @@ pop_sdms<-foreach(i = seq_along(pop_dfs), .combine = 'list',.packages = c('forea
 stopCluster(cl)
 
 #####read in .rds if already fit
-fit_0.1.pop<-readRDS('fit_0.1.Pacific ocean perch.rds')
-fit_0.2.pop<-readRDS('fit_0.2.Pacific ocean perch.rds')
-fit_0.3.pop<-readRDS('fit_0.3.Pacific ocean perch.rds')
-fit_0.4.pop<-readRDS('fit_0.4.Pacific ocean perch.rds')
-fit_0.5.pop<-readRDS('fit_0.5.Pacific ocean perch.rds')
-fit_0.6.pop<-readRDS('fit_0.6.Pacific ocean perch.rds')
-fit_0.7.pop<-readRDS('fit_0.7.Pacific ocean perch.rds')
-fit_0.8.pop<-readRDS('fit_0.8.Pacific ocean perch.rds')
-fit_0.9.pop<-readRDS('fit_0.9.Pacific ocean perch.rds')
-fit_1.pop<-readRDS('fit_1.Pacific ocean perch.rds')
-
-#make a list
-pop_sdms<-list(fit_0.1.pop,
-                    fit_0.2.pop,fit_0.3.pop,fit_0.4.pop,
-                    fit_0.5.pop,fit_0.6.pop,fit_0.7.pop,fit_0.8.pop,
-                    fit_0.9.pop,fit_1.pop)
-
-#fix names vector if some models didn't fit
-#pop_names<-pop_names[2:10]
-names(pop_sdms)<-pop_names
+pop_sdms<-pull_files(pop,"fit")
 
 #extract outputs
 pop_fits<-lapply(pop_sdms, fit_df_fn)
@@ -1350,12 +1002,8 @@ pop_fit_check<- lapply(pop_sdms, fit_check_fn)
 pop_fit_check_df<- bind_fit_check(pop_fit_check)
 
 #pop_indices requires parallel processing for efficiency
-#remove df for which there were problems with the fit
-#pop_dfs<-pop_dfs[2:10]
-#pop_files<-pop_files[2:10]
-
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(pop)
@@ -1368,24 +1016,7 @@ pop_indices<-foreach(i = seq_along(pop_dfs), .combine = 'list',.packages = c('fo
 stopCluster(cl)
 
 #####read in .rds if already fit
-index_0.1.pop<-readRDS('index_0.1.Pacific ocean perch.rds')
-index_0.2.pop<-readRDS('index_0.2.Pacific ocean perch.rds')
-index_0.3.pop<-readRDS('index_0.3.Pacific ocean perch.rds')
-index_0.4.pop<-readRDS('index_0.4.Pacific ocean perch.rds')
-index_0.5.pop<-readRDS('index_0.5.Pacific ocean perch.rds')
-index_0.6.pop<-readRDS('index_0.6.Pacific ocean perch.rds')
-index_0.7.pop<-readRDS('index_0.7.Pacific ocean perch.rds')
-index_0.8.pop<-readRDS('index_0.8.Pacific ocean perch.rds')
-index_0.9.pop<-readRDS('index_0.9.Pacific ocean perch.rds')
-index_1.pop<-readRDS('index_1.Pacific ocean perch.rds')
-
-pop_indices<-list(index_0.1.pop,
-                       index_0.2.pop,index_0.3.pop,index_0.4.pop,
-                       index_0.5.pop,index_0.6.pop,index_0.7.pop,index_0.8.pop,
-                       index_0.9.pop,index_1.pop)
-
-names(pop_indices)<-pop_names
-#pop_indices<- map2(pop_sdms, pop_dfs, index_fn)
+pop_indices<-pull_files(pop,"index")
 pop_indices_df<- bind_fn(pop_indices)
 
 setwd(pop)
@@ -1425,10 +1056,9 @@ dogfish_sdm_fn<- function(x,y){
   return(fit)
 }
 
-#dogfish_sdms<-lapply(dogfish_dfs,dogfish_sdm_fn)
 #setup parallel backend to use many processors
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(dogfish)
@@ -1441,26 +1071,7 @@ dogfish_sdms<-foreach(i = seq_along(dogfish_dfs), .combine = 'list',.packages = 
 stopCluster(cl)
 
 #####read in .rds if already fit
-fit_0.1.dogfish<-readRDS('fit_0.1.Pacific spiny dogfish.rds')
-fit_0.2.dogfish<-readRDS('fit_0.2.Pacific spiny dogfish.rds')
-fit_0.3.dogfish<-readRDS('fit_0.3.Pacific spiny dogfish.rds')
-fit_0.4.dogfish<-readRDS('fit_0.4.Pacific spiny dogfish.rds')
-fit_0.5.dogfish<-readRDS('fit_0.5.Pacific spiny dogfish.rds')
-fit_0.6.dogfish<-readRDS('fit_0.6.Pacific spiny dogfish.rds')
-fit_0.7.dogfish<-readRDS('fit_0.7.Pacific spiny dogfish.rds')
-fit_0.8.dogfish<-readRDS('fit_0.8.Pacific spiny dogfish.rds')
-fit_0.9.dogfish<-readRDS('fit_0.9.Pacific spiny dogfish.rds')
-fit_1.dogfish<-readRDS('fit_1.Pacific spiny dogfish.rds')
-
-#make a list
-dogfish_sdms<-list(fit_0.1.dogfish,
-               fit_0.2.dogfish,fit_0.3.dogfish,fit_0.4.dogfish,
-               fit_0.5.dogfish,fit_0.6.dogfish,fit_0.7.dogfish,fit_0.8.dogfish,
-               fit_0.9.dogfish,fit_1.dogfish)
-
-#fix names vector if some models didn't fit
-#dogfish_names<-dogfish_names[2:10]
-names(dogfish_sdms)<-dogfish_names
+dogfish_sdms<-pull_files(dogfish,"fit")
 
 #extract outputs
 dogfish_fits<-lapply(dogfish_sdms, fit_df_fn)
@@ -1473,12 +1084,8 @@ dogfish_fit_check<- lapply(dogfish_sdms, fit_check_fn)
 dogfish_fit_check_df<- bind_fit_check(dogfish_fit_check)
 
 #dogfish_indices requires parallel processing for efficiency
-#remove df for which there were problems with the fit
-#dogfish_dfs<-dogfish_dfs[2:10]
-#dogfish_files<-dogfish_files[2:10]
-
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(output)
@@ -1491,24 +1098,7 @@ dogfish_indices<-foreach(i = seq_along(dogfish_dfs), .combine = 'list',.packages
 stopCluster(cl)
 
 #####read in .rds if already fit
-index_0.1.dogfish<-readRDS('index_0.1.Pacific spiny dogfish.rds')
-index_0.2.dogfish<-readRDS('index_0.2.Pacific spiny dogfish.rds')
-index_0.3.dogfish<-readRDS('index_0.3.Pacific spiny dogfish.rds')
-index_0.4.dogfish<-readRDS('index_0.4.Pacific spiny dogfish.rds')
-index_0.5.dogfish<-readRDS('index_0.5.Pacific spiny dogfish.rds')
-index_0.6.dogfish<-readRDS('index_0.6.Pacific spiny dogfish.rds')
-index_0.7.dogfish<-readRDS('index_0.7.Pacific spiny dogfish.rds')
-index_0.8.dogfish<-readRDS('index_0.8.Pacific spiny dogfish.rds')
-index_0.9.dogfish<-readRDS('index_0.9.Pacific spiny dogfish.rds')
-index_1.dogfish<-readRDS('index_1.Pacific spiny dogfish.rds')
-
-dogfish_indices<-list(index_0.1.dogfish,
-                  index_0.2.dogfish,index_0.3.dogfish,index_0.4.dogfish,
-                  index_0.5.dogfish,index_0.6.dogfish,index_0.7.dogfish,index_0.8.dogfish,
-                  index_0.9.dogfish,index_1.dogfish)
-
-names(dogfish_indices)<-dogfish_names
-#dogfish_indices<- map2(dogfish_sdms, dogfish_dfs, index_fn)
+dogfish_indices<-pull_files(dogfish,"index")
 dogfish_indices_df<- bind_fn(dogfish_indices)
 
 setwd(output)
@@ -1548,10 +1138,9 @@ petrale_sdm_fn<- function(x,y){
   return(fit)
 }
 
-#petrale_sdms<-lapply(petrale_dfs,petrale_sdm_fn)
 #setup parallel backend to use many processors
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(petrale)
@@ -1564,27 +1153,7 @@ petrale_sdms<-foreach(i = seq_along(petrale_dfs), .combine = 'list',.packages = 
 stopCluster(cl)
 
 #####read in .rds if already fit
-fit_0.1.petrale<-readRDS('fit_0.1.petrale sole.rds')
-fit_0.2.petrale<-readRDS('fit_0.2.petrale sole.rds')
-fit_0.3.petrale<-readRDS('fit_0.3.petrale sole.rds')
-fit_0.4.petrale<-readRDS('fit_0.4.petrale sole.rds')
-fit_0.5.petrale<-readRDS('fit_0.5.petrale sole.rds')
-fit_0.6.petrale<-readRDS('fit_0.6.petrale sole.rds')
-fit_0.7.petrale<-readRDS('fit_0.7.petrale sole.rds')
-fit_0.8.petrale<-readRDS('fit_0.8.petrale sole.rds')
-fit_0.9.petrale<-readRDS('fit_0.9.petrale sole.rds')
-fit_1.petrale<-readRDS('fit_1.petrale sole.rds')
-
-#make a list
-petrale_sdms<-list(fit_0.1.petrale,
-                   fit_0.2.petrale,fit_0.3.petrale,fit_0.4.petrale,
-                   fit_0.5.petrale,fit_0.6.petrale,fit_0.7.petrale,
-                  fit_0.8.petrale,
-                   fit_0.9.petrale,fit_1.petrale)
-
-#fix names vector if some models didn't fit
-#petrale_names<-petrale_names[2:10]
-names(petrale_sdms)<-petrale_names
+petrale_sdms<-pull_files(petrale,"fit")
 
 #extract outputs
 petrale_fits<-lapply(petrale_sdms, fit_df_fn)
@@ -1597,12 +1166,8 @@ petrale_fit_check<- lapply(petrale_sdms, fit_check_fn)
 petrale_fit_check_df<- bind_fit_check(petrale_fit_check)
 
 #petrale_indices requires parallel processing for efficiency
-#remove df for which there were problems with the fit
-#petrale_dfs<-petrale_dfs[8:10]
-#petrale_files<-petrale_files[8:10]
-
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(petrale)
@@ -1615,24 +1180,7 @@ petrale_indices<-foreach(i = seq_along(petrale_dfs), .combine = 'list',.packages
 stopCluster(cl)
 
 #####read in .rds if already fit
-index_0.1.petrale<-readRDS('index_0.1.petrale sole.rds')
-index_0.2.petrale<-readRDS('index_0.2.petrale sole.rds')
-index_0.3.petrale<-readRDS('index_0.3.petrale sole.rds')
-index_0.4.petrale<-readRDS('index_0.4.petrale sole.rds')
-index_0.5.petrale<-readRDS('index_0.5.petrale sole.rds')
-index_0.6.petrale<-readRDS('index_0.6.petrale sole.rds')
-index_0.7.petrale<-readRDS('index_0.7.petrale sole.rds')
-index_0.8.petrale<-readRDS('index_0.8.petrale sole.rds')
-index_0.9.petrale<-readRDS('index_0.9.petrale sole.rds')
-index_1.petrale<-readRDS('index_1.petrale sole.rds')
-
-petrale_indices<-list(index_0.1.petrale,
-                      index_0.2.petrale,index_0.3.petrale,index_0.4.petrale,
-                      index_0.5.petrale,index_0.6.petrale,index_0.7.petrale,index_0.8.petrale,
-                      index_0.9.petrale,index_1.petrale)
-
-names(petrale_indices)<-petrale_names
-#petrale_indices<- map2(petrale_sdms, petrale_dfs, index_fn)
+petrale_indices<-pull_files(petrale,"index")
 petrale_indices_df<- bind_fn(petrale_indices)
 
 setwd(petrale)
@@ -1672,10 +1220,9 @@ rex_sdm_fn<- function(x,y){
   return(fit)
 }
 
-#rex_sdms<-lapply(rex_dfs,rex_sdm_fn)
 #setup parallel backend to use many processors
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(rex)
@@ -1688,26 +1235,7 @@ rex_sdms<-foreach(i = seq_along(rex_dfs), .combine = 'list',.packages = c('forea
 stopCluster(cl)
 
 #####read in .rds if already fit
-fit_0.1.rex<-readRDS('fit_0.1.rex sole.rds')
-fit_0.2.rex<-readRDS('fit_0.2.rex sole.rds')
-fit_0.3.rex<-readRDS('fit_0.3.rex sole.rds')
-fit_0.4.rex<-readRDS('fit_0.4.rex sole.rds')
-fit_0.5.rex<-readRDS('fit_0.5.rex sole.rds')
-fit_0.6.rex<-readRDS('fit_0.6.rex sole.rds')
-fit_0.7.rex<-readRDS('fit_0.7.rex sole.rds')
-fit_0.8.rex<-readRDS('fit_0.8.rex sole.rds')
-fit_0.9.rex<-readRDS('fit_0.9.rex sole.rds')
-fit_1.rex<-readRDS('fit_1.rex sole.rds')
-
-#make a list
-rex_sdms<-list(fit_0.1.rex,
-                   fit_0.2.rex,fit_0.3.rex,fit_0.4.rex,
-                   fit_0.5.rex,fit_0.6.rex,fit_0.7.rex,fit_0.8.rex,
-                   fit_0.9.rex,fit_1.rex)
-
-#fix names vector if some models didn't fit
-#rex_names<-rex_names[2:10]
-names(rex_sdms)<-rex_names
+rex_sdms<-pull_files(rex,"fit")
 
 #extract outputs
 rex_fits<-lapply(rex_sdms, fit_df_fn)
@@ -1720,12 +1248,8 @@ rex_fit_check<- lapply(rex_sdms, fit_check_fn)
 rex_fit_check_df<- bind_fit_check(rex_fit_check)
 
 #rex_indices requires parallel processing for efficiency
-#remove df for which there were problems with the fit
-#rex_dfs<-rex_dfs[2:10]
-#rex_files<-rex_files[2:10]
-
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(rex)
@@ -1738,24 +1262,7 @@ rex_indices<-foreach(i = seq_along(rex_dfs), .combine = 'list',.packages = c('fo
 stopCluster(cl)
 
 #####read in .rds if already fit
-index_0.1.rex<-readRDS('index_0.1.rex sole.rds')
-index_0.2.rex<-readRDS('index_0.2.rex sole.rds')
-index_0.3.rex<-readRDS('index_0.3.rex sole.rds')
-index_0.4.rex<-readRDS('index_0.4.rex sole.rds')
-index_0.5.rex<-readRDS('index_0.5.rex sole.rds')
-index_0.6.rex<-readRDS('index_0.6.rex sole.rds')
-index_0.7.rex<-readRDS('index_0.7.rex sole.rds')
-index_0.8.rex<-readRDS('index_0.8.rex sole.rds')
-index_0.9.rex<-readRDS('index_0.9.rex sole.rds')
-index_1.rex<-readRDS('index_1.rex sole.rds')
-
-rex_indices<-list(index_0.1.rex,
-                      index_0.2.rex,index_0.3.rex,index_0.4.rex,
-                      index_0.5.rex,index_0.6.rex,index_0.7.rex,index_0.8.rex,
-                      index_0.9.rex,index_1.rex)
-
-names(rex_indices)<-rex_names
-#rex_indices<- map2(rex_sdms, rex_dfs, index_fn)
+rex_indices<-pull_files(rex,"index")
 rex_indices_df<- bind_fn(rex_indices)
 
 setwd(rex)
@@ -1793,10 +1300,9 @@ sablefish_sdm_fn<- function(x,y){
   return(fit)
 }
 
-#sablefish_sdms<-lapply(sablefish_dfs,sablefish_sdm_fn)
 #setup parallel backend to use many processors
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(sablefish)
@@ -1809,26 +1315,7 @@ sablefish_sdms<-foreach(i = seq_along(sablefish_dfs), .combine = 'list',.package
 stopCluster(cl)
 
 #####read in .rds if already fit
-fit_0.1.sablefish<-readRDS('fit_0.1.sablefish.rds')
-fit_0.2.sablefish<-readRDS('fit_0.2.sablefish.rds')
-fit_0.3.sablefish<-readRDS('fit_0.3.sablefish.rds')
-fit_0.4.sablefish<-readRDS('fit_0.4.sablefish.rds')
-fit_0.5.sablefish<-readRDS('fit_0.5.sablefish.rds')
-fit_0.6.sablefish<-readRDS('fit_0.6.sablefish.rds')
-fit_0.7.sablefish<-readRDS('fit_0.7.sablefish.rds')
-fit_0.8.sablefish<-readRDS('fit_0.8.sablefish.rds')
-fit_0.9.sablefish<-readRDS('fit_0.9.sablefish.rds')
-fit_1.sablefish<-readRDS('fit_1.sablefish.rds')
-
-#make a list
-sablefish_sdms<-list(fit_0.1.sablefish,
-               fit_0.2.sablefish,fit_0.3.sablefish,fit_0.4.sablefish,
-               fit_0.5.sablefish,fit_0.6.sablefish,fit_0.7.sablefish,fit_0.8.sablefish,
-               fit_0.9.sablefish,fit_1.sablefish)
-
-#fix names vector if some models didn't fit
-#sablefish_names<-sablefish_names[2:10]
-names(sablefish_sdms)<-sablefish_names
+sablefish_sdms<-pull_files(sablefish,"fit")
 
 #extract outputs
 sablefish_fits<-lapply(sablefish_sdms, fit_df_fn)
@@ -1841,12 +1328,8 @@ sablefish_fit_check<- lapply(sablefish_sdms, fit_check_fn)
 sablefish_fit_check_df<- bind_fit_check(sablefish_fit_check)
 
 #sablefish_indices requires parallel processing for efficiency
-#remove df for which there were problems with the fit
-#sablefish_dfs<-sablefish_dfs[2:10]
-#sablefish_files<-sablefish_files[2:10]
-
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(sablefish)
@@ -1859,25 +1342,7 @@ sablefish_indices<-foreach(i = seq_along(sablefish_dfs), .combine = 'list',.pack
 stopCluster(cl)
 
 #####read in .rds if already fit
-index_0.1.sablefish<-readRDS('index_0.1.sablefish.rds')
-index_0.2.sablefish<-readRDS('index_0.2.sablefish.rds')
-index_0.3.sablefish<-readRDS('index_0.3.sablefish.rds')
-index_0.4.sablefish<-readRDS('index_0.4.sablefish.rds')
-index_0.5.sablefish<-readRDS('index_0.5.sablefish.rds')
-index_0.6.sablefish<-readRDS('index_0.6.sablefish.rds')
-index_0.7.sablefish<-readRDS('index_0.7.sablefish.rds')
-index_0.8.sablefish<-readRDS('index_0.8.sablefish.rds')
-index_0.9.sablefish<-readRDS('index_0.9.sablefish.rds')
-index_1.sablefish<-readRDS('index_1.sablefish.rds')
-
-sablefish_indices<-list(index_0.1.sablefish,
-                  index_0.2.sablefish,index_0.3.sablefish,index_0.4.sablefish,
-                  index_0.5.sablefish,index_0.6.sablefish,index_0.7.sablefish,index_0.8.sablefish,
-                  index_0.9.sablefish,index_1.sablefish)
-
-names(sablefish_indices)<-sablefish_names
-
-#sablefish_indices<- map2(sablefish_sdms, sablefish_dfs, index_fn)
+sablefish_indices<-pull_files(sablefish,"index")
 sablefish_indices_df<- bind_fn(sablefish_indices)
 
 setwd(sablefish)
@@ -1915,10 +1380,9 @@ shortspine_sdm_fn<- function(x,y){
   return(fit)
 }
 
-#shortspine_sdms<-lapply(shortspine_dfs,shortspine_sdm_fn)
 #setup parallel backend to use many processors
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(shortspine)
@@ -1931,26 +1395,7 @@ shortspine_sdms<-foreach(i = seq_along(shortspine_dfs), .combine = 'list',.packa
 stopCluster(cl)
 
 #####read in .rds if already fit
-fit_0.1.shortspine<-readRDS('fit_0.1.shortspine thornyhead.rds')
-fit_0.2.shortspine<-readRDS('fit_0.2.shortspine thornyhead.rds')
-fit_0.3.shortspine<-readRDS('fit_0.3.shortspine thornyhead.rds')
-fit_0.4.shortspine<-readRDS('fit_0.4.shortspine thornyhead.rds')
-fit_0.5.shortspine<-readRDS('fit_0.5.shortspine thornyhead.rds')
-fit_0.6.shortspine<-readRDS('fit_0.6.shortspine thornyhead.rds')
-fit_0.7.shortspine<-readRDS('fit_0.7.shortspine thornyhead.rds')
-fit_0.8.shortspine<-readRDS('fit_0.8.shortspine thornyhead.rds')
-fit_0.9.shortspine<-readRDS('fit_0.9.shortspine thornyhead.rds')
-fit_1.shortspine<-readRDS('fit_1.shortspine thornyhead.rds')
-
-#make a list
-shortspine_sdms<-list(fit_0.1.shortspine,
-                     fit_0.2.shortspine,fit_0.3.shortspine,fit_0.4.shortspine,
-                     fit_0.5.shortspine,fit_0.6.shortspine,fit_0.7.shortspine,fit_0.8.shortspine,
-                     fit_0.9.shortspine,fit_1.shortspine)
-
-#fix names vector if some models didn't fit
-#shortspine_names<-shortspine_names[2:10]
-names(shortspine_sdms)<-shortspine_names
+shortspine_sdms<-pull_files(shortspine,"fit")
 
 #extract outputs
 shortspine_fits<-lapply(shortspine_sdms, fit_df_fn)
@@ -1963,12 +1408,8 @@ shortspine_fit_check<- lapply(shortspine_sdms, fit_check_fn)
 shortspine_fit_check_df<- bind_fit_check(shortspine_fit_check)
 
 #shortspine_indices requires parallel processing for efficiency
-#remove df for which there were problems with the fit
-#shortspine_dfs<-shortspine_dfs[2:10]
-#shortspine_files<-shortspine_files[2:10]
-
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(shortspine)
@@ -1980,29 +1421,8 @@ shortspine_indices<-foreach(i = seq_along(shortspine_dfs), .combine = 'list',.pa
 
 stopCluster(cl)
 
-#shortspine_indices <- foreach(x = shortspine_sdms, y = shortspine_dfs, .combine = 'list',.packages = 'sdmTMB') %dopar% {
-#  index_fn(x,y)
-#} 
-
 #####read in .rds if already fit
-index_0.1.shortspine<-readRDS('index_0.1.shortspine thornyhead.rds')
-index_0.2.shortspine<-readRDS('index_0.2.shortspine thornyhead.rds')
-index_0.3.shortspine<-readRDS('index_0.3.shortspine thornyhead.rds')
-index_0.4.shortspine<-readRDS('index_0.4.shortspine thornyhead.rds')
-index_0.5.shortspine<-readRDS('index_0.5.shortspine thornyhead.rds')
-index_0.6.shortspine<-readRDS('index_0.6.shortspine thornyhead.rds')
-index_0.7.shortspine<-readRDS('index_0.7.shortspine thornyhead.rds')
-index_0.8.shortspine<-readRDS('index_0.8.shortspine thornyhead.rds')
-index_0.9.shortspine<-readRDS('index_0.9.shortspine thornyhead.rds')
-index_1.shortspine<-readRDS('index_1.shortspine thornyhead.rds')
-
-shortspine_indices<-list(index_0.1.shortspine,
-                        index_0.2.shortspine,index_0.3.shortspine,index_0.4.shortspine,
-                        index_0.5.shortspine,index_0.6.shortspine,index_0.7.shortspine,index_0.8.shortspine,
-                        index_0.9.shortspine,index_1.shortspine)
-
-names(shortspine_indices)<-shortspine_names
-#shortspine_indices<- map2(shortspine_sdms, shortspine_dfs, index_fn)
+shortspine_indices<-pull_files(shortspine,"index")
 shortspine_indices_df<- bind_fn(shortspine_indices)
 
 setwd(shortspine)
@@ -2010,6 +1430,7 @@ write.csv(shortspine_fit_df, "shortspine_fit_df.csv",row.names = F)
 write.csv(shortspine_pars_df, "shortspine_pars_df.csv",row.names = F)
 write.csv(shortspine_fit_check_df, "shortspine_fit_check_df.csv",row.names = F)
 write.csv(shortspine_indices_df, "shortspine_indices_df.csv",row.names = F)
+
 #### Widow rockfish ###########################################################################################################
 widow_names<- grep("widow rockfish", names(species_all_yrs),value = T)
 widow_dfs<-species_all_yrs[names(species_all_yrs)%in% widow_names]
@@ -2043,10 +1464,9 @@ widow_sdm_fn<- function(x,y){
   return(fit)
 }
 
-#widow_sdms<-lapply(widow_dfs,widow_sdm_fn)
 #setup parallel backend to use many processors
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(widow)
@@ -2059,26 +1479,7 @@ widow_sdms<-foreach(i = seq_along(widow_dfs), .combine = 'list',.packages = c('f
 stopCluster(cl)
 
 #####read in .rds if already fit
-fit_0.1.widow<-readRDS('fit_0.1.widow rockfish.rds')
-fit_0.2.widow<-readRDS('fit_0.2.widow rockfish.rds')
-fit_0.3.widow<-readRDS('fit_0.3.widow rockfish.rds')
-fit_0.4.widow<-readRDS('fit_0.4.widow rockfish.rds')
-fit_0.5.widow<-readRDS('fit_0.5.widow rockfish.rds')
-fit_0.6.widow<-readRDS('fit_0.6.widow rockfish.rds')
-fit_0.7.widow<-readRDS('fit_0.7.widow rockfish.rds')
-fit_0.8.widow<-readRDS('fit_0.8.widow rockfish.rds')
-fit_0.9.widow<-readRDS('fit_0.9.widow rockfish.rds')
-fit_1.widow<-readRDS('fit_1.widow rockfish.rds')
-
-#make a list
-widow_sdms<-list(fit_0.1.widow,
-                      fit_0.2.widow,fit_0.3.widow,fit_0.4.widow,
-                      fit_0.5.widow,fit_0.6.widow,fit_0.7.widow,fit_0.8.widow,
-                      fit_0.9.widow,fit_1.widow)
-
-#fix names vector if some models didn't fit
-#widow_names<-widow_names[2:10]
-names(widow_sdms)<-widow_names
+widow_sdms<-pull_files(widow,"fit")
 
 #extract outputs
 widow_fits<-lapply(widow_sdms, fit_df_fn)
@@ -2091,12 +1492,8 @@ widow_fit_check<- lapply(widow_sdms, fit_check_fn)
 widow_fit_check_df<- bind_fit_check(widow_fit_check)
 
 #widow_indices requires parallel processing for efficiency
-#remove df for which there were problems with the fit
-#widow_dfs<-widow_dfs[2:10]
-#widow_files<-widow_files[2:10]
-
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(widow)
@@ -2109,24 +1506,7 @@ widow_indices<-foreach(i = seq_along(widow_dfs), .combine = 'list',.packages = c
 stopCluster(cl)
 
 #####read in .rds if already fit
-index_0.1.widow<-readRDS('index_0.1.widow rockfish.rds')
-index_0.2.widow<-readRDS('index_0.2.widow rockfish.rds')
-index_0.3.widow<-readRDS('index_0.3.widow rockfish.rds')
-index_0.4.widow<-readRDS('index_0.4.widow rockfish.rds')
-index_0.5.widow<-readRDS('index_0.5.widow rockfish.rds')
-index_0.6.widow<-readRDS('index_0.6.widow rockfish.rds')
-index_0.7.widow<-readRDS('index_0.7.widow rockfish.rds')
-index_0.8.widow<-readRDS('index_0.8.widow rockfish.rds')
-index_0.9.widow<-readRDS('index_0.9.widow rockfish.rds')
-index_1.widow<-readRDS('index_1.widow rockfish.rds')
-
-widow_indices<-list(index_0.1.widow,
-                         index_0.2.widow,index_0.3.widow,index_0.4.widow,
-                         index_0.5.widow,index_0.6.widow,index_0.7.widow,index_0.8.widow,
-                         index_0.9.widow,index_1.widow)
-
-names(widow_indices)<-widow_names
-#widow_indices<- map2(widow_sdms, widow_dfs, index_fn)
+widow_indices<-pull_files(widow,"index")
 widow_indices_df<- bind_fn(widow_indices)
 
 setwd(widow)
@@ -2168,10 +1548,9 @@ yellowtail_sdm_fn<- function(x,y){
   return(fit)
 }
 
-#yellowtail_sdms<-lapply(yellowtail_dfs,yellowtail_sdm_fn)
 #setup parallel backend to use many processors
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(yellowtail)
@@ -2184,26 +1563,7 @@ yellowtail_sdms<-foreach(i = seq_along(yellowtail_dfs), .combine = 'list',.packa
 stopCluster(cl)
 
 #####read in .rds if already fit
-fit_0.1.yellowtail<-readRDS('fit_0.1.yellowtail rockfish.rds')
-fit_0.2.yellowtail<-readRDS('fit_0.2.yellowtail rockfish.rds')
-fit_0.3.yellowtail<-readRDS('fit_0.3.yellowtail rockfish.rds')
-fit_0.4.yellowtail<-readRDS('fit_0.4.yellowtail rockfish.rds')
-fit_0.5.yellowtail<-readRDS('fit_0.5.yellowtail rockfish.rds')
-fit_0.6.yellowtail<-readRDS('fit_0.6.yellowtail rockfish.rds')
-fit_0.7.yellowtail<-readRDS('fit_0.7.yellowtail rockfish.rds')
-fit_0.8.yellowtail<-readRDS('fit_0.8.yellowtail rockfish.rds')
-fit_0.9.yellowtail<-readRDS('fit_0.9.yellowtail rockfish.rds')
-fit_1.yellowtail<-readRDS('fit_1.yellowtail rockfish.rds')
-
-#make a list
-yellowtail_sdms<-list(#fit_0.1.yellowtail,
-                 fit_0.2.yellowtail,fit_0.3.yellowtail,fit_0.4.yellowtail,
-                 fit_0.5.yellowtail,fit_0.6.yellowtail,fit_0.7.yellowtail,fit_0.8.yellowtail,
-                 fit_0.9.yellowtail,fit_1.yellowtail)
-
-#fix names vector if some models didn't fit
-yellowtail_names<-yellowtail_names[2:10]
-names(yellowtail_sdms)<-yellowtail_names
+yellowtail_sdms<-pull_files(yellowtail,"fit")
 
 #extract outputs
 yellowtail_fits<-lapply(yellowtail_sdms, fit_df_fn)
@@ -2216,12 +1576,8 @@ yellowtail_fit_check<- lapply(yellowtail_sdms, fit_check_fn)
 yellowtail_fit_check_df<- bind_fit_check(yellowtail_fit_check)
 
 #yellowtail_indices requires parallel processing for efficiency
-#remove df for which there were problems with the fit
-yellowtail_dfs<-yellowtail_dfs[2:10]
-yellowtail_files<-yellowtail_files[2:10]
-
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #not to overload your computer
+cl <- makeCluster(cores[1]-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(yellowtail)
@@ -2234,24 +1590,7 @@ yellowtail_indices<-foreach(i = seq_along(yellowtail_dfs), .combine = 'list',.pa
 stopCluster(cl)
 
 #####read in .rds if already fit
-#index_0.1.yellowtail<-readRDS('index_0.1.yellowtail rockfish.rds')
-index_0.2.yellowtail<-readRDS('index_0.2.yellowtail rockfish.rds')
-index_0.3.yellowtail<-readRDS('index_0.3.yellowtail rockfish.rds')
-index_0.4.yellowtail<-readRDS('index_0.4.yellowtail rockfish.rds')
-index_0.5.yellowtail<-readRDS('index_0.5.yellowtail rockfish.rds')
-index_0.6.yellowtail<-readRDS('index_0.6.yellowtail rockfish.rds')
-index_0.7.yellowtail<-readRDS('index_0.7.yellowtail rockfish.rds')
-index_0.8.yellowtail<-readRDS('index_0.8.yellowtail rockfish.rds')
-index_0.9.yellowtail<-readRDS('index_0.9.yellowtail rockfish.rds')
-index_1.yellowtail<-readRDS('index_1.yellowtail rockfish.rds')
-
-yellowtail_indices<-list(#index_0.1.yellowtail,
-                    index_0.2.yellowtail,index_0.3.yellowtail,index_0.4.yellowtail,
-                    index_0.5.yellowtail,index_0.6.yellowtail,index_0.7.yellowtail,index_0.8.yellowtail,
-                    index_0.9.yellowtail,index_1.yellowtail)
-
-names(yellowtail_indices)<-yellowtail_names
-#yellowtail_indices<- map2(yellowtail_sdms, yellowtail_dfs, index_fn)
+yellowtail_indices<-pull_files(yellowtail,"index")
 yellowtail_indices_df<- bind_fn(yellowtail_indices)
 
 setwd(yellowtail)
