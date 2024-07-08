@@ -1,0 +1,2455 @@
+#######################################################################################################################################
+#### resample survey data: Multiple species, multiple years
+####
+#######################################################################################################################################
+
+#updated r, needed to reinstall rtools
+#set the path
+#Sys.setenv(PATH = paste(Sys.getenv("PATH"), "C:/RBuildtools/4.0", sep = ";"))
+
+####clear environment
+rm(list=ls())
+
+####set wds
+data = "C:/Users/Derek.Bolser/Documents/Resample survey data/Data"
+output = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results"
+arrowtooth = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Arrowtooth_flounder"
+bocaccio = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Bocaccio"
+canary = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Canary_rockfish"
+darkblotched = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Darkblotched_rockfish"
+dover = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Dover_sole"
+lingcod_n = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Lingcod_north"
+lingcod_s = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Lingcod_south"
+longnose = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Longnose_skate"
+pop = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Pacific_ocean_perch"
+dogfish = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Pacific_spint_dogfish"
+petrale = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Petrale_sole"
+rex = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Rex_sole"
+sablefish = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Sablefish"
+shortspine = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Shortspine_thornyhead"
+widow = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Widow_rockfish"
+yellowtail = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Yellowtail_rockfish"
+figures = "C:/Users/Derek.Bolser/Documents/Resample survey data/Figures"
+
+####install nwfsc survey and assessment packages for case study. problems... update packages
+#### copied file from personal comupter due to github install issues
+#set the PAT
+#Sys.setenv(GITHUB_PAT = "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")
+
+#remotes::install_github("pfmc-assessments/nwfscSurvey")
+#remotes::install_github("pfmc-assessments/indexwc")
+
+#update Matrix package
+library(nwfscSurvey)
+library(sampling)
+library(tidyverse)
+#library(TMB)
+#library(Matrix)
+library(sdmTMB)
+#library(indexwc)
+library(doParallel)
+
+#read in data
+setwd(data)
+catch<-read.csv("nwfsc_bt_fmp_spp.csv")
+
+#split by year
+catch_split<- split(catch, catch$Year)
+
+#create a vector of tows for including or excluding.
+tow_fn<-function(x){
+  tows<- as.data.frame(x$Trawl_id)
+  tows<-unique(tows)
+  tows<-as.data.frame(tows[!is.na(tows)])
+  names(tows)<-"Trawl_id"
+  return(tows)
+}
+
+tows<-lapply(catch_split,tow_fn)
+
+#specify how to downsample; for simple random sampling, a proportion of stations should do
+include_or_exclude <- function(df, proportions) {
+  
+  # Get the number of rows in the dataframe
+  num_rows <- nrow(df)
+  
+  # Use lapply to create a list of dataframes
+  result_list <- lapply(proportions, function(p) {
+    
+    # Generate a random vector of 1s and 0s based on the specified proportion
+    set.seed(1)
+    random_vectors <- replicate(10, sample(c(1, 0), size = num_rows, replace = TRUE, prob = c(p, 1 - p)), simplify = F)
+    
+    # Create a new dataframe with the random assignments
+    lapply(random_vectors, function (rv){
+      cbind(df, RandomAssignment = rv)
+    })
+    
+  })
+  
+  #flatten into single list
+  result_list<- do.call(c, result_list)
+  
+  # Set names for the list elements based on proportions
+  names(result_list) <- paste0(rep(proportions, each = 10), "_", rep(1:10, times = length(proportions)))
+  
+  # Return the list of dataframes
+  return(result_list)
+}
+
+# Assign random 1s and 0s based on the specified proportions to a list of dataframes
+props<-as.data.frame(seq(0.1,1.0, by = 0.1))
+names(props)<-"Trawl_id"
+
+#match the structure of the catch data
+props<-rep(props,length(tows))
+
+tows_assigned<-map2(tows,props, include_or_exclude)
+
+#remove replicates of the 1 effort level
+tows_assigned<- lapply(tows_assigned,function(x){
+  x<- x[1:91]
+  return(x)
+})
+
+tows_assigned<-unlist(tows_assigned, recursive = F)
+
+#merge with catch
+join_dfs <- function(list_of_dfs, main_df, shared_column) {
+  merged_dfs <- lapply(list_of_dfs, function(df) {
+    merged_df <- merge(df, main_df, by = shared_column)
+    return(merged_df)
+  })
+  return(merged_dfs)
+}
+
+catch_assigned <- join_dfs(tows_assigned, catch, "Trawl_id")
+
+#only keep the 1s
+alldata_resampled<-lapply(catch_assigned,function(x){
+  x[x$RandomAssignment==1,]
+})
+
+#split by species
+split_spp<-function(x){
+  spp_list<- split(x,x$Common_name)
+  return(spp_list)
+}
+
+adr_split<- lapply(alldata_resampled, split_spp)
+
+adr_split<- unlist(adr_split, recursive = F)
+
+####combine all years for each species
+names(adr_split)<-substr(names(adr_split),6,50) #it would be good to replace 50 with a logical indicating the end
+
+species_all_yrs<- adr_split %>%
+  bind_rows(.id = "source")
+
+species_all_yrs<-split(species_all_yrs,species_all_yrs$source)
+
+setwd(data)
+#saveRDS(species_all_yrs, "NWFSC_BT_data_focal_spp_split_by_spp_and_effort_rep.rds")
+
+####### calculate model based indices for all species and effort levels ######################################
+####### generic functions
+#dataframe of the fit
+fit_df_fn<- function(fit){
+  fit_df<-tidy(fit, conf.int = T)
+  return(fit_df)
+
+  filename <- paste0(name(fit), "_fit_df.csv")
+  write.csv(fit_df, file = filename, row.names = F)
+}
+
+#parameter estimates
+fit_pars_fn<- function(fit){
+  fit_pars<-tidy(fit, effects = "ran_pars", conf.int = T)
+  return(fit_pars)
+
+  filename <- paste0(name(fit), "_fit_pars.csv")
+  write.csv(index, file = filename, row.names = F)
+}
+
+#diagnostics
+fit_check_fn<- function(fit){
+  fit_check<- sanity(fit)
+  return(fit_check)
+
+filename <- paste0(name(fit), "_fit_check.csv")
+write.csv(index, file = filename, row.names = F)
+}
+
+#get index
+index_fn<- function(fit, x, names){ 
+  p_grid<-predict(fit, newdata = x)
+
+  grid_yrs <- replicate_df(p_grid, "year", unique(x$Year))
+
+  p_sbf <- predict(fit, newdata = x, 
+                         return_tmb_object = TRUE)
+
+  index <- get_index(p_sbf, area = 4, bias_correct = T)
+  
+  saveRDS(index, paste0("index_",names,".rds"))
+  
+  return(index)
+}
+
+#rbind and bring effort in as a column from rownames
+bind_fn<-function(x){
+  y<- do.call(rbind, x)
+  y$effort<- substr(rownames(y), start = 1, stop = 3)
+  y$effort <- gsub("\\.([^0-9])", ".", y$effort)
+  y$effort<-as.numeric(y$effort)
+  return(y)
+}
+
+#special bind function for fit check dfs
+bind_fit_check<-function(x){
+  y<- do.call(rbind, x)
+  y<-as.data.frame(y)
+  y$effort<- substr(rownames(y), start = 1, stop = 3)
+  y$effort <- gsub("\\.([^0-9])", ".", y$effort)
+  y$effort<-as.numeric(y$effort)
+  y<-apply(y,2,as.character)
+  return(y)
+}
+
+####specific functions for filtering by latitude and depth
+#remove south of 33.5 lat
+lat_filter_335<-function(x){
+  x[x$Latitude_dd> 33.5,]
+}
+
+#remove south of 34 lat
+lat_filter_34<-function(x){
+  x[x$Latitude_dd> 34,]
+}
+
+#remove north of 34 lat
+lat_filter_34_max<-function(x){
+  x[x$Latitude_dd< 34,]
+}
+
+lat_filter_35<-function(x){
+  x[x$Latitude_dd> 35,]
+}
+
+#remove deeper than 275 m
+depth_filter_275<-function(x){
+  x[x$Depth_m< 275,]
+}
+
+#remove deeper than 425 m
+depth_filter_425<-function(x){
+  x[x$Depth_m< 425,]
+}
+
+#remove deeper than 450 m
+depth_filter_450<-function(x){
+  x[x$Depth_m< 450,]
+}
+
+#remove deeper than 500 m
+depth_filter_500<-function(x){
+  x[x$Depth_m< 500,]
+}
+
+#remove deeper than 675 m
+depth_filter_675<-function(x){
+  x[x$Depth_m< 675,]
+}
+
+#remove deeper than 700 m 
+depth_filter_700<-function(x){
+  x[x$Depth_m< 700,]
+}
+
+#### Arrowtooth flounder ##########################################################################################################
+arrowtooth_names<- grep("arrowtooth flounder", names(species_all_yrs),value = T)
+arrowtooth_dfs<-species_all_yrs[names(species_all_yrs)%in% arrowtooth_names]
+
+arrowtooth_dfs<- lapply(arrowtooth_dfs,lat_filter_34)
+
+#make the names file
+arrowtooth_files<-as.list(arrowtooth_names)
+
+#fit SDMs
+arrowtooth_sdm_fn<- function(x,y){ 
+  #make mesh
+  mesh<- make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
+  
+  #fit model
+  fit<- sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year) + Pass, #fyear and pass_scaled were specified in the configs doc.
+    data = x,
+    mesh = mesh,
+    family = delta_gamma(),
+    time = "Year",
+    anisotropy = TRUE,
+    spatiotemporal = as.list(c("iid","iid"))
+  )
+  
+  #save file
+  saveRDS(fit, paste0("fit_",y,".rds"))
+ 
+  return(fit) 
+}
+
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(arrowtooth)
+
+#with predefined function
+arrowtooth_sdms<-foreach(i = seq_along(arrowtooth_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  arrowtooth_sdm_fn(arrowtooth_dfs[[i]],arrowtooth_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+fit_0.1.arrowtooth_flounder<-readRDS('fit_0.1.arrowtooth flounder.rds')
+fit_0.2.arrowtooth_flounder<-readRDS('fit_0.2.arrowtooth flounder.rds')
+fit_0.3.arrowtooth_flounder<-readRDS('fit_0.3.arrowtooth flounder.rds')
+fit_0.4.arrowtooth_flounder<-readRDS('fit_0.4.arrowtooth flounder.rds')
+fit_0.5.arrowtooth_flounder<-readRDS('fit_0.5.arrowtooth flounder.rds')
+fit_0.6.arrowtooth_flounder<-readRDS('fit_0.6.arrowtooth flounder.rds')
+fit_0.7.arrowtooth_flounder<-readRDS('fit_0.7.arrowtooth flounder.rds')
+fit_0.8.arrowtooth_flounder<-readRDS('fit_0.8.arrowtooth flounder.rds')
+fit_0.9.arrowtooth_flounder<-readRDS('fit_0.9.arrowtooth flounder.rds')
+fit_1.arrowtooth_flounder<-readRDS('fit_1.arrowtooth flounder.rds')
+
+arrowtooth_sdms<-list(fit_0.1.arrowtooth_flounder,fit_0.2.arrowtooth_flounder,fit_0.3.arrowtooth_flounder,fit_0.4.arrowtooth_flounder,
+                         fit_0.5.arrowtooth_flounder,fit_0.6.arrowtooth_flounder,fit_0.7.arrowtooth_flounder,fit_0.8.arrowtooth_flounder,
+                         fit_0.9.arrowtooth_flounder,fit_1.arrowtooth_flounder)
+
+names(arrowtooth_sdms)<-arrowtooth_names
+
+#extract outputs
+arrowtooth_fits<-lapply(arrowtooth_sdms, fit_df_fn)
+arrowtooth_fit_df<- bind_fn(arrowtooth_fits)
+
+arrowtooth_pars<- lapply(arrowtooth_sdms, fit_pars_fn)
+arrowtooth_pars_df<- bind_fn(arrowtooth_pars)
+
+arrowtooth_fit_check<- lapply(arrowtooth_sdms, fit_check_fn)
+arrowtooth_fit_check_df<- bind_fit_check(arrowtooth_fit_check)
+
+#arrowtooth_indices requires parallel processing for efficiency
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(arrowtooth)
+
+#with predefined function
+arrowtooth_indices<-foreach(i = seq_along(arrowtooth_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  index_fn(arrowtooth_sdms[[i]],arrowtooth_dfs[[i]], arrowtooth_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+index_0.1.arrowtooth_flounder<-readRDS('index_0.1.arrowtooth flounder.rds')
+index_0.2.arrowtooth_flounder<-readRDS('index_0.2.arrowtooth flounder.rds')
+index_0.3.arrowtooth_flounder<-readRDS('index_0.3.arrowtooth flounder.rds')
+index_0.4.arrowtooth_flounder<-readRDS('index_0.4.arrowtooth flounder.rds')
+index_0.5.arrowtooth_flounder<-readRDS('index_0.5.arrowtooth flounder.rds')
+index_0.6.arrowtooth_flounder<-readRDS('index_0.6.arrowtooth flounder.rds')
+index_0.7.arrowtooth_flounder<-readRDS('index_0.7.arrowtooth flounder.rds')
+index_0.8.arrowtooth_flounder<-readRDS('index_0.8.arrowtooth flounder.rds')
+index_0.9.arrowtooth_flounder<-readRDS('index_0.9.arrowtooth flounder.rds')
+index_1.arrowtooth_flounder<-readRDS('index_1.arrowtooth flounder.rds')
+
+arrowtooth_indices<-list(index_0.1.arrowtooth_flounder,index_0.2.arrowtooth_flounder,index_0.3.arrowtooth_flounder,index_0.4.arrowtooth_flounder,
+                      index_0.5.arrowtooth_flounder,index_0.6.arrowtooth_flounder,index_0.7.arrowtooth_flounder,index_0.8.arrowtooth_flounder,
+                      index_0.9.arrowtooth_flounder,index_1.arrowtooth_flounder)
+
+names(arrowtooth_indices)<-arrowtooth_names
+
+arrowtooth_indices_df<- bind_fn(arrowtooth_indices)
+
+setwd(arrowtooth)
+write.csv(arrowtooth_fit_df, "arrowtooth_fit_df.csv",row.names = F)
+write.csv(arrowtooth_pars_df, "arrowtooth_pars_df.csv",row.names = F)
+write.csv(arrowtooth_fit_check_df, "arrowtooth_fit_check_df.csv",row.names = F)
+write.csv(arrowtooth_indices_df, "arrowtooth_indices_df.csv",row.names = F)
+
+#### Bocaccio #############################################################################################################
+bocaccio_names<- grep("bocaccio", names(species_all_yrs),value = T)
+bocaccio_dfs<-species_all_yrs[names(species_all_yrs)%in% bocaccio_names]
+
+bocaccio_dfs<- lapply(bocaccio_dfs,depth_filter_500)
+
+#make the names file
+bocaccio_files<-as.list(bocaccio_names)
+
+#fit SDMs
+bocaccio_sdm_fn<- function(x,y){ 
+  #make mesh
+  mesh<- make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
+  
+  #fit model
+  fit<- sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year) + Pass, #fyear and pass_scaled were specified in the configs doc.
+    data = x,
+    mesh = mesh,
+    family = delta_gamma(),
+    time = "Year",
+    anisotropy = TRUE,
+    spatiotemporal = as.list(c("iid","iid"))
+    )
+  
+  #save file
+  saveRDS(fit, paste0("fit_",y,".rds"))
+  
+  return(fit) 
+}
+
+#bocaccio_sdms<-lapply(bocaccio_dfs,bocaccio_sdm_fn)
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(bocaccio)
+
+#with predefined function
+bocaccio_sdms<-foreach(i = seq_along(bocaccio_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  bocaccio_sdm_fn(bocaccio_dfs[[i]],bocaccio_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+#fit_0.1.bocaccio<-readRDS('fit_0.1.bocaccio.rds')
+fit_0.2.bocaccio<-readRDS('fit_0.2.bocaccio.rds')
+fit_0.3.bocaccio<-readRDS('fit_0.3.bocaccio.rds')
+fit_0.4.bocaccio<-readRDS('fit_0.4.bocaccio.rds')
+fit_0.5.bocaccio<-readRDS('fit_0.5.bocaccio.rds')
+fit_0.6.bocaccio<-readRDS('fit_0.6.bocaccio.rds')
+fit_0.7.bocaccio<-readRDS('fit_0.7.bocaccio.rds')
+fit_0.8.bocaccio<-readRDS('fit_0.8.bocaccio.rds')
+fit_0.9.bocaccio<-readRDS('fit_0.9.bocaccio.rds')
+fit_1.bocaccio<-readRDS('fit_1.bocaccio.rds')
+
+#0.1 effort bocaccio model did not fit
+bocaccio_sdms<-list(#fit_0.1.bocaccio,
+                    fit_0.2.bocaccio,fit_0.3.bocaccio,fit_0.4.bocaccio,
+                      fit_0.5.bocaccio,fit_0.6.bocaccio,fit_0.7.bocaccio,fit_0.8.bocaccio,
+                      fit_0.9.bocaccio,fit_1.bocaccio)
+
+#fix names vector
+bocaccio_names<-bocaccio_names[2:10]
+
+names(bocaccio_sdms)<-bocaccio_names
+
+#extract outputs
+bocaccio_fits<-lapply(bocaccio_sdms, fit_df_fn)
+bocaccio_fit_df<- bind_fn(bocaccio_fits)
+
+bocaccio_pars<- lapply(bocaccio_sdms, fit_pars_fn)
+bocaccio_pars_df<- bind_fn(bocaccio_pars)
+
+bocaccio_fit_check<- lapply(bocaccio_sdms, fit_check_fn)
+bocaccio_fit_check_df<- bind_fit_check(bocaccio_fit_check)
+
+#bocaccio_indices requires parallel processing for efficiency
+#remove df for which there were problems with the fit
+bocaccio_dfs<-bocaccio_dfs[2:10]
+bocaccio_files<-bocaccio_files[2:10]
+
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(bocaccio)
+
+#with predefined function
+bocaccio_indices<-foreach(i = seq_along(bocaccio_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  index_fn(bocaccio_sdms[[i]],bocaccio_dfs[[i]], bocaccio_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+#index_0.1.bocaccio<-readRDS('index_0.1.bocaccio.rds')
+index_0.2.bocaccio<-readRDS('index_0.2.bocaccio.rds')
+index_0.3.bocaccio<-readRDS('index_0.3.bocaccio.rds')
+index_0.4.bocaccio<-readRDS('index_0.4.bocaccio.rds')
+index_0.5.bocaccio<-readRDS('index_0.5.bocaccio.rds')
+index_0.6.bocaccio<-readRDS('index_0.6.bocaccio.rds')
+index_0.7.bocaccio<-readRDS('index_0.7.bocaccio.rds')
+index_0.8.bocaccio<-readRDS('index_0.8.bocaccio.rds')
+index_0.9.bocaccio<-readRDS('index_0.9.bocaccio.rds')
+index_1.bocaccio<-readRDS('index_1.bocaccio.rds')
+
+bocaccio_indices<-list(#index_0.1.bocaccio,
+                       index_0.2.bocaccio,index_0.3.bocaccio,index_0.4.bocaccio,
+                         index_0.5.bocaccio,index_0.6.bocaccio,index_0.7.bocaccio,index_0.8.bocaccio,
+                         index_0.9.bocaccio,index_1.bocaccio)
+
+names(bocaccio_indices)<-bocaccio_names
+
+#bocaccio_indices<- map2(bocaccio_sdms, bocaccio_dfs, index_fn)
+bocaccio_indices_df<- bind_fn(bocaccio_indices)
+
+setwd(bocaccio)
+write.csv(bocaccio_fit_df, "bocaccio_fit_df.csv",row.names = F)
+write.csv(bocaccio_pars_df, "bocaccio_pars_df.csv",row.names = F)
+write.csv(bocaccio_fit_check_df, "bocaccio_fit_check_df.csv",row.names = F)
+write.csv(bocaccio_indices_df, "bocaccio_indices_df.csv",row.names = F)
+
+#### Canary rockfish ##########################################################################################################
+canary_names<- grep("canary rockfish", names(species_all_yrs),value = T)
+canary_dfs<-species_all_yrs[names(species_all_yrs)%in% canary_names]
+
+canary_dfs<- lapply(canary_dfs,depth_filter_275)
+
+#make the names file
+canary_files<-as.list(canary_names)
+
+#fit SDMs
+canary_sdm_fn<- function(x,y){ 
+  #make mesh
+  mesh<- make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 200)
+  
+  #fit model
+  fit<- sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year) + Pass, #fyear and pass_scaled were specified in the configs doc.
+    data = x,
+    mesh = mesh,
+    family = delta_lognormal(),
+    time = "Year",
+    anisotropy = FALSE,
+    spatiotemporal = as.list(c("iid","off"))
+  )
+  
+  #save file
+  saveRDS(fit, paste0("fit_",y,".rds"))
+  
+  return(fit)
+  
+}
+
+#canary_sdms<-lapply(canary_dfs,canary_sdm_fn)
+
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(canary)
+
+#with predefined function
+canary_sdms<-foreach(i = seq_along(canary_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  canary_sdm_fn(canary_dfs[[i]],canary_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+fit_0.1.canary<-readRDS('fit_0.1.canary rockfish.rds')
+fit_0.2.canary<-readRDS('fit_0.2.canary rockfish.rds')
+fit_0.3.canary<-readRDS('fit_0.3.canary rockfish.rds')
+fit_0.4.canary<-readRDS('fit_0.4.canary rockfish.rds')
+fit_0.5.canary<-readRDS('fit_0.5.canary rockfish.rds')
+fit_0.6.canary<-readRDS('fit_0.6.canary rockfish.rds')
+fit_0.7.canary<-readRDS('fit_0.7.canary rockfish.rds')
+fit_0.8.canary<-readRDS('fit_0.8.canary rockfish.rds')
+fit_0.9.canary<-readRDS('fit_0.9.canary rockfish.rds')
+fit_1.canary<-readRDS('fit_1.canary rockfish.rds')
+
+#make a list
+canary_sdms<-list(fit_0.1.canary,
+  fit_0.2.canary,fit_0.3.canary,fit_0.4.canary,
+  fit_0.5.canary,fit_0.6.canary,fit_0.7.canary,fit_0.8.canary,
+  fit_0.9.canary,fit_1.canary)
+
+#fix names vector if some models didn't fit
+#canary_names<-canary_names[2:10]
+names(canary_sdms)<-canary_names
+
+#extract outputs
+canary_fits<-lapply(canary_sdms, fit_df_fn)
+canary_fit_df<- bind_fn(canary_fits)
+
+canary_pars<- lapply(canary_sdms, fit_pars_fn)
+canary_pars_df<- bind_fn(canary_pars)
+
+canary_fit_check<- lapply(canary_sdms, fit_check_fn)
+canary_fit_check_df<- bind_fit_check(canary_fit_check)
+
+#canary_indices<- map2(canary_sdms, canary_dfs, index_fn)
+#canary_indices requires parallel processing for efficiency
+#remove df for which there were problems with the fit
+#canary_dfs<-canary_dfs[2:10]
+#canary_files<-canary_files[2:10]
+
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(canary)
+
+#with predefined function
+canary_indices<-foreach(i = seq_along(canary_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  index_fn(canary_sdms[[i]],canary_dfs[[i]], canary_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+index_0.1.canary<-readRDS('index_0.1.canary rockfish.rds')
+index_0.2.canary<-readRDS('index_0.2.canary rockfish.rds')
+index_0.3.canary<-readRDS('index_0.3.canary rockfish.rds')
+index_0.4.canary<-readRDS('index_0.4.canary rockfish.rds')
+index_0.5.canary<-readRDS('index_0.5.canary rockfish.rds')
+index_0.6.canary<-readRDS('index_0.6.canary rockfish.rds')
+index_0.7.canary<-readRDS('index_0.7.canary rockfish.rds')
+index_0.8.canary<-readRDS('index_0.8.canary rockfish.rds')
+index_0.9.canary<-readRDS('index_0.9.canary rockfish.rds')
+index_1.canary<-readRDS('index_1.canary rockfish.rds')
+
+canary_indices<-list(index_0.1.canary,
+  index_0.2.canary,index_0.3.canary,index_0.4.canary,
+  index_0.5.canary,index_0.6.canary,index_0.7.canary,index_0.8.canary,
+  index_0.9.canary,index_1.canary)
+
+names(canary_indices)<-canary_names
+
+canary_indices_df<- bind_fn(canary_indices)
+
+setwd(canary)
+write.csv(canary_fit_df, "canary_fit_df.csv",row.names = F)
+write.csv(canary_pars_df, "canary_pars_df.csv",row.names = F)
+write.csv(canary_fit_check_df, "canary_fit_check_df.csv",row.names = F)
+write.csv(canary_indices_df, "canary_indices_df.csv",row.names = F)
+
+#### Darkblotched rockfish ####################################################################################################
+darkblotched_names<- grep("darkblotched rockfish", names(species_all_yrs),value = T)
+darkblotched_dfs<-species_all_yrs[names(species_all_yrs)%in% darkblotched_names]
+
+darkblotched_dfs<- lapply(darkblotched_dfs,lat_filter_335)
+
+darkblotched_dfs<- lapply(darkblotched_dfs,depth_filter_675)
+
+#make the names file
+darkblotched_files<-as.list(darkblotched_names)
+
+#fit SDMs
+darkblotched_sdm_fn<- function(x,y){ 
+  #make mesh
+  mesh<- make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 250)
+  
+  #fit model
+  fit<- sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year) + Pass, #fyear and pass_scaled were specified in the configs doc.
+    data = x,
+    mesh = mesh,
+    family = delta_lognormal(),
+    time = "Year",
+    anisotropy = TRUE,
+    spatiotemporal = as.list(c("off","iid"))
+  )
+
+  #save file
+  saveRDS(fit, paste0("fit_",y,".rds"))
+  
+  return(fit)
+  
+}
+
+#darkblotched_sdms<-lapply(darkblotched_dfs,darkblotched_sdm_fn)
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(darkblotched)
+
+#with predefined function
+darkblotched_sdms<-foreach(i = seq_along(darkblotched_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  darkblotched_sdm_fn(darkblotched_dfs[[i]],darkblotched_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+fit_0.1.darkblotched<-readRDS('fit_0.1.darkblotched rockfish.rds')
+fit_0.2.darkblotched<-readRDS('fit_0.2.darkblotched rockfish.rds')
+fit_0.3.darkblotched<-readRDS('fit_0.3.darkblotched rockfish.rds')
+fit_0.4.darkblotched<-readRDS('fit_0.4.darkblotched rockfish.rds')
+fit_0.5.darkblotched<-readRDS('fit_0.5.darkblotched rockfish.rds')
+fit_0.6.darkblotched<-readRDS('fit_0.6.darkblotched rockfish.rds')
+fit_0.7.darkblotched<-readRDS('fit_0.7.darkblotched rockfish.rds')
+fit_0.8.darkblotched<-readRDS('fit_0.8.darkblotched rockfish.rds')
+fit_0.9.darkblotched<-readRDS('fit_0.9.darkblotched rockfish.rds')
+fit_1.darkblotched<-readRDS('fit_1.darkblotched rockfish.rds')
+
+#make a list
+darkblotched_sdms<-list(fit_0.1.darkblotched,
+                  fit_0.2.darkblotched,fit_0.3.darkblotched,fit_0.4.darkblotched,
+                  fit_0.5.darkblotched,fit_0.6.darkblotched,fit_0.7.darkblotched,fit_0.8.darkblotched,
+                  fit_0.9.darkblotched,fit_1.darkblotched)
+
+#fix names vector if some models didn't fit
+#darkblotched_names<-darkblotched_names[2:10]
+names(darkblotched_sdms)<-darkblotched_names
+
+#extract outputs
+darkblotched_fits<-lapply(darkblotched_sdms, fit_df_fn)
+darkblotched_fit_df<- bind_fn(darkblotched_fits)
+
+darkblotched_pars<- lapply(darkblotched_sdms, fit_pars_fn)
+darkblotched_pars_df<- bind_fn(darkblotched_pars)
+
+darkblotched_fit_check<- lapply(darkblotched_sdms, fit_check_fn)
+darkblotched_fit_check_df<- bind_fit_check(darkblotched_fit_check)
+
+#darkblotched_indices<- map2(darkblotched_sdms, darkblotched_dfs, index_fn)
+#darkblotched_indices requires parallel processing for efficiency
+#remove df for which there were problems with the fit
+#darkblotched_dfs<-darkblotched_dfs[2:10]
+#darkblotched_files<-darkblotched_files[2:10]
+
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(darkblotched)
+
+#with predefined function
+darkblotched_indices<-foreach(i = seq_along(darkblotched_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  index_fn(darkblotched_sdms[[i]],darkblotched_dfs[[i]], darkblotched_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+index_0.1.darkblotched<-readRDS('index_0.1.darkblotched rockfish.rds')
+index_0.2.darkblotched<-readRDS('index_0.2.darkblotched rockfish.rds')
+index_0.3.darkblotched<-readRDS('index_0.3.darkblotched rockfish.rds')
+index_0.4.darkblotched<-readRDS('index_0.4.darkblotched rockfish.rds')
+index_0.5.darkblotched<-readRDS('index_0.5.darkblotched rockfish.rds')
+index_0.6.darkblotched<-readRDS('index_0.6.darkblotched rockfish.rds')
+index_0.7.darkblotched<-readRDS('index_0.7.darkblotched rockfish.rds')
+index_0.8.darkblotched<-readRDS('index_0.8.darkblotched rockfish.rds')
+index_0.9.darkblotched<-readRDS('index_0.9.darkblotched rockfish.rds')
+index_1.darkblotched<-readRDS('index_1.darkblotched rockfish.rds')
+
+darkblotched_indices<-list(index_0.1.darkblotched,
+                     index_0.2.darkblotched,index_0.3.darkblotched,index_0.4.darkblotched,
+                     index_0.5.darkblotched,index_0.6.darkblotched,index_0.7.darkblotched,index_0.8.darkblotched,
+                     index_0.9.darkblotched,index_1.darkblotched)
+
+names(darkblotched_indices)<-darkblotched_names
+#darkblotched_indices<- map2(darkblotched_sdms, darkblotched_dfs, index_fn)
+darkblotched_indices_df<- bind_fn(darkblotched_indices)
+
+setwd(darkblotched)
+write.csv(darkblotched_fit_df, "darkblotched_fit_df.csv",row.names = F)
+write.csv(darkblotched_pars_df, "darkblotched_pars_df.csv",row.names = F)
+write.csv(darkblotched_fit_check_df, "darkblotched_fit_check_df.csv",row.names = F)
+write.csv(darkblotched_indices_df, "darkblotched_indices_df.csv",row.names = F)
+
+#### Dover sole ###############################################################################################################
+dover_names<- grep("Dover sole", names(species_all_yrs),value = T)
+dover_dfs<-species_all_yrs[names(species_all_yrs)%in% dover_names]
+
+#make the names file
+dover_files<-as.list(dover_names)
+
+#fit SDMs
+dover_sdm_fn<- function(x,y){ 
+  #make mesh
+  mesh<- make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
+  
+  #fit model
+  fit<- sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year) + Pass, #fyear and pass_scaled were specified in the configs doc.
+    data = x,
+    mesh = mesh,
+    family = delta_gamma(),
+    time = "Year",
+    anisotropy = TRUE,
+    spatiotemporal = as.list(c("iid","iid"))
+  )
+
+  #save file
+  saveRDS(fit, paste0("fit_",y,".rds"))
+  
+  return(fit)
+}
+
+#dover_sdms<-lapply(dover_dfs,dover_sdm_fn)
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(dover)
+
+#with predefined function
+dover_sdms<-foreach(i = seq_along(dover_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  dover_sdm_fn(dover_dfs[[i]],dover_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+fit_0.1.dover<-readRDS('fit_0.1.Dover sole.rds')
+fit_0.2.dover<-readRDS('fit_0.2.Dover sole.rds')
+fit_0.3.dover<-readRDS('fit_0.3.Dover sole.rds')
+fit_0.4.dover<-readRDS('fit_0.4.Dover sole.rds')
+fit_0.5.dover<-readRDS('fit_0.5.Dover sole.rds')
+fit_0.6.dover<-readRDS('fit_0.6.Dover sole.rds')
+fit_0.7.dover<-readRDS('fit_0.7.Dover sole.rds')
+fit_0.8.dover<-readRDS('fit_0.8.Dover sole.rds')
+fit_0.9.dover<-readRDS('fit_0.9.Dover sole.rds')
+fit_1.dover<-readRDS('fit_1.Dover sole.rds')
+
+#make a list
+dover_sdms<-list(fit_0.1.dover,
+                        fit_0.2.dover,fit_0.3.dover,fit_0.4.dover,
+                        fit_0.5.dover,fit_0.6.dover,fit_0.7.dover,fit_0.8.dover,
+                        fit_0.9.dover,fit_1.dover)
+
+#fix names vector if some models didn't fit
+#dover_names<-dover_names[2:10]
+names(dover_sdms)<-dover_names
+
+#extract outputs
+dover_fits<-lapply(dover_sdms, fit_df_fn)
+dover_fit_df<- bind_fn(dover_fits)
+
+dover_pars<- lapply(dover_sdms, fit_pars_fn)
+dover_pars_df<- bind_fn(dover_pars)
+
+dover_fit_check<- lapply(dover_sdms, fit_check_fn)
+dover_fit_check_df<- bind_fit_check(dover_fit_check)
+
+#dover_indices requires parallel processing for efficiency
+#remove df for which there were problems with the fit
+#dover_dfs<-dover_dfs[2:10]
+#dover_files<-dover_files[2:10]
+
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(dover)
+
+#with predefined function
+dover_indices<-foreach(i = seq_along(dover_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  index_fn(dover_sdms[[i]],dover_dfs[[i]], dover_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+index_0.1.dover<-readRDS('index_0.1.Dover sole.rds')
+index_0.2.dover<-readRDS('index_0.2.Dover sole.rds')
+index_0.3.dover<-readRDS('index_0.3.Dover sole.rds')
+index_0.4.dover<-readRDS('index_0.4.Dover sole.rds')
+index_0.5.dover<-readRDS('index_0.5.Dover sole.rds')
+index_0.6.dover<-readRDS('index_0.6.Dover sole.rds')
+index_0.7.dover<-readRDS('index_0.7.Dover sole.rds')
+index_0.8.dover<-readRDS('index_0.8.Dover sole.rds')
+index_0.9.dover<-readRDS('index_0.9.Dover sole.rds')
+index_1.dover<-readRDS('index_1.Dover sole.rds')
+
+dover_indices<-list(index_0.1.dover,
+                           index_0.2.dover,index_0.3.dover,index_0.4.dover,
+                           index_0.5.dover,index_0.6.dover,index_0.7.dover,index_0.8.dover,
+                           index_0.9.dover,index_1.dover)
+
+names(dover_indices)<-dover_names
+#dover_indices<- map2(dover_sdms, dover_dfs, index_fn)
+dover_indices_df<- bind_fn(dover_indices)
+
+setwd(dover)
+write.csv(dover_fit_df, "dover_fit_df.csv",row.names = F)
+write.csv(dover_pars_df, "dover_pars_df.csv",row.names = F)
+write.csv(dover_fit_check_df, "dover_fit_check_df.csv",row.names = F)
+write.csv(dover_indices_df, "dover_indices_df.csv",row.names = F)
+
+#### Lingcod North ############################################################################################################
+lingcod_n_names<- grep("lingcod", names(species_all_yrs),value = T)
+lingcod_n_dfs<-species_all_yrs[names(species_all_yrs)%in% lingcod_n_names]
+
+lingcod_n_dfs<- lapply(lingcod_n_dfs,lat_filter_34)
+
+lingcod_n_dfs<- lapply(lingcod_n_dfs,depth_filter_450)
+
+#make the names file; edit to include n
+lingcod_n_names<-gsub('lingcod','lingcod_n', lingcod_n_names)
+
+lingcod_n_files<-as.list(lingcod_n_names)
+
+#fit SDMs
+lingcod_n_sdm_fn<- function(x,y){ 
+  #make mesh
+  mesh<- make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500) #or split based on area?
+  
+  #fit model
+  fit<- sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year) + Pass, #fyear and pass_scaled were specified in the configs doc.
+    data = x,
+    mesh = mesh,
+    family = delta_gamma(),
+    time = "Year",
+    anisotropy = TRUE,
+    spatiotemporal = as.list(c("iid","iid"))
+  )
+  
+  #save file
+  saveRDS(fit, paste0("fit_",y,".rds"))
+  
+  return(fit)
+}
+
+#lingcod_n_sdms<-lapply(lingcod_n_dfs,lingcod_n_sdm_fn)
+
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(lingcod_n)
+
+#with predefined function
+lingcod_n_sdms<-foreach(i = seq_along(lingcod_n_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  lingcod_n_sdm_fn(lingcod_n_dfs[[i]],lingcod_n_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+fit_0.1.lingcod_n<-readRDS('fit_0.1.lingcod_n.rds')
+fit_0.2.lingcod_n<-readRDS('fit_0.2.lingcod_n.rds')
+fit_0.3.lingcod_n<-readRDS('fit_0.3.lingcod_n.rds')
+fit_0.4.lingcod_n<-readRDS('fit_0.4.lingcod_n.rds')
+fit_0.5.lingcod_n<-readRDS('fit_0.5.lingcod_n.rds')
+fit_0.6.lingcod_n<-readRDS('fit_0.6.lingcod_n.rds')
+fit_0.7.lingcod_n<-readRDS('fit_0.7.lingcod_n.rds')
+fit_0.8.lingcod_n<-readRDS('fit_0.8.lingcod_n.rds')
+fit_0.9.lingcod_n<-readRDS('fit_0.9.lingcod_n.rds')
+fit_1.lingcod_n<-readRDS('fit_1.lingcod_n.rds')
+
+#make a list
+lingcod_n_sdms<-list(fit_0.1.lingcod_n,
+                 fit_0.2.lingcod_n,fit_0.3.lingcod_n,fit_0.4.lingcod_n,
+                 fit_0.5.lingcod_n,fit_0.6.lingcod_n,fit_0.7.lingcod_n,fit_0.8.lingcod_n,
+                 fit_0.9.lingcod_n,fit_1.lingcod_n)
+
+#fix names vector if some models didn't fit
+#lingcod_n_names<-lingcod_n_names[2:10]
+names(lingcod_n_sdms)<-lingcod_n_names
+
+#extract outputs
+lingcod_n_fits<-lapply(lingcod_n_sdms, fit_df_fn)
+lingcod_n_fit_df<- bind_fn(lingcod_n_fits)
+
+lingcod_n_pars<- lapply(lingcod_n_sdms, fit_pars_fn)
+lingcod_n_pars_df<- bind_fn(lingcod_n_pars)
+
+lingcod_n_fit_check<- lapply(lingcod_n_sdms, fit_check_fn)
+lingcod_n_fit_check_df<- bind_fit_check(lingcod_n_fit_check)
+
+#lingcod_n_indices requires parallel processing for efficiency
+#remove df for which there were problems with the fit
+#lingcod_n_dfs<-lingcod_n_dfs[2:10]
+#lingcod_n_files<-lingcod_n_files[2:10]
+
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(lingcod_n)
+
+#with predefined function
+lingcod_n_indices<-foreach(i = seq_along(lingcod_n_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  index_fn(lingcod_n_sdms[[i]],lingcod_n_dfs[[i]], lingcod_n_files[[i]])
+}  
+
+stopCluster(cl)
+
+#lingcod_n_indices <- foreach(x = lingcod_n_sdms, y = lingcod_n_dfs, .combine = 'list',.packages = 'sdmTMB') %dopar% {
+#  index_fn(x,y)
+#} 
+
+#####read in .rds if already fit
+index_0.1.lingcod_n<-readRDS('index_0.1.lingcod_n.rds')
+index_0.2.lingcod_n<-readRDS('index_0.2.lingcod_n.rds')
+index_0.3.lingcod_n<-readRDS('index_0.3.lingcod_n.rds')
+index_0.4.lingcod_n<-readRDS('index_0.4.lingcod_n.rds')
+index_0.5.lingcod_n<-readRDS('index_0.5.lingcod_n.rds')
+index_0.6.lingcod_n<-readRDS('index_0.6.lingcod_n.rds')
+index_0.7.lingcod_n<-readRDS('index_0.7.lingcod_n.rds')
+index_0.8.lingcod_n<-readRDS('index_0.8.lingcod_n.rds')
+index_0.9.lingcod_n<-readRDS('index_0.9.lingcod_n.rds')
+index_1.lingcod_n<-readRDS('index_1.lingcod_n.rds')
+
+lingcod_n_indices<-list(index_0.1.lingcod_n,
+                    index_0.2.lingcod_n,index_0.3.lingcod_n,index_0.4.lingcod_n,
+                    index_0.5.lingcod_n,index_0.6.lingcod_n,index_0.7.lingcod_n,index_0.8.lingcod_n,
+                    index_0.9.lingcod_n,index_1.lingcod_n)
+
+names(lingcod_n_indices)<-lingcod_n_names
+#lingcod_n_indices<- map2(lingcod_n_sdms, lingcod_n_dfs, index_fn)
+lingcod_n_indices_df<- bind_fn(lingcod_n_indices)
+
+setwd(lingcod_n)
+write.csv(lingcod_n_fit_df, "lingcod_n_fit_df.csv",row.names = F)
+write.csv(lingcod_n_pars_df, "lingcod_n_pars_df.csv",row.names = F)
+write.csv(lingcod_n_fit_check_df, "lingcod_n_fit_check_df.csv",row.names = F)
+write.csv(lingcod_n_indices_df, "lingcod_n_indices_df.csv",row.names = F)
+
+#### Lingcod South ###############################################################################################
+lingcod_s_names<- grep("lingcod", names(species_all_yrs),value = T)
+lingcod_s_dfs<-species_all_yrs[names(species_all_yrs)%in% lingcod_s_names]
+
+lingcod_s_dfs<- lapply(lingcod_s_dfs,lat_filter_34_max)
+
+lingcod_s_dfs<- lapply(lingcod_s_dfs,depth_filter_450)
+
+#make the names file; edit to include s
+lingcod_s_names<-gsub('lingcod','lingcod_s', lingcod_s_names)
+
+lingcod_s_files<-as.list(lingcod_s_names)
+
+#fit SDMs
+lingcod_s_sdm_fn<- function(x,y){ 
+  #make mesh
+  mesh<- make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500) #or split based on area?
+  
+  #fit model
+  fit<- sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year) + Pass, #fyear and pass_scaled were specified in the configs doc.
+    data = x,
+    mesh = mesh,
+    family = delta_gamma(),
+    time = "Year",
+    anisotropy = TRUE,
+    spatiotemporal = as.list(c("iid","iid"))
+  )
+
+  #save file
+  saveRDS(fit, paste0("fit_",y,".rds"))
+  
+  return(fit)
+}
+
+#lingcod_s_sdms<-lapply(lingcod_s_dfs,lingcod_s_sdm_fn)
+
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(lingcod_s)
+
+#with predefined function
+lingcod_s_sdms<-foreach(i = seq_along(lingcod_s_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  lingcod_s_sdm_fn(lingcod_s_dfs[[i]],lingcod_s_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+#fit_0.1.lingcod_s<-readRDS('fit_0.1.lingcod_s.rds')
+#fit_0.2.lingcod_s<-readRDS('fit_0.2.lingcod_s.rds')
+#fit_0.3.lingcod_s<-readRDS('fit_0.3.lingcod_s.rds')
+#fit_0.4.lingcod_s<-readRDS('fit_0.4.lingcod_s.rds')
+#fit_0.5.lingcod_s<-readRDS('fit_0.5.lingcod_s.rds')
+#fit_0.6.lingcod_s<-readRDS('fit_0.6.lingcod_s.rds')
+fit_0.7.lingcod_s<-readRDS('fit_0.7.lingcod_s.rds')
+fit_0.8.lingcod_s<-readRDS('fit_0.8.lingcod_s.rds')
+#fit_0.9.lingcod_s<-readRDS('fit_0.9.lingcod_s.rds')
+fit_1.lingcod_s<-readRDS('fit_1.lingcod_s.rds')
+
+#make a list
+lingcod_s_sdms<-list(#fit_0.1.lingcod_s,
+  #fit_0.2.lingcod_s,fit_0.3.lingcod_s,fit_0.4.lingcod_s,
+  #fit_0.5.lingcod_s,fit_0.6.lingcod_s,
+  fit_0.7.lingcod_s,fit_0.8.lingcod_s,
+  #fit_0.9.lingcod_s,
+  fit_1.lingcod_s)
+
+#fix names vector if some models didn't fit
+lingcod_s_names<-lingcod_s_names[c(7,8,10)]
+names(lingcod_s_sdms)<-lingcod_s_names
+
+#extract outputs
+lingcod_s_fits<-lapply(lingcod_s_sdms, fit_df_fn)
+lingcod_s_fit_df<- bind_fn(lingcod_s_fits)
+
+lingcod_s_pars<- lapply(lingcod_s_sdms, fit_pars_fn)
+lingcod_s_pars_df<- bind_fn(lingcod_s_pars)
+
+lingcod_s_fit_check<- lapply(lingcod_s_sdms, fit_check_fn)
+lingcod_s_fit_check_df<- bind_fit_check(lingcod_s_fit_check)
+
+#lingcod_s_indices requires parallel processing for efficiency
+#remove df for which there were problems with the fit
+lingcod_s_dfs<-lingcod_s_dfs[c(7,8,10)]
+lingcod_s_files<-lingcod_s_files[c(7,8,10)]
+
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(lingcod_s)
+
+#with predefined function
+lingcod_s_indices<-foreach(i = seq_along(lingcod_s_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  index_fn(lingcod_s_sdms[[i]],lingcod_s_dfs[[i]], lingcod_s_files[[i]])
+}  
+
+stopCluster(cl)
+
+#lingcod_s_indices <- foreach(x = lingcod_s_sdms, y = lingcod_s_dfs, .combine = 'list',.packages = 'sdmTMB') %dopar% {
+#  index_fn(x,y)
+#} 
+
+#####read in .rds if already fit
+#index_0.1.lingcod_s<-readRDS('index_0.1.lingcod_s.rds')
+#index_0.2.lingcod_s<-readRDS('index_0.2.lingcod_s.rds')
+#index_0.3.lingcod_s<-readRDS('index_0.3.lingcod_s.rds')
+#index_0.4.lingcod_s<-readRDS('index_0.4.lingcod_s.rds')
+#index_0.5.lingcod_s<-readRDS('index_0.5.lingcod_s.rds')
+#index_0.6.lingcod_s<-readRDS('index_0.6.lingcod_s.rds')
+index_0.7.lingcod_s<-readRDS('index_0.7.lingcod_s.rds')
+index_0.8.lingcod_s<-readRDS('index_0.8.lingcod_s.rds')
+#index_0.9.lingcod_s<-readRDS('index_0.9.lingcod_s.rds')
+index_1.lingcod_s<-readRDS('index_1.lingcod_s.rds')
+
+lingcod_s_indices<-list(#index_0.1.lingcod_s,
+                        #index_0.2.lingcod_s,index_0.3.lingcod_s,index_0.4.lingcod_s,
+                        #index_0.5.lingcod_s,index_0.6.lingcod_s,
+                        index_0.7.lingcod_s,index_0.8.lingcod_s,
+                        #index_0.9.lingcod_s,
+                        index_1.lingcod_s)
+
+names(lingcod_s_indices)<-lingcod_s_names
+
+#lingcod_s_indices<- map2(lingcod_s_sdms, lingcod_s_dfs, index_fn)
+lingcod_s_indices_df<- bind_fn(lingcod_s_indices)
+
+setwd(lingcod_s)
+write.csv(lingcod_s_fit_df, "lingcod_s_fit_df.csv",row.names = F)
+write.csv(lingcod_s_pars_df, "lingcod_s_pars_df.csv",row.names = F)
+write.csv(lingcod_s_fit_check_df, "lingcod_s_fit_check_df.csv",row.names = F)
+write.csv(lingcod_s_indices_df, "lingcod_s_indices_df.csv",row.names = F)
+
+#### Longnose Skate ###########################################################################################################
+longnose_names<- grep("longnose skate", names(species_all_yrs),value = T)
+longnose_dfs<-species_all_yrs[names(species_all_yrs)%in% longnose_names]
+
+#make the names file
+longnose_files<-as.list(longnose_names)
+
+#fit SDMs
+longnose_sdm_fn<- function(x,y){ 
+  #make mesh
+  mesh<- make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
+  
+  #fit model
+  fit<- sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year) + Pass, #fyear and pass_scaled were specified in the configs doc.
+    data = x,
+    mesh = mesh,
+    family = delta_gamma(),
+    time = "Year",
+    anisotropy = TRUE,
+    spatiotemporal = as.list(c("iid","iid"))
+  )
+
+  #save file
+  saveRDS(fit, paste0("fit_",y,".rds"))
+  
+  return(fit)
+}
+
+#longnose_sdms<-lapply(longnose_dfs,longnose_sdm_fn)
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(longnose)
+
+#with predefined function
+longnose_sdms<-foreach(i = seq_along(longnose_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  longnose_sdm_fn(longnose_dfs[[i]],longnose_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+fit_0.1.longnose<-readRDS('fit_0.1.longnose skate.rds')
+fit_0.2.longnose<-readRDS('fit_0.2.longnose skate.rds')
+fit_0.3.longnose<-readRDS('fit_0.3.longnose skate.rds')
+fit_0.4.longnose<-readRDS('fit_0.4.longnose skate.rds')
+fit_0.5.longnose<-readRDS('fit_0.5.longnose skate.rds')
+fit_0.6.longnose<-readRDS('fit_0.6.longnose skate.rds')
+fit_0.7.longnose<-readRDS('fit_0.7.longnose skate.rds')
+fit_0.8.longnose<-readRDS('fit_0.8.longnose skate.rds')
+fit_0.9.longnose<-readRDS('fit_0.9.longnose skate.rds')
+fit_1.longnose<-readRDS('fit_1.longnose skate.rds')
+
+#make a list
+longnose_sdms<-list(fit_0.1.longnose,
+                     fit_0.2.longnose,fit_0.3.longnose,fit_0.4.longnose,
+                     fit_0.5.longnose,fit_0.6.longnose,fit_0.7.longnose,fit_0.8.longnose,
+                     fit_0.9.longnose,fit_1.longnose)
+
+#fix names vector if some models didn't fit
+#longnose_names<-longnose_names[2:10]
+names(longnose_sdms)<-longnose_names
+
+#extract outputs
+longnose_fits<-lapply(longnose_sdms, fit_df_fn)
+longnose_fit_df<- bind_fn(longnose_fits)
+
+longnose_pars<- lapply(longnose_sdms, fit_pars_fn)
+longnose_pars_df<- bind_fn(longnose_pars)
+
+longnose_fit_check<- lapply(longnose_sdms, fit_check_fn)
+longnose_fit_check_df<- bind_fit_check(longnose_fit_check)
+
+#longnose_indices requires parallel processing for efficiency
+#remove df for which there were problems with the fit
+#longnose_dfs<-longnose_dfs[2:10]
+#longnose_files<-longnose_files[2:10]
+
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(longnose)
+
+#with predefined function
+longnose_indices<-foreach(i = seq_along(longnose_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  index_fn(longnose_sdms[[i]],longnose_dfs[[i]], longnose_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+index_0.1.longnose<-readRDS('index_0.1.longnose skate.rds')
+index_0.2.longnose<-readRDS('index_0.2.longnose skate.rds')
+index_0.3.longnose<-readRDS('index_0.3.longnose skate.rds')
+index_0.4.longnose<-readRDS('index_0.4.longnose skate.rds')
+index_0.5.longnose<-readRDS('index_0.5.longnose skate.rds')
+index_0.6.longnose<-readRDS('index_0.6.longnose skate.rds')
+index_0.7.longnose<-readRDS('index_0.7.longnose skate.rds')
+index_0.8.longnose<-readRDS('index_0.8.longnose skate.rds')
+index_0.9.longnose<-readRDS('index_0.9.longnose skate.rds')
+index_1.longnose<-readRDS('index_1.longnose skate.rds')
+
+longnose_indices<-list(index_0.1.longnose,
+                        index_0.2.longnose,index_0.3.longnose,index_0.4.longnose,
+                        index_0.5.longnose,index_0.6.longnose,index_0.7.longnose,index_0.8.longnose,
+                        index_0.9.longnose,index_1.longnose)
+
+names(longnose_indices)<-longnose_names
+
+#longnose_indices<- map2(longnose_sdms, longnose_dfs, index_fn)
+longnose_indices_df<- bind_fn(longnose_indices)
+
+setwd(longnose)
+write.csv(longnose_fit_df, "longnose_fit_df.csv",row.names = F)
+write.csv(longnose_pars_df, "longnose_pars_df.csv",row.names = F)
+write.csv(longnose_fit_check_df, "longnose_fit_check_df.csv",row.names = F)
+write.csv(longnose_indices_df, "longnose_indices_df.csv",row.names = F)
+
+#### Pacific ocean perch ######################################################################################################
+pop_names<- grep("Pacific ocean perch", names(species_all_yrs),value = T)
+pop_dfs<-species_all_yrs[names(species_all_yrs)%in% pop_names]
+
+pop_dfs<- lapply(pop_dfs,lat_filter_35)
+
+pop_dfs<- lapply(pop_dfs,depth_filter_500)
+
+#make the names file
+pop_files<-as.list(pop_names)
+
+#fit SDMs
+pop_sdm_fn<- function(x,y){ 
+  #make mesh
+  mesh<- make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
+  
+  #fit model
+  fit<- sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year) + Pass, #fyear and pass_scaled were specified in the configs doc.
+    data = x,
+    mesh = mesh,
+    family = delta_gamma(),
+    time = "Year",
+    anisotropy = TRUE,
+    spatiotemporal = as.list(c("iid","iid"))
+  )
+
+  #save file
+  saveRDS(fit, paste0("fit_",y,".rds"))
+  
+  return(fit)
+}
+
+#pop_sdms<-lapply(pop_dfs,pop_sdm_fn)
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(pop)
+
+#with predefined function
+pop_sdms<-foreach(i = seq_along(pop_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  pop_sdm_fn(pop_dfs[[i]],pop_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+fit_0.1.pop<-readRDS('fit_0.1.Pacific ocean perch.rds')
+fit_0.2.pop<-readRDS('fit_0.2.Pacific ocean perch.rds')
+fit_0.3.pop<-readRDS('fit_0.3.Pacific ocean perch.rds')
+fit_0.4.pop<-readRDS('fit_0.4.Pacific ocean perch.rds')
+fit_0.5.pop<-readRDS('fit_0.5.Pacific ocean perch.rds')
+fit_0.6.pop<-readRDS('fit_0.6.Pacific ocean perch.rds')
+fit_0.7.pop<-readRDS('fit_0.7.Pacific ocean perch.rds')
+fit_0.8.pop<-readRDS('fit_0.8.Pacific ocean perch.rds')
+fit_0.9.pop<-readRDS('fit_0.9.Pacific ocean perch.rds')
+fit_1.pop<-readRDS('fit_1.Pacific ocean perch.rds')
+
+#make a list
+pop_sdms<-list(fit_0.1.pop,
+                    fit_0.2.pop,fit_0.3.pop,fit_0.4.pop,
+                    fit_0.5.pop,fit_0.6.pop,fit_0.7.pop,fit_0.8.pop,
+                    fit_0.9.pop,fit_1.pop)
+
+#fix names vector if some models didn't fit
+#pop_names<-pop_names[2:10]
+names(pop_sdms)<-pop_names
+
+#extract outputs
+pop_fits<-lapply(pop_sdms, fit_df_fn)
+pop_fit_df<- bind_fn(pop_fits)
+
+pop_pars<- lapply(pop_sdms, fit_pars_fn)
+pop_pars_df<- bind_fn(pop_pars)
+
+pop_fit_check<- lapply(pop_sdms, fit_check_fn)
+pop_fit_check_df<- bind_fit_check(pop_fit_check)
+
+#pop_indices requires parallel processing for efficiency
+#remove df for which there were problems with the fit
+#pop_dfs<-pop_dfs[2:10]
+#pop_files<-pop_files[2:10]
+
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(pop)
+
+#with predefined function
+pop_indices<-foreach(i = seq_along(pop_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  index_fn(pop_sdms[[i]],pop_dfs[[i]], pop_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+index_0.1.pop<-readRDS('index_0.1.Pacific ocean perch.rds')
+index_0.2.pop<-readRDS('index_0.2.Pacific ocean perch.rds')
+index_0.3.pop<-readRDS('index_0.3.Pacific ocean perch.rds')
+index_0.4.pop<-readRDS('index_0.4.Pacific ocean perch.rds')
+index_0.5.pop<-readRDS('index_0.5.Pacific ocean perch.rds')
+index_0.6.pop<-readRDS('index_0.6.Pacific ocean perch.rds')
+index_0.7.pop<-readRDS('index_0.7.Pacific ocean perch.rds')
+index_0.8.pop<-readRDS('index_0.8.Pacific ocean perch.rds')
+index_0.9.pop<-readRDS('index_0.9.Pacific ocean perch.rds')
+index_1.pop<-readRDS('index_1.Pacific ocean perch.rds')
+
+pop_indices<-list(index_0.1.pop,
+                       index_0.2.pop,index_0.3.pop,index_0.4.pop,
+                       index_0.5.pop,index_0.6.pop,index_0.7.pop,index_0.8.pop,
+                       index_0.9.pop,index_1.pop)
+
+names(pop_indices)<-pop_names
+#pop_indices<- map2(pop_sdms, pop_dfs, index_fn)
+pop_indices_df<- bind_fn(pop_indices)
+
+setwd(pop)
+write.csv(pop_fit_df, "pop_fit_df.csv",row.names = F)
+write.csv(pop_pars_df, "pop_pars_df.csv",row.names = F)
+write.csv(pop_fit_check_df, "pop_fit_check_df.csv",row.names = F)
+write.csv(pop_indices_df, "pop_indices_df.csv",row.names = F)
+
+#### Pacific spiny dogfish ########################################################################################################
+dogfish_names<- grep("Pacific spiny dogfish", names(species_all_yrs),value = T)
+dogfish_dfs<-species_all_yrs[names(species_all_yrs)%in% dogfish_names]
+
+dogfish_dfs<- lapply(dogfish_dfs,depth_filter_700)
+
+#make the names file
+dogfish_files<-as.list(dogfish_names)
+
+#fit SDMs
+dogfish_sdm_fn<- function(x,y){ 
+  #make mesh
+  mesh<- make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
+  
+  #fit model
+  fit<- sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year) + Pass, #fyear and pass_scaled were specified in the configs doc.
+    data = x,
+    mesh = mesh,
+    family = delta_lognormal(),
+    time = "Year",
+    anisotropy = TRUE,
+    spatiotemporal = as.list(c("iid","iid"))
+  )
+
+  #save file
+  saveRDS(fit, paste0("fit_",y,".rds"))
+  
+  return(fit)
+}
+
+#dogfish_sdms<-lapply(dogfish_dfs,dogfish_sdm_fn)
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(dogfish)
+
+#with predefined function
+dogfish_sdms<-foreach(i = seq_along(dogfish_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  dogfish_sdm_fn(dogfish_dfs[[i]],dogfish_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+fit_0.1.dogfish<-readRDS('fit_0.1.Pacific spiny dogfish.rds')
+fit_0.2.dogfish<-readRDS('fit_0.2.Pacific spiny dogfish.rds')
+fit_0.3.dogfish<-readRDS('fit_0.3.Pacific spiny dogfish.rds')
+fit_0.4.dogfish<-readRDS('fit_0.4.Pacific spiny dogfish.rds')
+fit_0.5.dogfish<-readRDS('fit_0.5.Pacific spiny dogfish.rds')
+fit_0.6.dogfish<-readRDS('fit_0.6.Pacific spiny dogfish.rds')
+fit_0.7.dogfish<-readRDS('fit_0.7.Pacific spiny dogfish.rds')
+fit_0.8.dogfish<-readRDS('fit_0.8.Pacific spiny dogfish.rds')
+fit_0.9.dogfish<-readRDS('fit_0.9.Pacific spiny dogfish.rds')
+fit_1.dogfish<-readRDS('fit_1.Pacific spiny dogfish.rds')
+
+#make a list
+dogfish_sdms<-list(fit_0.1.dogfish,
+               fit_0.2.dogfish,fit_0.3.dogfish,fit_0.4.dogfish,
+               fit_0.5.dogfish,fit_0.6.dogfish,fit_0.7.dogfish,fit_0.8.dogfish,
+               fit_0.9.dogfish,fit_1.dogfish)
+
+#fix names vector if some models didn't fit
+#dogfish_names<-dogfish_names[2:10]
+names(dogfish_sdms)<-dogfish_names
+
+#extract outputs
+dogfish_fits<-lapply(dogfish_sdms, fit_df_fn)
+dogfish_fit_df<- bind_fn(dogfish_fits)
+
+dogfish_pars<- lapply(dogfish_sdms, fit_pars_fn)
+dogfish_pars_df<- bind_fn(dogfish_pars)
+
+dogfish_fit_check<- lapply(dogfish_sdms, fit_check_fn)
+dogfish_fit_check_df<- bind_fit_check(dogfish_fit_check)
+
+#dogfish_indices requires parallel processing for efficiency
+#remove df for which there were problems with the fit
+#dogfish_dfs<-dogfish_dfs[2:10]
+#dogfish_files<-dogfish_files[2:10]
+
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(output)
+
+#with predefined function
+dogfish_indices<-foreach(i = seq_along(dogfish_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  index_fn(dogfish_sdms[[i]],dogfish_dfs[[i]], dogfish_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+index_0.1.dogfish<-readRDS('index_0.1.Pacific spiny dogfish.rds')
+index_0.2.dogfish<-readRDS('index_0.2.Pacific spiny dogfish.rds')
+index_0.3.dogfish<-readRDS('index_0.3.Pacific spiny dogfish.rds')
+index_0.4.dogfish<-readRDS('index_0.4.Pacific spiny dogfish.rds')
+index_0.5.dogfish<-readRDS('index_0.5.Pacific spiny dogfish.rds')
+index_0.6.dogfish<-readRDS('index_0.6.Pacific spiny dogfish.rds')
+index_0.7.dogfish<-readRDS('index_0.7.Pacific spiny dogfish.rds')
+index_0.8.dogfish<-readRDS('index_0.8.Pacific spiny dogfish.rds')
+index_0.9.dogfish<-readRDS('index_0.9.Pacific spiny dogfish.rds')
+index_1.dogfish<-readRDS('index_1.Pacific spiny dogfish.rds')
+
+dogfish_indices<-list(index_0.1.dogfish,
+                  index_0.2.dogfish,index_0.3.dogfish,index_0.4.dogfish,
+                  index_0.5.dogfish,index_0.6.dogfish,index_0.7.dogfish,index_0.8.dogfish,
+                  index_0.9.dogfish,index_1.dogfish)
+
+names(dogfish_indices)<-dogfish_names
+#dogfish_indices<- map2(dogfish_sdms, dogfish_dfs, index_fn)
+dogfish_indices_df<- bind_fn(dogfish_indices)
+
+setwd(output)
+write.csv(dogfish_fit_df, "dogfish_fit_df.csv",row.names = F)
+write.csv(dogfish_pars_df, "dogfish_pars_df.csv",row.names = F)
+write.csv(dogfish_fit_check_df, "dogfish_fit_check_df.csv",row.names = F)
+write.csv(dogfish_indices_df, "dogfish_indices_df.csv",row.names = F)
+
+#### Petrale sole #############################################################################################################
+petrale_names<- grep("petrale sole", names(species_all_yrs),value = T)
+petrale_dfs<-species_all_yrs[names(species_all_yrs)%in% petrale_names]
+
+petrale_dfs<- lapply(petrale_dfs,depth_filter_675)
+
+#make the names file
+petrale_files<-as.list(petrale_names)
+
+#fit SDMs
+petrale_sdm_fn<- function(x,y){ 
+  #make mesh
+  mesh<- make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
+  
+  #fit model
+  fit<- sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year) + Pass, #fyear and pass_scaled were specified in the configs doc.
+    data = x,
+    mesh = mesh,
+    family = delta_lognormal(),
+    time = "Year",
+    anisotropy = TRUE,
+    spatiotemporal = as.list(c("iid","iid"))
+  )
+
+  #save file
+  saveRDS(fit, paste0("fit_",y,".rds"))
+  
+  return(fit)
+}
+
+#petrale_sdms<-lapply(petrale_dfs,petrale_sdm_fn)
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(petrale)
+
+#with predefined function
+petrale_sdms<-foreach(i = seq_along(petrale_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  petrale_sdm_fn(petrale_dfs[[i]],petrale_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+fit_0.1.petrale<-readRDS('fit_0.1.petrale sole.rds')
+fit_0.2.petrale<-readRDS('fit_0.2.petrale sole.rds')
+fit_0.3.petrale<-readRDS('fit_0.3.petrale sole.rds')
+fit_0.4.petrale<-readRDS('fit_0.4.petrale sole.rds')
+fit_0.5.petrale<-readRDS('fit_0.5.petrale sole.rds')
+fit_0.6.petrale<-readRDS('fit_0.6.petrale sole.rds')
+fit_0.7.petrale<-readRDS('fit_0.7.petrale sole.rds')
+fit_0.8.petrale<-readRDS('fit_0.8.petrale sole.rds')
+fit_0.9.petrale<-readRDS('fit_0.9.petrale sole.rds')
+fit_1.petrale<-readRDS('fit_1.petrale sole.rds')
+
+#make a list
+petrale_sdms<-list(fit_0.1.petrale,
+                   fit_0.2.petrale,fit_0.3.petrale,fit_0.4.petrale,
+                   fit_0.5.petrale,fit_0.6.petrale,fit_0.7.petrale,
+                  fit_0.8.petrale,
+                   fit_0.9.petrale,fit_1.petrale)
+
+#fix names vector if some models didn't fit
+#petrale_names<-petrale_names[2:10]
+names(petrale_sdms)<-petrale_names
+
+#extract outputs
+petrale_fits<-lapply(petrale_sdms, fit_df_fn)
+petrale_fit_df<- bind_fn(petrale_fits)
+
+petrale_pars<- lapply(petrale_sdms, fit_pars_fn)
+petrale_pars_df<- bind_fn(petrale_pars)
+
+petrale_fit_check<- lapply(petrale_sdms, fit_check_fn)
+petrale_fit_check_df<- bind_fit_check(petrale_fit_check)
+
+#petrale_indices requires parallel processing for efficiency
+#remove df for which there were problems with the fit
+#petrale_dfs<-petrale_dfs[8:10]
+#petrale_files<-petrale_files[8:10]
+
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(petrale)
+
+#with predefined function
+petrale_indices<-foreach(i = seq_along(petrale_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  index_fn(petrale_sdms[[i]],petrale_dfs[[i]], petrale_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+index_0.1.petrale<-readRDS('index_0.1.petrale sole.rds')
+index_0.2.petrale<-readRDS('index_0.2.petrale sole.rds')
+index_0.3.petrale<-readRDS('index_0.3.petrale sole.rds')
+index_0.4.petrale<-readRDS('index_0.4.petrale sole.rds')
+index_0.5.petrale<-readRDS('index_0.5.petrale sole.rds')
+index_0.6.petrale<-readRDS('index_0.6.petrale sole.rds')
+index_0.7.petrale<-readRDS('index_0.7.petrale sole.rds')
+index_0.8.petrale<-readRDS('index_0.8.petrale sole.rds')
+index_0.9.petrale<-readRDS('index_0.9.petrale sole.rds')
+index_1.petrale<-readRDS('index_1.petrale sole.rds')
+
+petrale_indices<-list(index_0.1.petrale,
+                      index_0.2.petrale,index_0.3.petrale,index_0.4.petrale,
+                      index_0.5.petrale,index_0.6.petrale,index_0.7.petrale,index_0.8.petrale,
+                      index_0.9.petrale,index_1.petrale)
+
+names(petrale_indices)<-petrale_names
+#petrale_indices<- map2(petrale_sdms, petrale_dfs, index_fn)
+petrale_indices_df<- bind_fn(petrale_indices)
+
+setwd(petrale)
+write.csv(petrale_fit_df, "petrale_fit_df.csv",row.names = F)
+write.csv(petrale_pars_df, "petrale_pars_df.csv",row.names = F)
+write.csv(petrale_fit_check_df, "petrale_fit_check_df.csv",row.names = F)
+write.csv(petrale_indices_df, "petrale_indices_df.csv",row.names = F)
+
+#### Rex sole #################################################################################################################
+rex_names<- grep("rex sole", names(species_all_yrs),value = T)
+rex_dfs<-species_all_yrs[names(species_all_yrs)%in% rex_names]
+
+rex_dfs<- lapply(rex_dfs,depth_filter_700)
+
+#make the names file
+rex_files<-as.list(rex_names)
+
+#fit SDMs
+rex_sdm_fn<- function(x,y){ 
+  #make mesh
+  mesh<- make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
+  
+  #fit model
+  fit<- sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year) + Pass, #fyear and pass_scaled were specified in the configs doc.
+    data = x,
+    mesh = mesh,
+    family = delta_gamma(),
+    time = "Year",
+    anisotropy = TRUE,
+    spatiotemporal = as.list(c("iid","iid"))
+  )
+
+  #save file
+  saveRDS(fit, paste0("fit_",y,".rds"))
+  
+  return(fit)
+}
+
+#rex_sdms<-lapply(rex_dfs,rex_sdm_fn)
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(rex)
+
+#with predefined function
+rex_sdms<-foreach(i = seq_along(rex_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  rex_sdm_fn(rex_dfs[[i]],rex_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+fit_0.1.rex<-readRDS('fit_0.1.rex sole.rds')
+fit_0.2.rex<-readRDS('fit_0.2.rex sole.rds')
+fit_0.3.rex<-readRDS('fit_0.3.rex sole.rds')
+fit_0.4.rex<-readRDS('fit_0.4.rex sole.rds')
+fit_0.5.rex<-readRDS('fit_0.5.rex sole.rds')
+fit_0.6.rex<-readRDS('fit_0.6.rex sole.rds')
+fit_0.7.rex<-readRDS('fit_0.7.rex sole.rds')
+fit_0.8.rex<-readRDS('fit_0.8.rex sole.rds')
+fit_0.9.rex<-readRDS('fit_0.9.rex sole.rds')
+fit_1.rex<-readRDS('fit_1.rex sole.rds')
+
+#make a list
+rex_sdms<-list(fit_0.1.rex,
+                   fit_0.2.rex,fit_0.3.rex,fit_0.4.rex,
+                   fit_0.5.rex,fit_0.6.rex,fit_0.7.rex,fit_0.8.rex,
+                   fit_0.9.rex,fit_1.rex)
+
+#fix names vector if some models didn't fit
+#rex_names<-rex_names[2:10]
+names(rex_sdms)<-rex_names
+
+#extract outputs
+rex_fits<-lapply(rex_sdms, fit_df_fn)
+rex_fit_df<- bind_fn(rex_fits)
+
+rex_pars<- lapply(rex_sdms, fit_pars_fn)
+rex_pars_df<- bind_fn(rex_pars)
+
+rex_fit_check<- lapply(rex_sdms, fit_check_fn)
+rex_fit_check_df<- bind_fit_check(rex_fit_check)
+
+#rex_indices requires parallel processing for efficiency
+#remove df for which there were problems with the fit
+#rex_dfs<-rex_dfs[2:10]
+#rex_files<-rex_files[2:10]
+
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(rex)
+
+#with predefined function
+rex_indices<-foreach(i = seq_along(rex_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  index_fn(rex_sdms[[i]],rex_dfs[[i]], rex_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+index_0.1.rex<-readRDS('index_0.1.rex sole.rds')
+index_0.2.rex<-readRDS('index_0.2.rex sole.rds')
+index_0.3.rex<-readRDS('index_0.3.rex sole.rds')
+index_0.4.rex<-readRDS('index_0.4.rex sole.rds')
+index_0.5.rex<-readRDS('index_0.5.rex sole.rds')
+index_0.6.rex<-readRDS('index_0.6.rex sole.rds')
+index_0.7.rex<-readRDS('index_0.7.rex sole.rds')
+index_0.8.rex<-readRDS('index_0.8.rex sole.rds')
+index_0.9.rex<-readRDS('index_0.9.rex sole.rds')
+index_1.rex<-readRDS('index_1.rex sole.rds')
+
+rex_indices<-list(index_0.1.rex,
+                      index_0.2.rex,index_0.3.rex,index_0.4.rex,
+                      index_0.5.rex,index_0.6.rex,index_0.7.rex,index_0.8.rex,
+                      index_0.9.rex,index_1.rex)
+
+names(rex_indices)<-rex_names
+#rex_indices<- map2(rex_sdms, rex_dfs, index_fn)
+rex_indices_df<- bind_fn(rex_indices)
+
+setwd(rex)
+write.csv(rex_fit_df, "rex_fit_df.csv",row.names = F)
+write.csv(rex_pars_df, "rex_pars_df.csv",row.names = F)
+write.csv(rex_fit_check_df, "rex_fit_check_df.csv",row.names = F)
+write.csv(rex_indices_df, "rex_indices_df.csv",row.names = F)
+
+#### Sablefish ##################################################################################################################
+sablefish_names<- grep("sablefish", names(species_all_yrs),value = T)
+sablefish_dfs<-species_all_yrs[names(species_all_yrs)%in% sablefish_names]
+
+#make the names file
+sablefish_files<-as.list(sablefish_names)
+
+#fit SDMs
+sablefish_sdm_fn<- function(x,y){ 
+  #make mesh
+  mesh<- make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
+  
+  #fit model
+  fit<- sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year) + Pass, #fyear and pass_scaled were specified in the configs doc.
+    data = x,
+    mesh = mesh,
+    family = delta_lognormal(),
+    time = "Year",
+    anisotropy = TRUE,
+    spatiotemporal = as.list(c("iid","iid"))
+    )
+
+  #save file
+  saveRDS(fit, paste0("fit_",y,".rds"))
+  
+  return(fit)
+}
+
+#sablefish_sdms<-lapply(sablefish_dfs,sablefish_sdm_fn)
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(sablefish)
+
+#with predefined function
+sablefish_sdms<-foreach(i = seq_along(sablefish_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  sablefish_sdm_fn(sablefish_dfs[[i]],sablefish_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+fit_0.1.sablefish<-readRDS('fit_0.1.sablefish.rds')
+fit_0.2.sablefish<-readRDS('fit_0.2.sablefish.rds')
+fit_0.3.sablefish<-readRDS('fit_0.3.sablefish.rds')
+fit_0.4.sablefish<-readRDS('fit_0.4.sablefish.rds')
+fit_0.5.sablefish<-readRDS('fit_0.5.sablefish.rds')
+fit_0.6.sablefish<-readRDS('fit_0.6.sablefish.rds')
+fit_0.7.sablefish<-readRDS('fit_0.7.sablefish.rds')
+fit_0.8.sablefish<-readRDS('fit_0.8.sablefish.rds')
+fit_0.9.sablefish<-readRDS('fit_0.9.sablefish.rds')
+fit_1.sablefish<-readRDS('fit_1.sablefish.rds')
+
+#make a list
+sablefish_sdms<-list(fit_0.1.sablefish,
+               fit_0.2.sablefish,fit_0.3.sablefish,fit_0.4.sablefish,
+               fit_0.5.sablefish,fit_0.6.sablefish,fit_0.7.sablefish,fit_0.8.sablefish,
+               fit_0.9.sablefish,fit_1.sablefish)
+
+#fix names vector if some models didn't fit
+#sablefish_names<-sablefish_names[2:10]
+names(sablefish_sdms)<-sablefish_names
+
+#extract outputs
+sablefish_fits<-lapply(sablefish_sdms, fit_df_fn)
+sablefish_fit_df<- bind_fn(sablefish_fits)
+
+sablefish_pars<- lapply(sablefish_sdms, fit_pars_fn)
+sablefish_pars_df<- bind_fn(sablefish_pars)
+
+sablefish_fit_check<- lapply(sablefish_sdms, fit_check_fn)
+sablefish_fit_check_df<- bind_fit_check(sablefish_fit_check)
+
+#sablefish_indices requires parallel processing for efficiency
+#remove df for which there were problems with the fit
+#sablefish_dfs<-sablefish_dfs[2:10]
+#sablefish_files<-sablefish_files[2:10]
+
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(sablefish)
+
+#with predefined function
+sablefish_indices<-foreach(i = seq_along(sablefish_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  index_fn(sablefish_sdms[[i]],sablefish_dfs[[i]], sablefish_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+index_0.1.sablefish<-readRDS('index_0.1.sablefish.rds')
+index_0.2.sablefish<-readRDS('index_0.2.sablefish.rds')
+index_0.3.sablefish<-readRDS('index_0.3.sablefish.rds')
+index_0.4.sablefish<-readRDS('index_0.4.sablefish.rds')
+index_0.5.sablefish<-readRDS('index_0.5.sablefish.rds')
+index_0.6.sablefish<-readRDS('index_0.6.sablefish.rds')
+index_0.7.sablefish<-readRDS('index_0.7.sablefish.rds')
+index_0.8.sablefish<-readRDS('index_0.8.sablefish.rds')
+index_0.9.sablefish<-readRDS('index_0.9.sablefish.rds')
+index_1.sablefish<-readRDS('index_1.sablefish.rds')
+
+sablefish_indices<-list(index_0.1.sablefish,
+                  index_0.2.sablefish,index_0.3.sablefish,index_0.4.sablefish,
+                  index_0.5.sablefish,index_0.6.sablefish,index_0.7.sablefish,index_0.8.sablefish,
+                  index_0.9.sablefish,index_1.sablefish)
+
+names(sablefish_indices)<-sablefish_names
+
+#sablefish_indices<- map2(sablefish_sdms, sablefish_dfs, index_fn)
+sablefish_indices_df<- bind_fn(sablefish_indices)
+
+setwd(sablefish)
+write.csv(sablefish_fit_df, "sablefish_fit_df.csv",row.names = F)
+write.csv(sablefish_pars_df, "sablefish_pars_df.csv",row.names = F)
+write.csv(sablefish_fit_check_df, "sablefish_fit_check_df.csv",row.names = F)
+write.csv(sablefish_indices_df, "sablefish_indices_df.csv",row.names = F)
+
+#### Shortspine thornyhead ####################################################################################################
+shortspine_names<- grep("shortspine thornyhead", names(species_all_yrs),value = T)
+shortspine_dfs<-species_all_yrs[names(species_all_yrs)%in% shortspine_names]
+
+#make the names file
+shortspine_files<-as.list(shortspine_names)
+
+#fit SDMs
+shortspine_sdm_fn<- function(x,y){ 
+  #make mesh
+  mesh<- make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
+  
+  #fit model
+  fit<- sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year) + Pass + Depth_m + (Depth_m^2), #fyear and pass_scaled were specified in the configs doc.
+    data = x,
+    mesh = mesh,
+    family = delta_lognormal(),
+    time = "Year",
+    anisotropy = TRUE,
+    spatiotemporal = as.list(c("iid","iid"))
+  )
+
+  #save file
+  saveRDS(fit, paste0("fit_",y,".rds"))
+  
+  return(fit)
+}
+
+#shortspine_sdms<-lapply(shortspine_dfs,shortspine_sdm_fn)
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(shortspine)
+
+#with predefined function
+shortspine_sdms<-foreach(i = seq_along(shortspine_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  shortspine_sdm_fn(shortspine_dfs[[i]],shortspine_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+fit_0.1.shortspine<-readRDS('fit_0.1.shortspine thornyhead.rds')
+fit_0.2.shortspine<-readRDS('fit_0.2.shortspine thornyhead.rds')
+fit_0.3.shortspine<-readRDS('fit_0.3.shortspine thornyhead.rds')
+fit_0.4.shortspine<-readRDS('fit_0.4.shortspine thornyhead.rds')
+fit_0.5.shortspine<-readRDS('fit_0.5.shortspine thornyhead.rds')
+fit_0.6.shortspine<-readRDS('fit_0.6.shortspine thornyhead.rds')
+fit_0.7.shortspine<-readRDS('fit_0.7.shortspine thornyhead.rds')
+fit_0.8.shortspine<-readRDS('fit_0.8.shortspine thornyhead.rds')
+fit_0.9.shortspine<-readRDS('fit_0.9.shortspine thornyhead.rds')
+fit_1.shortspine<-readRDS('fit_1.shortspine thornyhead.rds')
+
+#make a list
+shortspine_sdms<-list(fit_0.1.shortspine,
+                     fit_0.2.shortspine,fit_0.3.shortspine,fit_0.4.shortspine,
+                     fit_0.5.shortspine,fit_0.6.shortspine,fit_0.7.shortspine,fit_0.8.shortspine,
+                     fit_0.9.shortspine,fit_1.shortspine)
+
+#fix names vector if some models didn't fit
+#shortspine_names<-shortspine_names[2:10]
+names(shortspine_sdms)<-shortspine_names
+
+#extract outputs
+shortspine_fits<-lapply(shortspine_sdms, fit_df_fn)
+shortspine_fit_df<- bind_fn(shortspine_fits)
+
+shortspine_pars<- lapply(shortspine_sdms, fit_pars_fn)
+shortspine_pars_df<- bind_fn(shortspine_pars)
+
+shortspine_fit_check<- lapply(shortspine_sdms, fit_check_fn)
+shortspine_fit_check_df<- bind_fit_check(shortspine_fit_check)
+
+#shortspine_indices requires parallel processing for efficiency
+#remove df for which there were problems with the fit
+#shortspine_dfs<-shortspine_dfs[2:10]
+#shortspine_files<-shortspine_files[2:10]
+
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(shortspine)
+
+#with predefined function
+shortspine_indices<-foreach(i = seq_along(shortspine_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  index_fn(shortspine_sdms[[i]],shortspine_dfs[[i]], shortspine_files[[i]])
+}  
+
+stopCluster(cl)
+
+#shortspine_indices <- foreach(x = shortspine_sdms, y = shortspine_dfs, .combine = 'list',.packages = 'sdmTMB') %dopar% {
+#  index_fn(x,y)
+#} 
+
+#####read in .rds if already fit
+index_0.1.shortspine<-readRDS('index_0.1.shortspine thornyhead.rds')
+index_0.2.shortspine<-readRDS('index_0.2.shortspine thornyhead.rds')
+index_0.3.shortspine<-readRDS('index_0.3.shortspine thornyhead.rds')
+index_0.4.shortspine<-readRDS('index_0.4.shortspine thornyhead.rds')
+index_0.5.shortspine<-readRDS('index_0.5.shortspine thornyhead.rds')
+index_0.6.shortspine<-readRDS('index_0.6.shortspine thornyhead.rds')
+index_0.7.shortspine<-readRDS('index_0.7.shortspine thornyhead.rds')
+index_0.8.shortspine<-readRDS('index_0.8.shortspine thornyhead.rds')
+index_0.9.shortspine<-readRDS('index_0.9.shortspine thornyhead.rds')
+index_1.shortspine<-readRDS('index_1.shortspine thornyhead.rds')
+
+shortspine_indices<-list(index_0.1.shortspine,
+                        index_0.2.shortspine,index_0.3.shortspine,index_0.4.shortspine,
+                        index_0.5.shortspine,index_0.6.shortspine,index_0.7.shortspine,index_0.8.shortspine,
+                        index_0.9.shortspine,index_1.shortspine)
+
+names(shortspine_indices)<-shortspine_names
+#shortspine_indices<- map2(shortspine_sdms, shortspine_dfs, index_fn)
+shortspine_indices_df<- bind_fn(shortspine_indices)
+
+setwd(shortspine)
+write.csv(shortspine_fit_df, "shortspine_fit_df.csv",row.names = F)
+write.csv(shortspine_pars_df, "shortspine_pars_df.csv",row.names = F)
+write.csv(shortspine_fit_check_df, "shortspine_fit_check_df.csv",row.names = F)
+write.csv(shortspine_indices_df, "shortspine_indices_df.csv",row.names = F)
+#### Widow rockfish ###########################################################################################################
+widow_names<- grep("widow rockfish", names(species_all_yrs),value = T)
+widow_dfs<-species_all_yrs[names(species_all_yrs)%in% widow_names]
+
+widow_dfs<- lapply(widow_dfs,lat_filter_335)
+
+widow_dfs<- lapply(widow_dfs,depth_filter_675)
+
+#make the names file
+widow_files<-as.list(widow_names)
+
+#fit SDMs
+widow_sdm_fn<- function(x,y){ 
+  #make mesh
+  mesh<- make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 200)
+  
+  #fit model
+  fit<- sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year) + Pass, #fyear and pass_scaled were specified in the configs doc.
+    data = x,
+    mesh = mesh,
+    family = delta_gamma(),
+    time = "Year",
+    anisotropy = TRUE,
+    spatiotemporal = as.list(c("off","off"))
+  )
+
+  #save file
+  saveRDS(fit, paste0("fit_",y,".rds"))
+  
+  return(fit)
+}
+
+#widow_sdms<-lapply(widow_dfs,widow_sdm_fn)
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(widow)
+
+#with predefined function
+widow_sdms<-foreach(i = seq_along(widow_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  widow_sdm_fn(widow_dfs[[i]],widow_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+fit_0.1.widow<-readRDS('fit_0.1.widow rockfish.rds')
+fit_0.2.widow<-readRDS('fit_0.2.widow rockfish.rds')
+fit_0.3.widow<-readRDS('fit_0.3.widow rockfish.rds')
+fit_0.4.widow<-readRDS('fit_0.4.widow rockfish.rds')
+fit_0.5.widow<-readRDS('fit_0.5.widow rockfish.rds')
+fit_0.6.widow<-readRDS('fit_0.6.widow rockfish.rds')
+fit_0.7.widow<-readRDS('fit_0.7.widow rockfish.rds')
+fit_0.8.widow<-readRDS('fit_0.8.widow rockfish.rds')
+fit_0.9.widow<-readRDS('fit_0.9.widow rockfish.rds')
+fit_1.widow<-readRDS('fit_1.widow rockfish.rds')
+
+#make a list
+widow_sdms<-list(fit_0.1.widow,
+                      fit_0.2.widow,fit_0.3.widow,fit_0.4.widow,
+                      fit_0.5.widow,fit_0.6.widow,fit_0.7.widow,fit_0.8.widow,
+                      fit_0.9.widow,fit_1.widow)
+
+#fix names vector if some models didn't fit
+#widow_names<-widow_names[2:10]
+names(widow_sdms)<-widow_names
+
+#extract outputs
+widow_fits<-lapply(widow_sdms, fit_df_fn)
+widow_fit_df<- bind_fn(widow_fits)
+
+widow_pars<- lapply(widow_sdms, fit_pars_fn)
+widow_pars_df<- bind_fn(widow_pars)
+
+widow_fit_check<- lapply(widow_sdms, fit_check_fn)
+widow_fit_check_df<- bind_fit_check(widow_fit_check)
+
+#widow_indices requires parallel processing for efficiency
+#remove df for which there were problems with the fit
+#widow_dfs<-widow_dfs[2:10]
+#widow_files<-widow_files[2:10]
+
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(widow)
+
+#with predefined function
+widow_indices<-foreach(i = seq_along(widow_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  index_fn(widow_sdms[[i]],widow_dfs[[i]], widow_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+index_0.1.widow<-readRDS('index_0.1.widow rockfish.rds')
+index_0.2.widow<-readRDS('index_0.2.widow rockfish.rds')
+index_0.3.widow<-readRDS('index_0.3.widow rockfish.rds')
+index_0.4.widow<-readRDS('index_0.4.widow rockfish.rds')
+index_0.5.widow<-readRDS('index_0.5.widow rockfish.rds')
+index_0.6.widow<-readRDS('index_0.6.widow rockfish.rds')
+index_0.7.widow<-readRDS('index_0.7.widow rockfish.rds')
+index_0.8.widow<-readRDS('index_0.8.widow rockfish.rds')
+index_0.9.widow<-readRDS('index_0.9.widow rockfish.rds')
+index_1.widow<-readRDS('index_1.widow rockfish.rds')
+
+widow_indices<-list(index_0.1.widow,
+                         index_0.2.widow,index_0.3.widow,index_0.4.widow,
+                         index_0.5.widow,index_0.6.widow,index_0.7.widow,index_0.8.widow,
+                         index_0.9.widow,index_1.widow)
+
+names(widow_indices)<-widow_names
+#widow_indices<- map2(widow_sdms, widow_dfs, index_fn)
+widow_indices_df<- bind_fn(widow_indices)
+
+setwd(widow)
+write.csv(widow_fit_df, "widow_fit_df.csv",row.names = F)
+write.csv(widow_pars_df, "widow_pars_df.csv",row.names = F)
+write.csv(widow_fit_check_df, "widow_fit_check_df.csv",row.names = F)
+write.csv(widow_indices_df, "widow_indices_df.csv",row.names = F)
+
+#### Yellowtail rockfish ######################################################################################################
+yellowtail_names<- grep("yellowtail rockfish", names(species_all_yrs),value = T)
+yellowtail_dfs<-species_all_yrs[names(species_all_yrs)%in% yellowtail_names]
+
+yellowtail_dfs<- lapply(yellowtail_dfs,lat_filter_335)
+
+yellowtail_dfs<- lapply(yellowtail_dfs,depth_filter_425)
+
+#make the names file
+yellowtail_files<-as.list(yellowtail_names)
+
+#fit SDMs
+yellowtail_sdm_fn<- function(x,y){ 
+  #make mesh
+  mesh<- make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
+  
+  #fit model
+  fit<- sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year) + Pass, #fyear and pass_scaled were specified in the configs doc.
+    data = x,
+    mesh = mesh,
+    family = delta_gamma(),
+    time = "Year",
+    anisotropy = TRUE,
+    spatiotemporal = as.list(c("iid","iid"))
+  )
+
+  #save file
+  saveRDS(fit, paste0("fit_",y,".rds"))
+  
+  return(fit)
+}
+
+#yellowtail_sdms<-lapply(yellowtail_dfs,yellowtail_sdm_fn)
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(yellowtail)
+
+#with predefined function
+yellowtail_sdms<-foreach(i = seq_along(yellowtail_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  yellowtail_sdm_fn(yellowtail_dfs[[i]],yellowtail_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+fit_0.1.yellowtail<-readRDS('fit_0.1.yellowtail rockfish.rds')
+fit_0.2.yellowtail<-readRDS('fit_0.2.yellowtail rockfish.rds')
+fit_0.3.yellowtail<-readRDS('fit_0.3.yellowtail rockfish.rds')
+fit_0.4.yellowtail<-readRDS('fit_0.4.yellowtail rockfish.rds')
+fit_0.5.yellowtail<-readRDS('fit_0.5.yellowtail rockfish.rds')
+fit_0.6.yellowtail<-readRDS('fit_0.6.yellowtail rockfish.rds')
+fit_0.7.yellowtail<-readRDS('fit_0.7.yellowtail rockfish.rds')
+fit_0.8.yellowtail<-readRDS('fit_0.8.yellowtail rockfish.rds')
+fit_0.9.yellowtail<-readRDS('fit_0.9.yellowtail rockfish.rds')
+fit_1.yellowtail<-readRDS('fit_1.yellowtail rockfish.rds')
+
+#make a list
+yellowtail_sdms<-list(#fit_0.1.yellowtail,
+                 fit_0.2.yellowtail,fit_0.3.yellowtail,fit_0.4.yellowtail,
+                 fit_0.5.yellowtail,fit_0.6.yellowtail,fit_0.7.yellowtail,fit_0.8.yellowtail,
+                 fit_0.9.yellowtail,fit_1.yellowtail)
+
+#fix names vector if some models didn't fit
+yellowtail_names<-yellowtail_names[2:10]
+names(yellowtail_sdms)<-yellowtail_names
+
+#extract outputs
+yellowtail_fits<-lapply(yellowtail_sdms, fit_df_fn)
+yellowtail_fit_df<- bind_fn(yellowtail_fits)
+
+yellowtail_pars<- lapply(yellowtail_sdms, fit_pars_fn)
+yellowtail_pars_df<- bind_fn(yellowtail_pars)
+
+yellowtail_fit_check<- lapply(yellowtail_sdms, fit_check_fn)
+yellowtail_fit_check_df<- bind_fit_check(yellowtail_fit_check)
+
+#yellowtail_indices requires parallel processing for efficiency
+#remove df for which there were problems with the fit
+yellowtail_dfs<-yellowtail_dfs[2:10]
+yellowtail_files<-yellowtail_files[2:10]
+
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+setwd(yellowtail)
+
+#with predefined function
+yellowtail_indices<-foreach(i = seq_along(yellowtail_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+  index_fn(yellowtail_sdms[[i]],yellowtail_dfs[[i]], yellowtail_files[[i]])
+}  
+
+stopCluster(cl)
+
+#####read in .rds if already fit
+#index_0.1.yellowtail<-readRDS('index_0.1.yellowtail rockfish.rds')
+index_0.2.yellowtail<-readRDS('index_0.2.yellowtail rockfish.rds')
+index_0.3.yellowtail<-readRDS('index_0.3.yellowtail rockfish.rds')
+index_0.4.yellowtail<-readRDS('index_0.4.yellowtail rockfish.rds')
+index_0.5.yellowtail<-readRDS('index_0.5.yellowtail rockfish.rds')
+index_0.6.yellowtail<-readRDS('index_0.6.yellowtail rockfish.rds')
+index_0.7.yellowtail<-readRDS('index_0.7.yellowtail rockfish.rds')
+index_0.8.yellowtail<-readRDS('index_0.8.yellowtail rockfish.rds')
+index_0.9.yellowtail<-readRDS('index_0.9.yellowtail rockfish.rds')
+index_1.yellowtail<-readRDS('index_1.yellowtail rockfish.rds')
+
+yellowtail_indices<-list(#index_0.1.yellowtail,
+                    index_0.2.yellowtail,index_0.3.yellowtail,index_0.4.yellowtail,
+                    index_0.5.yellowtail,index_0.6.yellowtail,index_0.7.yellowtail,index_0.8.yellowtail,
+                    index_0.9.yellowtail,index_1.yellowtail)
+
+names(yellowtail_indices)<-yellowtail_names
+#yellowtail_indices<- map2(yellowtail_sdms, yellowtail_dfs, index_fn)
+yellowtail_indices_df<- bind_fn(yellowtail_indices)
+
+setwd(yellowtail)
+write.csv(yellowtail_fit_df, "yellowtail_fit_df.csv",row.names = F)
+write.csv(yellowtail_pars_df, "yellowtail_pars_df.csv",row.names = F)
+write.csv(yellowtail_fit_check_df, "yellowtail_fit_check_df.csv",row.names = F)
+write.csv(yellowtail_indices_df, "yellowtail_indices_df.csv",row.names = F)
+
+#### calculate metrics ############################################################################################################
+
+#get the index dfs
+string <- grep("indices_df", ls(), value = TRUE)
+all_indices <- lapply(string, get)
+
+#calculate CV based on CI width
+CV_fn<- function(x){
+  x$CV_CI<- (x$upr - x$lwr/x$est)
+  return(x)
+}
+
+all_indices<- lapply(all_indices,CV_fn)
+
+#make one big DF for plotting
+index_df<- do.call(rbind,all_indices)
+
+#make a species column
+index_df$species<- rownames(index_df)
+index_df$species <- gsub("[^[:alpha:] ]", "", index_df$species)
+
+#calculate CV
+index_df$CV<-(100*index_df$se)/index_df$log_est
+
+#####calculate relative error for metrics
+#get reference vales for the calculation
+#reference se
+index_df<-index_df%>%
+  group_by(Year,species)%>%
+  mutate(reference_se = se[effort == "1"][1])%>%
+  ungroup()
+
+#reference biomass
+index_df<-index_df%>%
+  group_by(Year,species)%>%
+  mutate(reference_biomass = est[effort == "1"][1])%>%
+  ungroup()
+
+#relative error of SE
+index_df<-index_df%>%
+  group_by(Year,species)%>%
+  mutate(se_relative_error = ((se-reference_se)/reference_se)*100)
+  
+#relative error of biomass
+index_df<-index_df%>%
+  group_by(Year,species)%>%
+  mutate(biomass_relative_error = ((est-reference_biomass)/reference_biomass)*100)
+
+#absolute relative error SE
+index_df$absolute_relative_error_se<-abs(index_df$se_relative_error)
+
+#absolute relative error biomass
+index_df$absolute_relative_error_biomass<-abs(index_df$biomass_relative_error)
+
+#write CSV
+setwd(output)
+write.csv(index_df,"all_NWFSC_BT_focal_FMP_spp_sdmTMB_indices.csv", row.names = F)
+
+##### make figures ##############################################################################################################
+#fix funky widow instance with negative CV
+#index_df$CV[index_df$CV<0]<-NA
+
+#make year a factor
+index_df$Year<-factor(index_df$Year)
+
+#plot index SE
+ggplot(data=index_df, aes(x=effort, y=se, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Index Standard Error")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_index_SE.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#index CV
+ggplot(data=index_df, aes(x=effort, y=CV, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Index CV")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_CV.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#biomass ests
+ggplot(data=index_df, aes(x=effort, y=est, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Biomass estimate")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_biomass_estimate.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#relative error of SE
+ggplot(data=index_df, aes(x=effort, y=se_relative_error, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  xlim(0,0.9)+
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Relative error of SE (%)")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_SE_relative_error.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#relative error of biomass
+ggplot(data=index_df, aes(x=effort, y=biomass_relative_error, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  xlim(0,0.9)+
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Relative error of biomass (%)")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_biomass_relative_error.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#absolute relative error of biomass
+ggplot(data=index_df, aes(x=effort, y=absolute_relative_error_biomass, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  xlim(0,0.9)+
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Absolute relative error of biomass (%)")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_biomass_absolute_relative_error.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+##### edit plotting window ###################################################################################################
+#plot index SE
+ggplot(data=index_df, aes(x=effort, y=se, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  ylim(0,1) +
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Index Standard Error")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_index_SE_window_edit.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#index CV
+ggplot(data=index_df, aes(x=effort, y=CV, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  ylim(0,15) +
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Index CV")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_CV_window_edit.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#log biomass ests
+ggplot(data=index_df, aes(x=effort, y=log_est, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Log (biomass estimate)")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_log_biomass_estimate.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#relative error of SE
+ggplot(data=index_df, aes(x=effort, y=se_relative_error, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  ylim(0,350) + xlim(0,0.9) +
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Relative error of SE (%)")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_SE_relative_error_window_edit.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#relative error of biomass
+ggplot(data=index_df, aes(x=effort, y=biomass_relative_error, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  ylim(-100,100) + xlim(0,0.9) +
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Relative error of biomass (%)")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_biomass_relative_error_window_edit.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#absolute relative error of biomass
+ggplot(data=index_df, aes(x=effort, y=absolute_relative_error_biomass, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  ylim(0,100) + xlim(0,0.9) +
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Absolute relative error of biomass (%)")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_biomass_absolute_relative_error_window_edit.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)

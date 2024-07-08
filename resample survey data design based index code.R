@@ -1,54 +1,7 @@
-#######################################################################################################################################
-#### resample survey data: Multiple species, multiple years
-####
-#######################################################################################################################################
+####calculate design-based indices
 
-#updated r, needed to reinstall rtools
-#set the path
-Sys.setenv(PATH = paste(Sys.getenv("PATH"), "C:/RBuildtools/4.0", sep = ";"))
-
-####clear environment
-rm(list=ls())
-
-####set wds
-output = "C:/Users/Derek.Bolser/Documents/Resample survey data"
-
-####install AFSC gapindex package
-#devtools::install_github("afsc-gap-products/gapindex")
-
-####install nwfsc survey and assessment packages for case study. problems... update packages
-#### copied file from personal comupter due to github install issues
-#remotes::install_github("pfmc-assessments/nwfscSurvey")
-remotes::install_github("pfmc-assessments/indexwc") #timed out
-
-library(nwfscSurvey)
-library(sampling)
-library(tidyverse)
-
-####install rtools??????
-
-#pull BT data for all spp
-#catch<-PullCatch.fn(Name = c("sablefish", "canary rockfish", "Pacific ocean perch"), YearRange = "2019", SurveyName = "NWFSC.Combo")
-allcatch<-PullCatch.fn(SurveyName = "NWFSC.Combo")
-#bio<-PullBio.fn(SurveyName = "NWFSC.Combo")
-
-table(allcatch$Common_name)
-
-#40 most abundant species that were used to stratify the survey; Bering skate, deepsea smelt not here
-species<- c("brown cat shark","Pacific spiny dogfish","Bering skate","longnose skate","Pacific sanddab","arrowtooth flounder","Pacific halibut",
-                  "petrale sole","English sole","deepsea sole","rex sole","Dover sole","sablefish","Pacific grenadier","giant grenadier",
-                  "shortspine thornyhead","longspine thornyhead","Pacific ocean perch","darkblotched rockfish","splitnose rockfish",
-                  "widow rockfish","yellowtail rockfish","chilipepper","shortbelly rockfish","bocaccio","canary rockfish","stripetail rockfish",
-                  "California slickhead","deepsea smelt","jack mackerel","Pacific herring","Pacific flatnose","lingcod","blacktail snailfish",
-                  "Pacific hake","white croaker","twoline eelpout","snakehead eelpout","bigfin eelpout","black eelpout")
-
-catch<-allcatch[allcatch$Common_name %in% species,]
-
-table(catch$Common_name)
-
-test<-species[!species %in% catch$Common_name] #two missing
-
-catch<-unique(catch)
+#read in data
+catch<-read.csv("nwfsc_bt_fmp_spp.csv")
 
 #split by year
 catch_split<- split(catch, catch$Year)
@@ -59,7 +12,7 @@ tow_fn<-function(x){
   tows<-unique(tows)
   tows<-as.data.frame(tows[!is.na(tows)])
   names(tows)<-"Trawl_id"
-return(tows)
+  return(tows)
 }
 
 tows<-lapply(catch_split,tow_fn)
@@ -111,7 +64,7 @@ catch_assigned <- join_dfs(tows_assigned, catch, "Trawl_id")
 #only keep the 1s
 alldata_resampled<-lapply(catch_assigned,function(x){
   x[x$RandomAssignment==1,]
-  })
+})
 
 #now, split by species
 split_spp<-function(x){
@@ -133,7 +86,7 @@ species_all_yrs<- adr_split %>%
 species_all_yrs<-split(species_all_yrs,species_all_yrs$source)
 
 ####Run biomass fn for all elements in the list
-#first, define the area and strata. Using the basic example first. Refine later and produce an unstratified estimate too. 
+#first, define the area and strata. Using the basic example first. Refine later and produce an unstratified estimate too.
 areaexample <- StrataAreas.fn(data.frame(
   name = LETTERS[1:8],
   Latitude_dd.2 = c(49, 49, 49, 45, 45, 40.5,40.5, 40.5),
@@ -144,8 +97,8 @@ areaexample <- StrataAreas.fn(data.frame(
 
 
 indicies<- lapply(species_all_yrs, function(x){Biomass.fn(dir = getwd(),
-                                                    dat = x,
-                                                    strat.df = areaexample)})
+                                                          dat = x,
+                                                          strat.df = areaexample)})
 
 
 all_indicies<-unlist(indicies,recursive = F)
@@ -178,7 +131,7 @@ global_ests_total<-add_column_based_on_names(global_ests_total)
 #seperate out proportions and species crudely... will fix later
 fix_columns<-function(x){
   x$Proportion<-gsub("[[:alpha:]]", "", x$species)
-  x$Proportion<-gsub("\\s", "", x$Proportion) 
+  x$Proportion<-gsub("\\s", "", x$Proportion)
   x$Proportion<-gsub("(?<![0-9])\\.|\\.(?![0-9])", "", x$Proportion, perl = TRUE)
   x$species<-gsub(".All.Total","", x$species)
   x$species<- gsub("[[:punct:]0-9]", "", x$species)
@@ -194,18 +147,11 @@ ests_df$Proportion<- as.numeric(ests_df$Proportion)
 ests_df<- rownames_to_column(ests_df, var = "Year")
 ests_df$Year<-substr(ests_df$Year,5,8)
 
-#make plots: index CV ###############################
-#few species
-ggplot(data=ests_df, aes(x=Proportion, y=cv, color = Year)) + geom_point() +
-  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1)) + facet_wrap(~species) +
-  theme_classic() + theme(axis.text=element_text(color = "black", size=12),
-                          axis.title = element_text(color="black",size=16)) +
-  labs(x="Proportion of tows kept", y = "Index CV")
-
+#write csv
 setwd(output)
-#ggsave(filename = 'NWFSC_BT_38_spp_by_year_design_index_CV_demo.tiff',plot = last_plot() , path = output, width = 12, height = 6, device = 'tiff', dpi = 150)
+write.csv(ests_df,"design_based_estimates.csv",row.names = F)
 
-#many species
+#make plots: index CV ###############################
 ggplot(data=ests_df, aes(x=Proportion, y=cv, color = Year)) + geom_point() +
   geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
   theme_classic() + theme(axis.text=element_text(color = "black", size=8),
@@ -213,21 +159,9 @@ ggplot(data=ests_df, aes(x=Proportion, y=cv, color = Year)) + geom_point() +
   labs(x="Proportion of tows kept", y = "Index CV")
 
 setwd(output)
-ggsave(filename = 'NWFSC_BT_38_spp_by_year_design_index_CV_demo.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+#ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_design_index_CV.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
 
 #make plots: biomass ests ###################################
-#few species
-ggplot(data=ests_df, aes(x=Proportion, y=Bhat, color = Year)) + geom_point() +
-  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1)) + facet_wrap(~species, scales = "free") +
-  #geom_errorbar(aes(ymin=ifelse(Bhat-seBhat < 0, 0, Bhat-seBhat), ymax=Bhat+seBhat),
-  #              width=.2, position=position_dodge(.9)) +
-  theme_classic() + theme(axis.text=element_text(color = "black", size=12),
-                          axis.title = element_text(color="black",size=16)) +
-  labs(x="Proportion of tows kept", y = "Biomass estimate")
-
-setwd(output)
-#ggsave(filename = 'NWFSC_BT_38_spp_by_year_design_biomass_ests_demo.tiff',plot = last_plot() , path = output, width = 12, height = 6, device = 'tiff', dpi = 150)
-
 #many species
 ggplot(data=ests_df, aes(x=Proportion, y=Bhat, color = Year)) + geom_point() +
   geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = "black") + facet_wrap(~species, scales = "free") +
@@ -238,11 +172,4 @@ ggplot(data=ests_df, aes(x=Proportion, y=Bhat, color = Year)) + geom_point() +
   labs(x="Proportion of tows kept", y = "Biomass estimate")
 
 setwd(output)
-ggsave(filename = 'NWFSC_BT_38_spp_by_year_design_biomass_ests_demo.tiff',plot = last_plot() , path = output, width = 14, height = 8, device = 'tiff', dpi = 150)
-
-
-####calculate model-based indicies
-
-#### calculate slopes
-
-
+#ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_design_biomass_ests.tiff',plot = last_plot() , path = output, width = 14, height = 8, device = 'tiff', dpi = 150)
