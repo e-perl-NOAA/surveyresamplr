@@ -1,5 +1,5 @@
 #######################################################################################################################################
-#### Resample_survey_data: Multiple species, multiple years
+#### resample survey data: Multiple species, multiple years
 ####
 #######################################################################################################################################
 
@@ -7,25 +7,24 @@
 rm(list=ls())
 
 ####set wds
-data = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Data"
-output = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results"
-arrowtooth = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Arrowtooth_flounder"
-bocaccio = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Bocaccio"
-canary = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Canary_rockfish"
-darkblotched = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Darkblotched_rockfish"
-dover = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Dover_sole"
-lingcod_n = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Lingcod_north"
-lingcod_s = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Lingcod_south"
-longnose = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Longnose_skate"
-pop = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Pacific_ocean_perch"
-dogfish = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Pacific_spiny_dogfish"
-petrale = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Petrale_sole"
-rex = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Rex_sole"
-sablefish = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Sablefish"
-shortspine = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Shortspine_thornyhead"
-widow = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Widow_rockfish"
-yellowtail = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Yellowtail_rockfish"
-figures = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Figures"
+output = "~/Results"
+arrowtooth = "~/Results/Arrowtooth_flounder"
+bocaccio = "~/Results/Bocaccio"
+canary = "~/Results/Canary_rockfish"
+darkblotched = "~/Results/Darkblotched_rockfish"
+dover = "~/Results/Dover_sole"
+lingcod_n = "~/Results/Lingcod_north"
+lingcod_s = "~/Results/Lingcod_south"
+longnose = "~/Results/Longnose_skate"
+pop = "~/Results/Pacific_ocean_perch"
+dogfish = "~/Results/Pacific_spiny_dogfish"
+petrale = "~/Results/Petrale_sole"
+rex = "~/Results/Rex_sole"
+sablefish = "~/Results/Sablefish"
+shortspine = "~/Results/Shortspine_thornyhead"
+widow = "~/Results/Widow_rockfish"
+yellowtail = "~/Results/Yellowtail_rockfish"
+figures = "~/Figures"
 
 #set the PAT if needed for package installation
 #Sys.setenv(GITHUB_PAT = "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")
@@ -44,8 +43,7 @@ library(sdmTMB)
 library(doParallel)
 
 #read in data
-setwd(data)
-catch<-read.csv("nwfsc_bt_fmp_spp.csv")
+catch<-read.csv(file.path(getwd(),"data","nwfsc_bt_fmp_spp.csv"))
 
 #split by year
 catch_split<- split(catch, catch$Year)
@@ -142,7 +140,7 @@ species_all_yrs<- adr_split %>%
 
 species_all_yrs<-split(species_all_yrs,species_all_yrs$source)
 
-setwd(data)
+# setwd(data)
 #saveRDS(species_all_yrs, "NWFSC_BT_data_focal_spp_split_by_spp_and_effort_rep.rds")
 
 ####### calculate model based indices for all species and effort levels ######################################
@@ -190,18 +188,12 @@ index_fn<- function(fit, x, names){
   return(index)
 }
 
-#rbind and bring effort and replicates in as columns from rownames
+#rbind and bring effort in as a column from rownames
 bind_fn<-function(x){
   y<- do.call(rbind, x)
-  y$effort<- substr(row.names(y), start = 5, stop = 9)
-  y$replicate<- substr(y$effort, start = 3, stop = 5)
-  y$effort<- substr(y$effort, start = 1, stop = 3)
+  y$effort<- substr(rownames(y), start = 1, stop = 3)
   y$effort <- gsub("\\.([^0-9])", ".", y$effort)
-  y$effort<- sub("_.*", "", y$effort)
   y$effort<-as.numeric(y$effort)
-  y$replicate<- sub("\\..*", "", y$replicate)
-  y$replicate<- sub(".*_", "", y$replicate)
-  y$replicate<-as.numeric(y$replicate)
   return(y)
 }
 
@@ -209,30 +201,10 @@ bind_fn<-function(x){
 bind_fit_check<-function(x){
   y<- do.call(rbind, x)
   y<-as.data.frame(y)
-  y$effort<- substr(row.names(y), start = 5, stop = 9)
-  y$replicate<- substr(y$effort, start = 3, stop = 5)
-  y$effort<- substr(y$effort, start = 1, stop = 3)
+  y$effort<- substr(rownames(y), start = 1, stop = 3)
   y$effort <- gsub("\\.([^0-9])", ".", y$effort)
-  y$effort<- sub("_.*", "", y$effort)
   y$effort<-as.numeric(y$effort)
-  y$replicate<- sub("\\..*", "", y$replicate)
-  y$replicate<- sub(".*_", "", y$replicate)
-  y$replicate<-as.numeric(y$replicate)
   y<-apply(y,2,as.character)
-  return(y)
-}
-
-bind_index_fn<-function(x){
-  y<- do.call(rbind, x)
-  y$effort<- substr(row.names(y), start = 7, stop = 11)
-  y$replicate<- substr(y$effort, start = 3, stop = 5)
-  y$effort<- substr(y$effort, start = 1, stop = 3)
-  y$effort <- gsub("\\.([^0-9])", ".", y$effort)
-  y$effort<- sub("_.*", "", y$effort)
-  y$effort<-as.numeric(y$effort)
-  y$replicate<- sub("\\..*", "", y$replicate)
-  y$replicate<- sub(".*_", "", y$replicate)
-  y$replicate<-as.numeric(y$replicate)
   return(y)
 }
 
@@ -375,7 +347,7 @@ stopCluster(cl)
 #####read in index files
 arrowtooth_indices<-pull_files(arrowtooth,"index")
 
-arrowtooth_indices_df<- bind_index_fn(arrowtooth_indices)
+arrowtooth_indices_df<- bind_fn(arrowtooth_indices)
 
 setwd(arrowtooth)
 write.csv(arrowtooth_fit_df, "arrowtooth_fit_df.csv",row.names = F)
@@ -458,7 +430,7 @@ stopCluster(cl)
 #####read in index files
 bocaccio_indices<-pull_files(bocaccio,"index")
 
-bocaccio_indices_df<- bind_index_fn(bocaccio_indices)
+bocaccio_indices_df<- bind_fn(bocaccio_indices)
 
 setwd(bocaccio)
 write.csv(bocaccio_fit_df, "bocaccio_fit_df.csv",row.names = F)
@@ -542,7 +514,7 @@ stopCluster(cl)
 #####read in .rds if already fit
 canary_indices<-pull_files(canary,"index")
 
-canary_indices_df<- bind_index_fn(canary_indices)
+canary_indices_df<- bind_fn(canary_indices)
 
 setwd(canary)
 write.csv(canary_fit_df, "canary_fit_df.csv",row.names = F)
@@ -627,7 +599,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 darkblotched_indices<-pull_files(darkblotched,"index")
-darkblotched_indices_df<- bind_index_fn(darkblotched_indices)
+darkblotched_indices_df<- bind_fn(darkblotched_indices)
 
 setwd(darkblotched)
 write.csv(darkblotched_fit_df, "darkblotched_fit_df.csv",row.names = F)
@@ -707,7 +679,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 dover_indices<-pull_files(dover,"index")
-dover_indices_df<- bind_index_fn(dover_indices)
+dover_indices_df<- bind_fn(dover_indices)
 
 setwd(dover)
 write.csv(dover_fit_df, "dover_fit_df.csv",row.names = F)
@@ -793,7 +765,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 lingcod_n_indices<-pull_files(lingcod_n,"index")
-lingcod_n_indices_df<- bind_index_fn(lingcod_n_indices)
+lingcod_n_indices_df<- bind_fn(lingcod_n_indices)
 
 setwd(lingcod_n)
 write.csv(lingcod_n_fit_df, "lingcod_n_fit_df.csv",row.names = F)
@@ -879,7 +851,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 lingcod_s_indices<-pull_files(lingcod_s,"index")
-lingcod_s_indices_df<- bind_index_fn(lingcod_s_indices)
+lingcod_s_indices_df<- bind_fn(lingcod_s_indices)
 
 setwd(lingcod_s)
 write.csv(lingcod_s_fit_df, "lingcod_s_fit_df.csv",row.names = F)
@@ -959,7 +931,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 longnose_indices<-pull_files(longnose,"index")
-longnose_indices_df<- bind_index_fn(longnose_indices)
+longnose_indices_df<- bind_fn(longnose_indices)
 
 setwd(longnose)
 write.csv(longnose_fit_df, "longnose_fit_df.csv",row.names = F)
@@ -1043,7 +1015,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 pop_indices<-pull_files(pop,"index")
-pop_indices_df<- bind_index_fn(pop_indices)
+pop_indices_df<- bind_fn(pop_indices)
 
 setwd(pop)
 write.csv(pop_fit_df, "pop_fit_df.csv",row.names = F)
@@ -1125,7 +1097,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 dogfish_indices<-pull_files(dogfish,"index")
-dogfish_indices_df<- bind_index_fn(dogfish_indices)
+dogfish_indices_df<- bind_fn(dogfish_indices)
 
 setwd(output)
 write.csv(dogfish_fit_df, "dogfish_fit_df.csv",row.names = F)
@@ -1207,7 +1179,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 petrale_indices<-pull_files(petrale,"index")
-petrale_indices_df<- bind_index_fn(petrale_indices)
+petrale_indices_df<- bind_fn(petrale_indices)
 
 setwd(petrale)
 write.csv(petrale_fit_df, "petrale_fit_df.csv",row.names = F)
@@ -1289,7 +1261,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 rex_indices<-pull_files(rex,"index")
-rex_indices_df<- bind_index_fn(rex_indices)
+rex_indices_df<- bind_fn(rex_indices)
 
 setwd(rex)
 write.csv(rex_fit_df, "rex_fit_df.csv",row.names = F)
@@ -1369,7 +1341,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 sablefish_indices<-pull_files(sablefish,"index")
-sablefish_indices_df<- bind_index_fn(sablefish_indices)
+sablefish_indices_df<- bind_fn(sablefish_indices)
 
 setwd(sablefish)
 write.csv(sablefish_fit_df, "sablefish_fit_df.csv",row.names = F)
@@ -1449,7 +1421,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 shortspine_indices<-pull_files(shortspine,"index")
-shortspine_indices_df<- bind_index_fn(shortspine_indices)
+shortspine_indices_df<- bind_fn(shortspine_indices)
 
 setwd(shortspine)
 write.csv(shortspine_fit_df, "shortspine_fit_df.csv",row.names = F)
@@ -1533,7 +1505,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 widow_indices<-pull_files(widow,"index")
-widow_indices_df<- bind_index_fn(widow_indices)
+widow_indices_df<- bind_fn(widow_indices)
 
 setwd(widow)
 write.csv(widow_fit_df, "widow_fit_df.csv",row.names = F)
@@ -1617,10 +1589,204 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 yellowtail_indices<-pull_files(yellowtail,"index")
-yellowtail_indices_df<- bind_index_fn(yellowtail_indices)
+yellowtail_indices_df<- bind_fn(yellowtail_indices)
 
 setwd(yellowtail)
 write.csv(yellowtail_fit_df, "yellowtail_fit_df.csv",row.names = F)
 write.csv(yellowtail_pars_df, "yellowtail_pars_df.csv",row.names = F)
 write.csv(yellowtail_fit_check_df, "yellowtail_fit_check_df.csv",row.names = F)
 write.csv(yellowtail_indices_df, "yellowtail_indices_df.csv",row.names = F)
+
+#### calculate metrics ############################################################################################################
+
+#get the index dfs
+string <- grep("indices_df", ls(), value = TRUE)
+all_indices <- lapply(string, get)
+
+#calculate CV based on CI width
+CV_fn<- function(x){
+  x$CV_CI<- (x$upr - x$lwr/x$est)
+  return(x)
+}
+
+all_indices<- lapply(all_indices,CV_fn)
+
+#make one big DF for plotting
+index_df<- do.call(rbind,all_indices)
+
+#make a species column
+index_df$species<- rownames(index_df)
+index_df$species <- gsub("[^[:alpha:] ]", "", index_df$species)
+
+#calculate CV
+index_df$CV<-(100*index_df$se)/index_df$log_est
+
+#####calculate relative error for metrics
+#get reference vales for the calculation
+#reference se
+index_df<-index_df%>%
+  group_by(Year,species)%>%
+  mutate(reference_se = se[effort == "1"][1])%>%
+  ungroup()
+
+#reference biomass
+index_df<-index_df%>%
+  group_by(Year,species)%>%
+  mutate(reference_biomass = est[effort == "1"][1])%>%
+  ungroup()
+
+#relative error of SE
+index_df<-index_df%>%
+  group_by(Year,species)%>%
+  mutate(se_relative_error = ((se-reference_se)/reference_se)*100)
+  
+#relative error of biomass
+index_df<-index_df%>%
+  group_by(Year,species)%>%
+  mutate(biomass_relative_error = ((est-reference_biomass)/reference_biomass)*100)
+
+#absolute relative error SE
+index_df$absolute_relative_error_se<-abs(index_df$se_relative_error)
+
+#absolute relative error biomass
+index_df$absolute_relative_error_biomass<-abs(index_df$biomass_relative_error)
+
+#write CSV
+setwd(output)
+write.csv(index_df,"all_NWFSC_BT_focal_FMP_spp_sdmTMB_indices.csv", row.names = F)
+
+##### make figures ##############################################################################################################
+#fix funky widow instance with negative CV
+#index_df$CV[index_df$CV<0]<-NA
+
+#make year a factor
+index_df$Year<-factor(index_df$Year)
+
+#plot index SE
+ggplot(data=index_df, aes(x=effort, y=se, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Index Standard Error")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_index_SE.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#index CV
+ggplot(data=index_df, aes(x=effort, y=CV, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Index CV")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_CV.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#biomass ests
+ggplot(data=index_df, aes(x=effort, y=est, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Biomass estimate")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_biomass_estimate.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#relative error of SE
+ggplot(data=index_df, aes(x=effort, y=se_relative_error, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  xlim(0,0.9)+
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Relative error of SE (%)")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_SE_relative_error.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#relative error of biomass
+ggplot(data=index_df, aes(x=effort, y=biomass_relative_error, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  xlim(0,0.9)+
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Relative error of biomass (%)")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_biomass_relative_error.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#absolute relative error of biomass
+ggplot(data=index_df, aes(x=effort, y=absolute_relative_error_biomass, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  xlim(0,0.9)+
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Absolute relative error of biomass (%)")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_biomass_absolute_relative_error.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+##### edit plotting window ###################################################################################################
+#plot index SE
+ggplot(data=index_df, aes(x=effort, y=se, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  ylim(0,1) +
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Index Standard Error")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_index_SE_window_edit.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#index CV
+ggplot(data=index_df, aes(x=effort, y=CV, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  ylim(0,15) +
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Index CV")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_CV_window_edit.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#log biomass ests
+ggplot(data=index_df, aes(x=effort, y=log_est, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Log (biomass estimate)")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_log_biomass_estimate.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#relative error of SE
+ggplot(data=index_df, aes(x=effort, y=se_relative_error, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  ylim(0,350) + xlim(0,0.9) +
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Relative error of SE (%)")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_SE_relative_error_window_edit.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#relative error of biomass
+ggplot(data=index_df, aes(x=effort, y=biomass_relative_error, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  ylim(-100,100) + xlim(0,0.9) +
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Relative error of biomass (%)")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_biomass_relative_error_window_edit.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
+
+#absolute relative error of biomass
+ggplot(data=index_df, aes(x=effort, y=absolute_relative_error_biomass, color = Year)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, degree = 3), se = T, na.rm = T, aes(group = 1), color = 'black') + facet_wrap(~species) +
+  ylim(0,100) + xlim(0,0.9) +
+  theme_classic() + theme(axis.text=element_text(color = "black", size=8),
+                          axis.title = element_text(color="black",size=16)) +
+  labs(x="Proportion of tows kept", y = "Absolute relative error of biomass (%)")
+
+setwd(figures)
+ggsave(filename = 'NWFSC_BT_FMP_focal_spp_by_year_sdmTMB_biomass_absolute_relative_error_window_edit.tiff',plot = last_plot(), path = output, width = 12, height = 8, device = 'tiff', dpi = 150)
