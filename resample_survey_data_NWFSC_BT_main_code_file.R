@@ -7,7 +7,7 @@
 rm(list=ls())
 
 ####set wds
-wd <- getwd()
+wd <- file.path(getwd(), "Resample_survey_data") #this was necessary to have the code run on my local machine
 output <- file.path(wd, "Results")
 arrowtooth <- file.path(output, "Arrowtooth_flounder")
 bocaccio <- file.path(output, "Bocaccio")
