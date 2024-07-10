@@ -288,6 +288,10 @@ arrowtooth_dfs<- lapply(arrowtooth_dfs,lat_filter_34)
 #make the names file
 arrowtooth_files<-as.list(arrowtooth_names)
 
+#reduce the number of DFs for testing
+arrowtooth_dfs<- arrowtooth_dfs[87:91]
+arrowtooth_files<-arrowtooth_files[87:91]
+
 #fit SDMs
 arrowtooth_sdm_fn<- function(x,y){ 
   #make mesh
