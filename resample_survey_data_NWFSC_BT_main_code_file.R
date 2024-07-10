@@ -7,24 +7,25 @@
 rm(list=ls())
 
 ####set wds
-output = "~/Results"
-arrowtooth = "~/Results/Arrowtooth_flounder"
-bocaccio = "~/Results/Bocaccio"
-canary = "~/Results/Canary_rockfish"
-darkblotched = "~/Results/Darkblotched_rockfish"
-dover = "~/Results/Dover_sole"
-lingcod_n = "~/Results/Lingcod_north"
-lingcod_s = "~/Results/Lingcod_south"
-longnose = "~/Results/Longnose_skate"
-pop = "~/Results/Pacific_ocean_perch"
-dogfish = "~/Results/Pacific_spiny_dogfish"
-petrale = "~/Results/Petrale_sole"
-rex = "~/Results/Rex_sole"
-sablefish = "~/Results/Sablefish"
-shortspine = "~/Results/Shortspine_thornyhead"
-widow = "~/Results/Widow_rockfish"
-yellowtail = "~/Results/Yellowtail_rockfish"
-figures = "~/Figures"
+wd <- getwd()
+output <- file.path(wd, "Results")
+arrowtooth <- file.path(output, "Arrowtooth_flounder")
+bocaccio <- file.path(output, "Bocaccio")
+canary <- file.path(output, "Canary_rockfish")
+darkblotched <- file.path(output, "Darkblotched_rockfish")
+dover <- file.path(output, "Dover_sole")
+lingcod_n <- file.path(output, "Lingcod_north")
+lingcod_s <- file.path(output, "Lingcod_south")
+longnose <- file.path(output, "Longnose_skate")
+pop <- file.path(output, "Pacific_ocean_perch")
+dogfish <- file.path(output, "Pacific_spiny_dogfish")
+petrale <- file.path(output, "Petrale_sole")
+rex <- file.path(output, "Rex_sole")
+sablefish <- file.path(output, "Sablefish")
+shortspine <- file.path(output, "Shortspine_thornyhead")
+widow <- file.path(output, "Widow_rockfish")
+yellowtail <- file.path(output, "Yellowtail_rockfish")
+figures <- file.path(wd, "Figures")
 
 #set the PAT if needed for package installation
 #Sys.setenv(GITHUB_PAT = "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")
@@ -33,9 +34,15 @@ figures = "~/Figures"
 #remotes::install_github("pfmc-assessments/indexwc")
 
 #load packages
-library(nwfscSurvey)
+#library(nwfscSurvey)
 library(sampling)
-library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(forcats)
+library(purrr)
+library(readr)
+library(tibble)
 #library(TMB)
 #library(Matrix)
 library(sdmTMB)
@@ -43,7 +50,7 @@ library(sdmTMB)
 library(doParallel)
 
 #read in data
-catch<-read.csv(file.path(getwd(),"data","nwfsc_bt_fmp_spp.csv"))
+catch<-read.csv(file.path(wd, "data", "nwfsc_bt_fmp_spp.csv"))
 
 #split by year
 catch_split<- split(catch, catch$Year)
