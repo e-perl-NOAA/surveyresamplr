@@ -1,5 +1,5 @@
 #######################################################################################################################################
-#### resample survey data: Multiple species, multiple years
+#### Resample_survey_data: Multiple species, multiple years
 ####
 #######################################################################################################################################
 
@@ -7,25 +7,25 @@
 rm(list=ls())
 
 ####set wds
-data = "C:/Users/Derek.Bolser/Documents/Resample survey data/Data"
-output = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results"
-arrowtooth = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Arrowtooth_flounder"
-bocaccio = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Bocaccio"
-canary = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Canary_rockfish"
-darkblotched = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Darkblotched_rockfish"
-dover = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Dover_sole"
-lingcod_n = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Lingcod_north"
-lingcod_s = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Lingcod_south"
-longnose = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Longnose_skate"
-pop = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Pacific_ocean_perch"
-dogfish = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Pacific_spiny_dogfish"
-petrale = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Petrale_sole"
-rex = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Rex_sole"
-sablefish = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Sablefish"
-shortspine = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Shortspine_thornyhead"
-widow = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Widow_rockfish"
-yellowtail = "C:/Users/Derek.Bolser/Documents/Resample survey data/Results/Yellowtail_rockfish"
-figures = "C:/Users/Derek.Bolser/Documents/Resample survey data/Figures"
+data = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Data"
+output = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results"
+arrowtooth = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Arrowtooth_flounder"
+bocaccio = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Bocaccio"
+canary = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Canary_rockfish"
+darkblotched = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Darkblotched_rockfish"
+dover = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Dover_sole"
+lingcod_n = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Lingcod_north"
+lingcod_s = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Lingcod_south"
+longnose = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Longnose_skate"
+pop = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Pacific_ocean_perch"
+dogfish = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Pacific_spiny_dogfish"
+petrale = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Petrale_sole"
+rex = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Rex_sole"
+sablefish = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Sablefish"
+shortspine = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Shortspine_thornyhead"
+widow = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Widow_rockfish"
+yellowtail = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Results/Yellowtail_rockfish"
+figures = "C:/Users/Derek.Bolser/Documents/Resample_survey_data/Figures"
 
 #set the PAT if needed for package installation
 #Sys.setenv(GITHUB_PAT = "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")
@@ -190,12 +190,18 @@ index_fn<- function(fit, x, names){
   return(index)
 }
 
-#rbind and bring effort in as a column from rownames
+#rbind and bring effort and replicates in as columns from rownames
 bind_fn<-function(x){
   y<- do.call(rbind, x)
-  y$effort<- substr(rownames(y), start = 1, stop = 3)
+  y$effort<- substr(row.names(y), start = 5, stop = 9)
+  y$replicate<- substr(y$effort, start = 3, stop = 5)
+  y$effort<- substr(y$effort, start = 1, stop = 3)
   y$effort <- gsub("\\.([^0-9])", ".", y$effort)
+  y$effort<- sub("_.*", "", y$effort)
   y$effort<-as.numeric(y$effort)
+  y$replicate<- sub("\\..*", "", y$replicate)
+  y$replicate<- sub(".*_", "", y$replicate)
+  y$replicate<-as.numeric(y$replicate)
   return(y)
 }
 
@@ -203,10 +209,30 @@ bind_fn<-function(x){
 bind_fit_check<-function(x){
   y<- do.call(rbind, x)
   y<-as.data.frame(y)
-  y$effort<- substr(rownames(y), start = 1, stop = 3)
+  y$effort<- substr(row.names(y), start = 5, stop = 9)
+  y$replicate<- substr(y$effort, start = 3, stop = 5)
+  y$effort<- substr(y$effort, start = 1, stop = 3)
   y$effort <- gsub("\\.([^0-9])", ".", y$effort)
+  y$effort<- sub("_.*", "", y$effort)
   y$effort<-as.numeric(y$effort)
+  y$replicate<- sub("\\..*", "", y$replicate)
+  y$replicate<- sub(".*_", "", y$replicate)
+  y$replicate<-as.numeric(y$replicate)
   y<-apply(y,2,as.character)
+  return(y)
+}
+
+bind_index_fn<-function(x){
+  y<- do.call(rbind, x)
+  y$effort<- substr(row.names(y), start = 7, stop = 11)
+  y$replicate<- substr(y$effort, start = 3, stop = 5)
+  y$effort<- substr(y$effort, start = 1, stop = 3)
+  y$effort <- gsub("\\.([^0-9])", ".", y$effort)
+  y$effort<- sub("_.*", "", y$effort)
+  y$effort<-as.numeric(y$effort)
+  y$replicate<- sub("\\..*", "", y$replicate)
+  y$replicate<- sub(".*_", "", y$replicate)
+  y$replicate<-as.numeric(y$replicate)
   return(y)
 }
 
@@ -349,7 +375,7 @@ stopCluster(cl)
 #####read in index files
 arrowtooth_indices<-pull_files(arrowtooth,"index")
 
-arrowtooth_indices_df<- bind_fn(arrowtooth_indices)
+arrowtooth_indices_df<- bind_index_fn(arrowtooth_indices)
 
 setwd(arrowtooth)
 write.csv(arrowtooth_fit_df, "arrowtooth_fit_df.csv",row.names = F)
@@ -432,7 +458,7 @@ stopCluster(cl)
 #####read in index files
 bocaccio_indices<-pull_files(bocaccio,"index")
 
-bocaccio_indices_df<- bind_fn(bocaccio_indices)
+bocaccio_indices_df<- bind_index_fn(bocaccio_indices)
 
 setwd(bocaccio)
 write.csv(bocaccio_fit_df, "bocaccio_fit_df.csv",row.names = F)
@@ -516,7 +542,7 @@ stopCluster(cl)
 #####read in .rds if already fit
 canary_indices<-pull_files(canary,"index")
 
-canary_indices_df<- bind_fn(canary_indices)
+canary_indices_df<- bind_index_fn(canary_indices)
 
 setwd(canary)
 write.csv(canary_fit_df, "canary_fit_df.csv",row.names = F)
@@ -601,7 +627,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 darkblotched_indices<-pull_files(darkblotched,"index")
-darkblotched_indices_df<- bind_fn(darkblotched_indices)
+darkblotched_indices_df<- bind_index_fn(darkblotched_indices)
 
 setwd(darkblotched)
 write.csv(darkblotched_fit_df, "darkblotched_fit_df.csv",row.names = F)
@@ -681,7 +707,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 dover_indices<-pull_files(dover,"index")
-dover_indices_df<- bind_fn(dover_indices)
+dover_indices_df<- bind_index_fn(dover_indices)
 
 setwd(dover)
 write.csv(dover_fit_df, "dover_fit_df.csv",row.names = F)
@@ -767,7 +793,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 lingcod_n_indices<-pull_files(lingcod_n,"index")
-lingcod_n_indices_df<- bind_fn(lingcod_n_indices)
+lingcod_n_indices_df<- bind_index_fn(lingcod_n_indices)
 
 setwd(lingcod_n)
 write.csv(lingcod_n_fit_df, "lingcod_n_fit_df.csv",row.names = F)
@@ -853,7 +879,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 lingcod_s_indices<-pull_files(lingcod_s,"index")
-lingcod_s_indices_df<- bind_fn(lingcod_s_indices)
+lingcod_s_indices_df<- bind_index_fn(lingcod_s_indices)
 
 setwd(lingcod_s)
 write.csv(lingcod_s_fit_df, "lingcod_s_fit_df.csv",row.names = F)
@@ -933,7 +959,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 longnose_indices<-pull_files(longnose,"index")
-longnose_indices_df<- bind_fn(longnose_indices)
+longnose_indices_df<- bind_index_fn(longnose_indices)
 
 setwd(longnose)
 write.csv(longnose_fit_df, "longnose_fit_df.csv",row.names = F)
@@ -1017,7 +1043,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 pop_indices<-pull_files(pop,"index")
-pop_indices_df<- bind_fn(pop_indices)
+pop_indices_df<- bind_index_fn(pop_indices)
 
 setwd(pop)
 write.csv(pop_fit_df, "pop_fit_df.csv",row.names = F)
@@ -1099,7 +1125,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 dogfish_indices<-pull_files(dogfish,"index")
-dogfish_indices_df<- bind_fn(dogfish_indices)
+dogfish_indices_df<- bind_index_fn(dogfish_indices)
 
 setwd(output)
 write.csv(dogfish_fit_df, "dogfish_fit_df.csv",row.names = F)
@@ -1181,7 +1207,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 petrale_indices<-pull_files(petrale,"index")
-petrale_indices_df<- bind_fn(petrale_indices)
+petrale_indices_df<- bind_index_fn(petrale_indices)
 
 setwd(petrale)
 write.csv(petrale_fit_df, "petrale_fit_df.csv",row.names = F)
@@ -1263,7 +1289,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 rex_indices<-pull_files(rex,"index")
-rex_indices_df<- bind_fn(rex_indices)
+rex_indices_df<- bind_index_fn(rex_indices)
 
 setwd(rex)
 write.csv(rex_fit_df, "rex_fit_df.csv",row.names = F)
@@ -1343,7 +1369,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 sablefish_indices<-pull_files(sablefish,"index")
-sablefish_indices_df<- bind_fn(sablefish_indices)
+sablefish_indices_df<- bind_index_fn(sablefish_indices)
 
 setwd(sablefish)
 write.csv(sablefish_fit_df, "sablefish_fit_df.csv",row.names = F)
@@ -1423,7 +1449,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 shortspine_indices<-pull_files(shortspine,"index")
-shortspine_indices_df<- bind_fn(shortspine_indices)
+shortspine_indices_df<- bind_index_fn(shortspine_indices)
 
 setwd(shortspine)
 write.csv(shortspine_fit_df, "shortspine_fit_df.csv",row.names = F)
@@ -1507,7 +1533,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 widow_indices<-pull_files(widow,"index")
-widow_indices_df<- bind_fn(widow_indices)
+widow_indices_df<- bind_index_fn(widow_indices)
 
 setwd(widow)
 write.csv(widow_fit_df, "widow_fit_df.csv",row.names = F)
@@ -1591,7 +1617,7 @@ stopCluster(cl)
 
 #####read in .rds if already fit
 yellowtail_indices<-pull_files(yellowtail,"index")
-yellowtail_indices_df<- bind_fn(yellowtail_indices)
+yellowtail_indices_df<- bind_index_fn(yellowtail_indices)
 
 setwd(yellowtail)
 write.csv(yellowtail_fit_df, "yellowtail_fit_df.csv",row.names = F)
