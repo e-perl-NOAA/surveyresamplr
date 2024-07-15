@@ -335,7 +335,7 @@ arrowtooth_sdm_fn<- function(x,y){
   )
   
   #save file
-  saveRDS(fit, paste0("fit_",y,".rds"))
+  saveRDS(fit, file.path(arrowtooth, paste0("fit_",y,".rds")))
  
   return(fit) 
 }
@@ -351,10 +351,23 @@ setwd(arrowtooth)
 arrowtooth_sdms<-foreach(i = seq_along(arrowtooth_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
   arrowtooth_sdm_fn(arrowtooth_dfs[[i]],arrowtooth_files[[i]])
 }  
+# approach above seems to make lists of 2 elements, where the first is the old list
+# and the second is the new element. Thus, the nesting gets deeper and deeper.
+nrow(arrowtooth_sdms[[1]]$data)
+# NULL
+nrow(arrowtooth_sdms[[2]]$data)
+# [1] 11165
+nrow(arrowtooth_sdms[[1]][[2]]$data)
+# [1] 9962
+nrow(arrowtooth_sdms[[1]][[1]][[2]]$data)
+# [1] 9957
+nrow(arrowtooth_sdms[[1]][[1]][[1]][[2]]$data)
+# [1] 9896
+
 
 stopCluster(cl)
 
-#####read in fit files
+#####read in fit files from .rds files (replaces object created above)
 arrowtooth_sdms<-pull_files(arrowtooth,"fit")
 
 #extract outputs
