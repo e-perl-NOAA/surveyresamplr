@@ -28,7 +28,6 @@ jobs:
 
       - name: Setup file structure
         run: |
-          mkdir Figures
           mkdir Results
           cd Results
           mkdir Arrowtooth_flounder
