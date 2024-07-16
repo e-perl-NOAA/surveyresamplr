@@ -103,7 +103,7 @@ names(props)<-"Trawl_id"
 #match the structure of the catch data
 props<-rep(props,length(tows))
 
-tows_assigned<-map2(tows,props, include_or_exclude)
+tows_assigned<-map2(tows, props, include_or_exclude)
 
 #remove replicates of the 1 effort level
 tows_assigned<- lapply(tows_assigned,function(x){
@@ -111,7 +111,14 @@ tows_assigned<- lapply(tows_assigned,function(x){
   return(x)
 })
 
-tows_assigned<-unlist(tows_assigned, recursive = F)
+tows_assigned_resampled<- purrr::map(tows_assigned, function(x){
+  purrr::map(x, function(y){
+    y[y$RandomAssignment == 1,]
+  })
+  }
+)
+
+tows_assigned_resampled<-unlist(tows_assigned_resampled, recursive = F)
 
 #merge with catch
 join_dfs <- function(list_of_dfs, main_df, shared_column) {
@@ -122,12 +129,12 @@ join_dfs <- function(list_of_dfs, main_df, shared_column) {
   return(merged_dfs)
 }
 
-catch_assigned <- join_dfs(tows_assigned, catch, "Trawl_id")
+alldata_resampled <- join_dfs(tows_assigned_resampled, catch, "Trawl_id")
 
 #only keep the 1s
-alldata_resampled<-lapply(catch_assigned,function(x){
-  x[x$RandomAssignment==1,]
-})
+# alldata_resampled<-lapply(catch_assigned,function(x){
+#   x[x$RandomAssignment==1,]
+# })
 
 #split by species
 split_spp<-function(x){
@@ -142,12 +149,12 @@ adr_split<- unlist(adr_split, recursive = F)
 ####combine all years for each species
 names(adr_split)<-substr(names(adr_split),6,50) #it would be good to replace 50 with a logical indicating the end
 
-species_all_yrs<- adr_split %>%
+species_all_yrs<- adr_split |>
   bind_rows(.id = "source")
 
 species_all_yrs<-split(species_all_yrs,species_all_yrs$source)
 
-# setwd(data)
+#setwd(data)
 #saveRDS(species_all_yrs, "NWFSC_BT_data_focal_spp_split_by_spp_and_effort_rep.rds")
 
 ####### calculate model based indices for all species and effort levels ######################################
@@ -1674,25 +1681,25 @@ write.csv(arrowtooth_indices_df, "arrowtooth_indices_df.csv",row.names = F)
 # #####calculate relative error for metrics
 # #get reference vales for the calculation
 # #reference se
-# index_df<-index_df%>%
-#   group_by(Year,species)%>%
-#   mutate(reference_se = se[effort == "1"][1])%>%
+# index_df<-index_df |>
+#   group_by(Year,species) |>
+#   mutate(reference_se = se[effort == "1"][1]) |>
 #   ungroup()
 
 # #reference biomass
-# index_df<-index_df%>%
-#   group_by(Year,species)%>%
-#   mutate(reference_biomass = est[effort == "1"][1])%>%
+# index_df<-index_df |>
+#   group_by(Year,species) |>
+#   mutate(reference_biomass = est[effort == "1"][1]) |>
 #   ungroup()
 
 # #relative error of SE
-# index_df<-index_df%>%
-#   group_by(Year,species)%>%
+# index_df<-index_df |>
+#   group_by(Year,species) |>
 #   mutate(se_relative_error = ((se-reference_se)/reference_se)*100)
   
 # #relative error of biomass
-# index_df<-index_df%>%
-#   group_by(Year,species)%>%
+# index_df<-index_df |>
+#   group_by(Year,species) |>
 #   mutate(biomass_relative_error = ((est-reference_biomass)/reference_biomass)*100)
 
 # #absolute relative error SE
