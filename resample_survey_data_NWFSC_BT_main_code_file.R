@@ -149,10 +149,9 @@ adr_split<- unlist(adr_split, recursive = F)
 ####combine all years for each species
 names(adr_split)<-substr(names(adr_split),6,50) #it would be good to replace 50 with a logical indicating the end
 
-species_all_yrs<- adr_split |>
-  bind_rows(.id = "source")
-
-species_all_yrs<-split(species_all_yrs,species_all_yrs$source)
+# species_all_yrs<- adr_split |>
+#   bind_rows(.id = "source")
+# species_all_yrs<-split(species_all_yrs,species_all_yrs$source)
 
 #setwd(data)
 #saveRDS(species_all_yrs, "NWFSC_BT_data_focal_spp_split_by_spp_and_effort_rep.rds")
@@ -313,10 +312,16 @@ depth_filter_700<-function(x){
 }
 
 #### Arrowtooth flounder ##########################################################################################################
-arrowtooth_names<- grep("arrowtooth flounder", names(species_all_yrs),value = T)
-arrowtooth_dfs<-species_all_yrs[names(species_all_yrs)%in% arrowtooth_names]
+arrowtooth_all_yrs<- adr_split[grep("arrowtooth flounder", names(adr_split))]
+arrowtooth_all_yrs <- arrowtooth_all_yrs |>
+                        bind_rows(.id = "source")
+arrowtooth_all_yrs<-split(arrowtooth_all_yrs,arrowtooth_all_yrs$source)
 
-arrowtooth_dfs<- lapply(arrowtooth_dfs,lat_filter_34)
+arrowtooth_names<- grep("arrowtooth flounder", names(arrowtooth_all_yrs),value = T)
+
+arrowtooth_dfs<-arrowtooth_all_yrs[names(arrowtooth_all_yrs) %in% arrowtooth_names]
+
+arrowtooth_dfs<- lapply(arrowtooth_dfs, lat_filter_34)
 
 #make the names file
 arrowtooth_files<-as.list(arrowtooth_names)
