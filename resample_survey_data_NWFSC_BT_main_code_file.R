@@ -129,32 +129,11 @@ join_dfs <- function(list_of_dfs, main_df, shared_column) {
   return(merged_dfs)
 }
 
-alldata_resampled <- join_dfs(tows_assigned_resampled, catch, "Trawl_id")
-
-#only keep the 1s
-# alldata_resampled<-lapply(catch_assigned,function(x){
-#   x[x$RandomAssignment==1,]
-# })
-
 #split by species
 split_spp<-function(x){
   spp_list<- split(x,x$Common_name)
   return(spp_list)
 }
-
-adr_split<- lapply(alldata_resampled, split_spp)
-
-adr_split<- unlist(adr_split, recursive = F)
-
-####combine all years for each species
-names(adr_split)<-substr(names(adr_split),6,50) #it would be good to replace 50 with a logical indicating the end
-
-# species_all_yrs<- adr_split |>
-#   bind_rows(.id = "source")
-# species_all_yrs<-split(species_all_yrs,species_all_yrs$source)
-
-#setwd(data)
-#saveRDS(species_all_yrs, "NWFSC_BT_data_focal_spp_split_by_spp_and_effort_rep.rds")
 
 ####### calculate model based indices for all species and effort levels ######################################
 ####### generic functions
@@ -162,7 +141,7 @@ names(adr_split)<-substr(names(adr_split),6,50) #it would be good to replace 50 
 fit_df_fn<- function(fit){
   fit_df<-tidy(fit, conf.int = T)
   return(fit_df)
-
+  
   filename <- paste0(name(fit), "_fit_df.csv")
   write.csv(fit_df, file = filename, row.names = F)
 }
@@ -171,7 +150,7 @@ fit_df_fn<- function(fit){
 fit_pars_fn<- function(fit){
   fit_pars<-tidy(fit, effects = "ran_pars", conf.int = T)
   return(fit_pars)
-
+  
   filename <- paste0(name(fit), "_fit_pars.csv")
   write.csv(index, file = filename, row.names = F)
 }
@@ -180,20 +159,20 @@ fit_pars_fn<- function(fit){
 fit_check_fn<- function(fit){
   fit_check<- sanity(fit)
   return(fit_check)
-
-filename <- paste0(name(fit), "_fit_check.csv")
-write.csv(index, file = filename, row.names = F)
+  
+  filename <- paste0(name(fit), "_fit_check.csv")
+  write.csv(index, file = filename, row.names = F)
 }
 
 #get index
 index_fn<- function(fit, x, names){ 
   p_grid<-predict(fit, newdata = x)
-
+  
   grid_yrs <- replicate_df(p_grid, "year", unique(x$Year))
-
+  
   p_sbf <- predict(fit, newdata = x, 
-                         return_tmb_object = TRUE)
-
+                   return_tmb_object = TRUE)
+  
   index <- get_index(p_sbf, area = 4, bias_correct = T)
   
   saveRDS(index, paste0("index_",names,".rds"))
@@ -312,26 +291,8 @@ depth_filter_700<-function(x){
 }
 
 #### Arrowtooth flounder ##########################################################################################################
-arrowtooth_all_yrs<- adr_split[grep("arrowtooth flounder", names(adr_split))]
-arrowtooth_all_yrs <- arrowtooth_all_yrs |>
-                        bind_rows(.id = "source")
-arrowtooth_all_yrs<-split(arrowtooth_all_yrs,arrowtooth_all_yrs$source)
-
-arrowtooth_names<- grep("arrowtooth flounder", names(arrowtooth_all_yrs),value = T)
-
-arrowtooth_dfs<-arrowtooth_all_yrs[names(arrowtooth_all_yrs) %in% arrowtooth_names]
-
-arrowtooth_dfs<- lapply(arrowtooth_dfs, lat_filter_34)
-
-#make the names file
-arrowtooth_files<-as.list(arrowtooth_names)
-
-#reduce the number of DFs for testing
-arrowtooth_dfs<- arrowtooth_dfs[87:91]
-arrowtooth_files<-arrowtooth_files[87:91]
-
-#fit SDMs
-arrowtooth_sdm_fn<- function(x,y){ 
+#Define SDM function
+arrowtooth_sdm_fn<-function(x,y){
   #make mesh
   mesh<- make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
   
@@ -347,37 +308,63 @@ arrowtooth_sdm_fn<- function(x,y){
   )
   
   #save file
-  saveRDS(fit, file.path(arrowtooth, paste0("fit_",y,".rds")))
- 
+  saveRDS(fit, paste0("fit_",y,".rds"))
+  
   return(fit) 
 }
 
-#setup parallel backend to use many processors
-cores=detectCores()
-cl <- makeCluster(cores[1]-1) #to not overload your computer
-registerDoParallel(cl)
+#process data and fit sdms
+fit_arrowtooth_sdms<- function(tows_assigned,catch){ 
+  
+  ###prepare data -- general processing
+  alldata_resampled <- join_dfs(tows_assigned_resampled, catch, "Trawl_id")
+  
+  adr_split<- lapply(alldata_resampled, split_spp)
+  
+  adr_split<- unlist(adr_split, recursive = F)
+  
+  names(adr_split)<-substr(names(adr_split),6,50) #it would be good to replace 50 with a logical indicating the end
+  
+  ###species-specific processing
+  arrowtooth_all_yrs<- adr_split[grep("arrowtooth flounder", names(adr_split))]
+  
+  arrowtooth_all_yrs <- arrowtooth_all_yrs |>
+    bind_rows(.id = "source")
+  
+  arrowtooth_all_yrs<-split(arrowtooth_all_yrs,arrowtooth_all_yrs$source)
+  
+  arrowtooth_names<- grep("arrowtooth flounder", names(arrowtooth_all_yrs),value = T)
+  
+  arrowtooth_dfs<-arrowtooth_all_yrs[names(arrowtooth_all_yrs) %in% arrowtooth_names]
+  
+  arrowtooth_dfs<- lapply(arrowtooth_dfs, lat_filter_34)
+  
+  #make the names file
+  arrowtooth_files<-as.list(arrowtooth_names)
+  
+  #reduce the number of DFs for testing
+  arrowtooth_dfs<- arrowtooth_dfs[87:91]
+  arrowtooth_files<-arrowtooth_files[87:91]
+  
+  #fit arrowtooth sdms in parallel
+  #setup parallel backend to use many processors
+  cores=detectCores()
+  cl <- makeCluster(cores[1]-1) #to not overload your computer
+  registerDoParallel(cl)
+  
+  setwd(arrowtooth)
+  
+  #with predefined function
+  arrowtooth_sdms<-foreach(i = seq_along(arrowtooth_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
+    arrowtooth_sdm_fn(arrowtooth_dfs[[i]],arrowtooth_files[[i]])
+}
+  stopCluster(cl)
+  
+return(arrowtooth_sdms)
+  
+}
 
-setwd(arrowtooth)
-
-#with predefined function
-arrowtooth_sdms<-foreach(i = seq_along(arrowtooth_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
-  arrowtooth_sdm_fn(arrowtooth_dfs[[i]],arrowtooth_files[[i]])
-}  
-# approach above seems to make lists of 2 elements, where the first is the old list
-# and the second is the new element. Thus, the nesting gets deeper and deeper.
-nrow(arrowtooth_sdms[[1]]$data)
-# NULL
-nrow(arrowtooth_sdms[[2]]$data)
-# [1] 11165
-nrow(arrowtooth_sdms[[1]][[2]]$data)
-# [1] 9962
-nrow(arrowtooth_sdms[[1]][[1]][[2]]$data)
-# [1] 9957
-nrow(arrowtooth_sdms[[1]][[1]][[1]][[2]]$data)
-# [1] 9896
-
-
-stopCluster(cl)
+arrowtooth_sdms<- fit_arrowtooth_sdms(tows_assigned_resampled,catch)
 
 #####read in fit files from .rds files (replaces object created above)
 arrowtooth_sdms<-pull_files(arrowtooth,"fit")
