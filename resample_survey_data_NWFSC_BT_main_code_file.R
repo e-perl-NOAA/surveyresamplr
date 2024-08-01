@@ -313,7 +313,7 @@ arrowtooth_sdm_fn<-function(x,y){
   return(fit) 
 }
 
-#process data and fit sdms
+#Fit arrowtooth SDMs
 fit_arrowtooth_sdms <- function(tows_assigned, catch) { 
   # Print diagnostic message
   print("Starting function execution")
@@ -323,20 +323,20 @@ fit_arrowtooth_sdms <- function(tows_assigned, catch) {
   print("Data joined successfully")
   
   adr_split <- lapply(alldata_resampled, split_spp)
-  print("Data split successfully")
+  print("Data split by species successfully")
   
   adr_split <- unlist(adr_split, recursive = FALSE)
   print("Data unlisted successfully")
   
   names(adr_split) <- substr(names(adr_split), 6, 50)
-  print("Names processed successfully")
+  print("Renamed dataframes successfully")
   
   ### Species-specific processing
   arrowtooth_all_yrs <- adr_split[grep("arrowtooth flounder", names(adr_split))]
   print("Arrowtooth flounder data extracted")
   
   arrowtooth_all_yrs <- arrowtooth_all_yrs |> bind_rows(.id = "source")
-  print("Data bound into a single dataframe")
+  print("Arrowtooth data bound into a single dataframe")
   
   arrowtooth_all_yrs <- split(arrowtooth_all_yrs, arrowtooth_all_yrs$source)
   print("Data split by source")
@@ -361,7 +361,7 @@ fit_arrowtooth_sdms <- function(tows_assigned, catch) {
   print("Reduced number of data frames for testing")
   
   # Fit arrowtooth SDMs in parallel
-  print("Starting parallel processing")
+  print("Starting parallel SDM processing")
   
   arrowtooth_sdms <- foreach(
     i = seq_along(arrowtooth_dfs), 
@@ -370,31 +370,48 @@ fit_arrowtooth_sdms <- function(tows_assigned, catch) {
     .errorhandling = "remove",
     .export = c("arrowtooth_sdm_fn", "lat_filter_34")
   ) %dopar% {
-    print(paste("Processing index:", i))
+    print(paste("Processing SDM:", i))
     result <- arrowtooth_sdm_fn(arrowtooth_dfs[[i]], arrowtooth_files[[i]])
-    print(paste("Result for index", i, ":", result))
+    print(paste("Result for SDM", i, ":", result))
     result
   }
   
-  print("Parallel processing complete")
+  print("Parallel SDM processing complete")
   print(arrowtooth_sdms)
   
+  #calculate indices
+  print("Starting parallel index calculation")
+  
+  arrowtooth_indices<-foreach(
+    i = seq_along(arrowtooth_dfs),
+    .combine = 'list',
+    .packages = c('foreach','doParallel','sdmTMB'),
+    .errorhandling = "remove") %dopar% {
+    print(paste("Processing index:", i))
+    result<- index_fn(arrowtooth_sdms[[i]],arrowtooth_dfs[[i]], arrowtooth_files[[i]])
+    print(paste("Result for index", i, ":", result))
+    result
+  }  
+  print("Parallel index calculation complete")
+  print(arrowtooth_indices)
   return(arrowtooth_sdms)
+  return(arrowth_indices
 }
 
 #fit arrowtooth sdms in parallel
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #to not overload your computer
+cl <- makeCluster(cores[1])#-1) #to not overload your computer
 registerDoParallel(cl)
 
 setwd(arrowtooth)
 
-arrowtooth_sdms<- fit_arrowtooth_sdms(tows_assigned_resampled,catch)
+fit_arrowtooth_sdms(tows_assigned_resampled,catch)
 
 stopCluster(cl)
 
-#####read in fit files from .rds files (replaces object created above)
+#####read in fit and index files
 arrowtooth_sdms<-pull_files(arrowtooth,"fit")
+arrowtooth_indices<-pull_files(arrowtooth,"index")
 
 #extract outputs
 arrowtooth_fits<-lapply(arrowtooth_sdms, fit_df_fn)
@@ -405,23 +422,6 @@ arrowtooth_pars_df<- bind_fn(arrowtooth_pars)
 
 arrowtooth_fit_check<- lapply(arrowtooth_sdms, fit_check_fn)
 arrowtooth_fit_check_df<- bind_fit_check(arrowtooth_fit_check)
-
-#arrowtooth_indices requires parallel processing for efficiency
-cores=detectCores()
-cl <- makeCluster(cores[1]) #use all the cores
-registerDoParallel(cl)
-
-setwd(arrowtooth)
-
-#with predefined function
-arrowtooth_indices<-foreach(i = seq_along(arrowtooth_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
-  index_fn(arrowtooth_sdms[[i]],arrowtooth_dfs[[i]], arrowtooth_files[[i]])
-}  
-
-stopCluster(cl)
-
-#####read in index files
-arrowtooth_indices<-pull_files(arrowtooth,"index")
 
 arrowtooth_indices_df<- bind_index_fn(arrowtooth_indices)
 
