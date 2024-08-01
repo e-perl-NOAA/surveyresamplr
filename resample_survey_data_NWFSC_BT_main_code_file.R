@@ -408,7 +408,7 @@ arrowtooth_fit_check_df<- bind_fit_check(arrowtooth_fit_check)
 
 #arrowtooth_indices requires parallel processing for efficiency
 cores=detectCores()
-cl <- makeCluster(cores[1]-1) #to not overload your computer
+cl <- makeCluster(cores[1]) #use all the cores
 registerDoParallel(cl)
 
 setwd(arrowtooth)
