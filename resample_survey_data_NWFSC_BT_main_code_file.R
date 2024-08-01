@@ -356,9 +356,9 @@ fit_arrowtooth_sdms <- function(tows_assigned, catch) {
     stop("Insufficient data frames for the specified range. Check the indices.")
   }
   
-  arrowtooth_dfs <- arrowtooth_dfs[87:91]
-  arrowtooth_files <- arrowtooth_files[87:91]
-  print("Reduced number of data frames for testing")
+  #arrowtooth_dfs <- arrowtooth_dfs[87:91]
+  #arrowtooth_files <- arrowtooth_files[87:91]
+  #print("Reduced number of data frames for testing")
   
   # Fit arrowtooth SDMs in parallel
   print("Starting parallel SDM processing")
