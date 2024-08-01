@@ -382,7 +382,16 @@ fit_arrowtooth_sdms <- function(tows_assigned, catch) {
   return(arrowtooth_sdms)
 }
 
+#fit arrowtooth sdms in parallel
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #to not overload your computer
+registerDoParallel(cl)
+
+setwd(arrowtooth)
+
 arrowtooth_sdms<- fit_arrowtooth_sdms(tows_assigned_resampled,catch)
+
+stopCluster(cl)
 
 #####read in fit files from .rds files (replaces object created above)
 arrowtooth_sdms<-pull_files(arrowtooth,"fit")
