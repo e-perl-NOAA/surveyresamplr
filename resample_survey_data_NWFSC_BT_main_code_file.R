@@ -314,54 +314,72 @@ arrowtooth_sdm_fn<-function(x,y){
 }
 
 #process data and fit sdms
-fit_arrowtooth_sdms<- function(tows_assigned,catch){ 
+fit_arrowtooth_sdms <- function(tows_assigned, catch) { 
+  # Print diagnostic message
+  print("Starting function execution")
   
-  ###prepare data -- general processing
-  alldata_resampled <- join_dfs(tows_assigned_resampled, catch, "Trawl_id")
+  ### Prepare data -- general processing
+  alldata_resampled <- join_dfs(tows_assigned, catch, "Trawl_id")
+  print("Data joined successfully")
   
-  adr_split<- lapply(alldata_resampled, split_spp)
+  adr_split <- lapply(alldata_resampled, split_spp)
+  print("Data split successfully")
   
-  adr_split<- unlist(adr_split, recursive = F)
+  adr_split <- unlist(adr_split, recursive = FALSE)
+  print("Data unlisted successfully")
   
-  names(adr_split)<-substr(names(adr_split),6,50) #it would be good to replace 50 with a logical indicating the end
+  names(adr_split) <- substr(names(adr_split), 6, 50)
+  print("Names processed successfully")
   
-  ###species-specific processing
-  arrowtooth_all_yrs<- adr_split[grep("arrowtooth flounder", names(adr_split))]
+  ### Species-specific processing
+  arrowtooth_all_yrs <- adr_split[grep("arrowtooth flounder", names(adr_split))]
+  print("Arrowtooth flounder data extracted")
   
-  arrowtooth_all_yrs <- arrowtooth_all_yrs |>
-    bind_rows(.id = "source")
+  arrowtooth_all_yrs <- arrowtooth_all_yrs |> bind_rows(.id = "source")
+  print("Data bound into a single dataframe")
   
-  arrowtooth_all_yrs<-split(arrowtooth_all_yrs,arrowtooth_all_yrs$source)
+  arrowtooth_all_yrs <- split(arrowtooth_all_yrs, arrowtooth_all_yrs$source)
+  print("Data split by source")
   
-  arrowtooth_names<- grep("arrowtooth flounder", names(arrowtooth_all_yrs),value = T)
+  arrowtooth_names <- grep("arrowtooth flounder", names(arrowtooth_all_yrs), value = TRUE)
+  print("Arrowtooth names extracted")
   
-  arrowtooth_dfs<-arrowtooth_all_yrs[names(arrowtooth_all_yrs) %in% arrowtooth_names]
+  arrowtooth_dfs <- arrowtooth_all_yrs[names(arrowtooth_all_yrs) %in% arrowtooth_names]
+  arrowtooth_dfs <- lapply(arrowtooth_dfs, lat_filter_34)
+  print("Latitude filter applied")
   
-  arrowtooth_dfs<- lapply(arrowtooth_dfs, lat_filter_34)
+  # Make the names file
+  arrowtooth_files <- as.list(arrowtooth_names)
   
-  #make the names file
-  arrowtooth_files<-as.list(arrowtooth_names)
+  # Reduce the number of DFs for testing
+  if (length(arrowtooth_dfs) < 91) {
+    stop("Insufficient data frames for the specified range. Check the indices.")
+  }
   
-  #reduce the number of DFs for testing
-  arrowtooth_dfs<- arrowtooth_dfs[87:91]
-  arrowtooth_files<-arrowtooth_files[87:91]
+  arrowtooth_dfs <- arrowtooth_dfs[87:91]
+  arrowtooth_files <- arrowtooth_files[87:91]
+  print("Reduced number of data frames for testing")
   
-  #fit arrowtooth sdms in parallel
-  #setup parallel backend to use many processors
-  cores=detectCores()
-  cl <- makeCluster(cores[1]-1) #to not overload your computer
-  registerDoParallel(cl)
+  # Fit arrowtooth SDMs in parallel
+  print("Starting parallel processing")
   
-  setwd(arrowtooth)
+  arrowtooth_sdms <- foreach(
+    i = seq_along(arrowtooth_dfs), 
+    .combine = 'list', 
+    .packages = c('foreach', 'doParallel', 'sdmTMB'), 
+    .errorhandling = "remove",
+    .export = c("arrowtooth_sdm_fn", "lat_filter_34")
+  ) %dopar% {
+    print(paste("Processing index:", i))
+    result <- arrowtooth_sdm_fn(arrowtooth_dfs[[i]], arrowtooth_files[[i]])
+    print(paste("Result for index", i, ":", result))
+    result
+  }
   
-  #with predefined function
-  arrowtooth_sdms<-foreach(i = seq_along(arrowtooth_dfs), .combine = 'list',.packages = c('foreach','doParallel','sdmTMB'), .errorhandling = "remove") %dopar% {
-    arrowtooth_sdm_fn(arrowtooth_dfs[[i]],arrowtooth_files[[i]])
-}
-  stopCluster(cl)
+  print("Parallel processing complete")
+  print(arrowtooth_sdms)
   
-return(arrowtooth_sdms)
-  
+  return(arrowtooth_sdms)
 }
 
 arrowtooth_sdms<- fit_arrowtooth_sdms(tows_assigned_resampled,catch)
