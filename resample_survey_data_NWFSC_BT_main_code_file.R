@@ -395,7 +395,7 @@ fit_arrowtooth_sdms <- function(tows_assigned, catch) {
   print("Parallel index calculation complete")
   print(arrowtooth_indices)
   return(arrowtooth_sdms)
-  return(arrowth_indices
+  return(arrowth_indices)
 }
 
 #fit arrowtooth sdms in parallel
