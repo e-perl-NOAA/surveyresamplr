@@ -33,12 +33,7 @@ cleanup_by_species <- function(df, species) {
 
   tows_assigned_resampled <- unlist(tows_assigned_resampled, recursive = F)
 
-  catch_assigned <- join_dfs(tows_assigned, catch, "Trawl_id")
-
-  # only keep the 1s
-  alldata_resampled <- lapply(catch_assigned, function(x) {
-    x[x$RandomAssignment == 1, ]
-  })
+  alldata_resampled <- join_dfs(tows_assigned_resampled, catch_species, "Trawl_id")
 
   names(alldata_resampled) <- substr(names(alldata_resampled), 6, 50) # it would be good to replace 50 with a logical indicating the end
 
@@ -47,7 +42,7 @@ cleanup_by_species <- function(df, species) {
 
   species_all_yrs <- split(species_all_yrs, species_all_yrs$source)
 
-  rm("catch_species", "catch_split", "tows", "props", "tows_assigned", "catch_assigned", "alldata_resampled")
+  rm("catch_species", "catch_split", "tows", "props", "tows_assigned", "alldata_resampled")
 
   return(species_all_yrs)
 }

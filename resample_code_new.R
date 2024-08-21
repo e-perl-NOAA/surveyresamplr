@@ -43,7 +43,7 @@ library(doParallel)
 # read in data
 catch <- read.csv(file.path(getwd(), "data", "nwfsc_bt_fmp_spp.csv"))
 source(file.path(getwd(), "smaller_functions.R"))
-source(file.path(getwd(), "species_function.R"))
+source(file.path(getwd(), "cleanup_by_species.R"))
 source(file.path(getwd(), "species_sdms.R"))
 
 
@@ -53,6 +53,11 @@ arrowtooth_dfs <- lapply(arrowtooth_dfs, lat_filter_34)
 arrowtooth_dfs <- arrowtooth_dfs[90:91] # reduce DFs for testing
 # make the names file
 arrowtooth_files <- as.list(names(arrowtooth_dfs))
+
+# Reduce the number of DFs for testing
+if (length(arrowtooth_dfs) < 91) {
+  stop("Insufficient data frames for the specified range. Check the indices.")
+}
 
 # setup parallel backend to use many processors
 cores <- detectCores()
