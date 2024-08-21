@@ -50,7 +50,7 @@ source(file.path(getwd(), "species_sdms.R"))
 #### Arrowtooth flounder ##########################################################################################################
 arrowtooth_dfs <- cleanup_by_species(df = catch, species = "arrowtooth flounder")
 arrowtooth_dfs <- lapply(arrowtooth_dfs, lat_filter_34)
-
+arrowtooth_dfs <- arrowtooth_dfs[90:91] # reduce DFs for testing
 # make the names file
 arrowtooth_files <- as.list(names(arrowtooth_dfs))
 
@@ -104,7 +104,7 @@ rm("arrowtooth_dfs", "arrowtooth_files", "arrowtooth_sdms", "arrowtooth_indices"
 #### Bocaccio #############################################################################################################
 bocaccio_dfs <- cleanup_by_species(df = catch, species = "bocaccio")
 bocaccio_dfs <- lapply(bocaccio_dfs, depth_filter_500)
-
+bocaccio_dfs <- bocaccio_dfs[90:91] # reduce DFs for testing
 # make the names file
 bocaccio_files <- as.list(names(bocaccio_dfs))
 
@@ -158,7 +158,7 @@ rm("bocaccio_dfs", "bocaccio_files", "bocaccio_sdms", "bocaccio_indices", "bocac
 #### Canary rockfish ##########################################################################################################
 canary_dfs <- cleanup_by_species(df = catch, species = "canary rockfish")
 canary_dfs <- lapply(canary_dfs, depth_filter_275)
-
+canary_dfs <- canary_dfs[90:91] # reduce DFs for testing
 # make the names file
 canary_files <- as.list(names(canary_dfs))
 
@@ -213,7 +213,7 @@ rm("canary_dfs", "canary_files", "canary_sdms", "canary_indices", "canary_indice
 darkblotched_dfs <- cleanup_by_species(df = catch, species = "darkblotched rockfish")
 darkblotched_dfs <- lapply(darkblotched_dfs, lat_filter_335)
 darkblotched_dfs <- lapply(darkblotched_dfs, depth_filter_675)
-
+darkblotched_dfs <- darkblotched_dfs[90:91] # reduce DFs for testing
 # make the names file
 darkblotched_files <- as.list(names(darkblotched_names))
 
@@ -266,7 +266,7 @@ rm("darkblotched_dfs", "darkblotched_files", "darkblotched_sdms", "darkblotched_
 
 #### Dover sole ###############################################################################################################
 dover_dfs <- cleanup_by_species(df = catch, species = "Dover sole")
-
+dover_dfs <- dover_dfs[90:91] # reduce DFs for testing
 # make the names file
 dover_files <- as.list(names(dover_names))
 
@@ -322,7 +322,7 @@ lingcod_n_dfs <- cleanup_by_species(df = catch, species = "lingcod")
 lingcod_n_dfs <- lapply(lingcod_n_dfs, lat_filter_34)
 lingcod_n_dfs <- lapply(lingcod_n_dfs, depth_filter_450)
 lingcod_n_dfs <- gsub("lingcod", "lingcod_n", lingcod_n_dfs)
-
+lingcod_n_dfs <- lingcod_n_dfs[90:91] # reduce DFs for testing
 # make the names file
 lingcod_n_files <- as.list(names(lingcod_n_dfs))
 
@@ -377,7 +377,7 @@ rm("lingcod_n_dfs", "lingcod_n_files", "lingcod_n_sdms", "lingcod_n_indices", "l
 lingcod_s_dfs <- cleanup_by_species(df = catch, species = "lingcod")
 lingcod_s_dfs <- lapply(lingcod_s_dfs, lat_filter_34_max)
 lingcod_s_dfs <- lapply(lingcod_s_dfs, depth_filter_450)
-
+lingcod_s_dfs <- lingcod_s_dfs[90:91] # reduce DFs for testing
 # make the names file
 lingcod_s_dfs <- gsub("lingcod", "lingcod_s", lingcod_s_dfs)
 lingcod_s_files <- as.list(names(lingcod_s_dfs))
@@ -431,7 +431,7 @@ rm("lingcod_s_dfs", "lingcod_s_files", "lingcod_s_sdms", "lingcod_s_indices", "l
 
 #### Longnose Skate ###########################################################################################################
 longnose_dfs <- cleanup_by_species(df = catch, species = "longnose skate")
-
+longnose_dfs <- longnose_dfs[90:91] # reduce DFs for testing
 # make the names file
 longnose_files <- as.list(names(longnose_dfs))
 
@@ -486,7 +486,7 @@ rm("longnose_dfs", "longnose_files", "longnose_sdms", "longnose_indices", "longn
 pop_dfs <- cleanup_by_species(df = catch, species = "Pacific ocean perch")
 pop_dfs <- lapply(pop_dfs, lat_filter_35)
 pop_dfs <- lapply(pop_dfs, depth_filter_500)
-
+pop_dfs <- pop_dfs[90:91] # reduce DFs for testing
 # make the names file
 pop_files <- as.list(names(pop_dfs))
 
@@ -540,7 +540,7 @@ rm("pop_dfs", "pop_files", "pop_sdms", "pop_indices", "pop_indices_df")
 #### Pacific spiny dogfish ########################################################################################################
 dogfish_dfs <- cleanup_by_species(df = catch, species = "Pacific spiny dogfish")
 dogfish_dfs <- lapply(dogfish_dfs, depth_filter_700)
-
+dogfish_dfs <- dogfish_dfs[90:91] # reduce DFs for testing
 # make the names file
 dogfish_files <- as.list(names(dogfish_dfs))
 
@@ -594,7 +594,7 @@ rm("dogfish_dfs", "dogfish_files", "dogfish_sdms", "dogfish_indices", "dogfish_i
 #### Petrale sole #############################################################################################################
 petrale_dfs <- cleanup_by_species(df = catch, species = "petrale sole")
 petrale_dfs <- lapply(petrale_dfs, depth_filter_675)
-
+petrale_dfs <- petrale_dfs[90:91] # reduce DFs for testing
 # make the names file
 petrale_files <- as.list(names(petrale_dfs))
 
@@ -648,7 +648,7 @@ rm("petrale_dfs", "petrale_files", "petrale_sdms", "petrale_indices", "petrale_i
 #### Rex sole #################################################################################################################
 rex_dfs <- cleanup_by_species(df = catch, species = "rex sole")
 rex_dfs <- lapply(rex_dfs, depth_filter_700)
-
+rex_dfs <- rex_dfs[90:91] # reduce DFs for testing
 # make the names file
 rex_files <- as.list(names(rex_dfs))
 
@@ -701,7 +701,7 @@ rm("rex_dfs", "rex_files", "rex_sdms", "rex_indices", "rex_indices_df")
 
 #### Sablefish ##################################################################################################################
 sablefish_dfs <- cleanup_by_species(df = catch, species = "sablefish")
-
+sablefish_dfs <- sablefish_dfs[90:91] # reduce DFs for testing
 # make the names file
 sablefish_files <- as.list(names(sablefish_dfs))
 
@@ -754,7 +754,7 @@ rm("sablefish_dfs", "sablefish_files", "sablefish_sdms", "sablefish_indices", "s
 
 #### Shortspine thornyhead ####################################################################################################
 shortspine_dfs <- cleanup_by_species(df = catch, species = "shortspine thornyhead")
-
+shortspine_dfs <- shortspine_dfs[90:91] # reduce DFs for testing
 # make the names file
 shortspine_files <- as.list(names(shortspine_dfs))
 
@@ -808,7 +808,7 @@ rm("shortspine_dfs", "shortspine_files", "shortspine_sdms", "shortspine_indices"
 widow_dfs <- cleanup_by_species(df = catch, species = "widow rockfish")
 widow_dfs <- lapply(widow_dfs, lat_filter_335)
 widow_dfs <- lapply(widow_dfs, depth_filter_675)
-
+widow_dfs <- widow_dfs[90:91] # reduce DFs for testing
 # make the names file
 widow_files <- as.list(names(widow_dfs))
 
@@ -863,7 +863,7 @@ rm("widow_dfs", "widow_files", "widow_sdms", "widow_indices", "widow_indices_df"
 yellowtail_dfs <- cleanup_by_species(df = catch, species = "yellowtail rockfish")
 yellowtail_dfs <- lapply(yellowtail_dfs, lat_filter_335)
 yellowtail_dfs <- lapply(yellowtail_dfs, depth_filter_425)
-
+yellowtail_dfs <- yellowtail_dfs[90:91] # reduce DFs for testing
 # make the names file
 yellowtail_files <- as.list(names(yellowtail_dfs))
 
