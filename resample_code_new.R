@@ -93,23 +93,6 @@ rm(
   "arrowtooth_pars_df", "arrowtooth_fit_check", "arrowtooth_fit_check_df"
 )
 
-# arrowtooth_indices requires parallel processing for efficiency
-cores <- detectCores()
-cl <- makeCluster(cores[1] - 1) # to not overload your computer
-registerDoParallel(cl)
-
-setwd(arrowtooth)
-# with predefined function
-print("Starting parallel index calculation")
-arrowtooth_indices <- foreach(i = seq_along(arrowtooth_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
-  print(paste("Processing index:", i))
-  result <- index_fn(arrowtooth_sdms[[i]], arrowtooth_dfs[[i]], arrowtooth_files[[i]])
-  print(paste("Result for index", i, ":", result))
-  result
-}
-stopCluster(cl)
-print("Parallel index calculation complete")
-
 ##### read in index files
 arrowtooth_indices <- pull_files(arrowtooth, "index")
 arrowtooth_indices_df <- bind_index_fn(arrowtooth_indices)
@@ -117,7 +100,6 @@ write.csv(arrowtooth_indices_df, "arrowtooth_indices_df.csv", row.names = F)
 
 # Remove the rest of the files
 rm("arrowtooth_dfs", "arrowtooth_files", "arrowtooth_sdms", "arrowtooth_indices", "arrowtooth_indices_df")
-
 
 #### Bocaccio #############################################################################################################
 bocaccio_dfs <- cleanup_by_species(df = catch, species = "bocaccio")
@@ -165,23 +147,6 @@ rm(
   "bocaccio_fit_check", "bocaccio_fit_check_df"
 )
 
-# bocaccio_indices requires parallel processing for efficiency
-cores <- detectCores()
-cl <- makeCluster(cores[1] - 1) # to not overload your computer
-registerDoParallel(cl)
-
-setwd(bocaccio)
-# with predefined function
-print("Starting parallel index calculation")
-bocaccio_indices <- foreach(i = seq_along(bocaccio_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
-  print(paste("Processing index:", i))
-  result <- index_fn(bocaccio_sdms[[i]], bocaccio_dfs[[i]], bocaccio_files[[i]])
-  print(paste("Result for index", i, ":", result))
-  result
-}
-stopCluster(cl)
-print("Parallel index calculation complete")
-
 ##### read in index files
 bocaccio_indices <- pull_files(bocaccio, "index")
 bocaccio_indices_df <- bind_index_fn(bocaccio_indices)
@@ -189,7 +154,6 @@ write.csv(bocaccio_indices_df, "bocaccio_indices_df.csv", row.names = F)
 
 # Remove the rest of the files
 rm("bocaccio_dfs", "bocaccio_files", "bocaccio_sdms", "bocaccio_indices", "bocaccio_indices_df")
-
 
 #### Canary rockfish ##########################################################################################################
 canary_dfs <- cleanup_by_species(df = catch, species = "canary rockfish")
@@ -237,23 +201,6 @@ rm(
   "canary_fit_check", "canary_fit_check_df"
 )
 
-# canary_indices requires parallel processing for efficiency
-cores <- detectCores()
-cl <- makeCluster(cores[1] - 1) # to not overload your computer
-registerDoParallel(cl)
-
-setwd(canary)
-# with predefined function
-print("Starting parallel index calculation")
-canary_indices <- foreach(i = seq_along(canary_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
-  print(paste("Processing index:", i))
-  result <- index_fn(canary_sdms[[i]], canary_dfs[[i]], canary_files[[i]])
-  print(paste("Result for index", i, ":", result))
-  result
-}
-stopCluster(cl)
-print("Parallel index calculation complete")
-
 ##### read in .rds if already fit
 canary_indices <- pull_files(canary, "index")
 canary_indices_df <- bind_index_fn(canary_indices)
@@ -261,7 +208,6 @@ write.csv(canary_indices_df, "canary_indices_df.csv", row.names = F)
 
 # Remove the rest of the files
 rm("canary_dfs", "canary_files", "canary_sdms", "canary_indices", "canary_indices_df")
-
 
 #### Darkblotched rockfish ####################################################################################################
 darkblotched_dfs <- cleanup_by_species(df = catch, species = "darkblotched rockfish")
@@ -310,23 +256,6 @@ rm(
   "darkblotched_pars_df", "darkblotched_fit_check", "darkblotched_fit_check_df"
 )
 
-# darkblotched_indices requires parallel processing for efficiency
-cores <- detectCores()
-cl <- makeCluster(cores[1] - 1) # to not overload your computer
-registerDoParallel(cl)
-
-setwd(darkblotched)
-# with predefined function
-print("Starting parallel index calculation")
-darkblotched_indices <- foreach(i = seq_along(darkblotched_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
-  print(paste("Processing index:", i))
-  result <- index_fn(darkblotched_sdms[[i]], darkblotched_dfs[[i]], darkblotched_files[[i]])
-  print(paste("Result for index", i, ":", result))
-  result
-}
-stopCluster(cl)
-print("Parallel index calculation complete")
-
 ##### read in .rds if already fit
 darkblotched_indices <- pull_files(darkblotched, "index")
 darkblotched_indices_df <- bind_index_fn(darkblotched_indices)
@@ -334,7 +263,6 @@ write.csv(darkblotched_indices_df, "darkblotched_indices_df.csv", row.names = F)
 
 # Remove the rest of the files
 rm("darkblotched_dfs", "darkblotched_files", "darkblotched_sdms", "darkblotched_indices", "darkblotched_indices_df")
-
 
 #### Dover sole ###############################################################################################################
 dover_dfs <- cleanup_by_species(df = catch, species = "Dover sole")
@@ -381,23 +309,6 @@ rm(
   "dover_pars_df", "dover_fit_check", "dover_fit_check_df"
 )
 
-# dover_indices requires parallel processing for efficiency
-cores <- detectCores()
-cl <- makeCluster(cores[1] - 1) # to not overload your computer
-registerDoParallel(cl)
-
-setwd(dover)
-# with predefined function
-print("Starting parallel index calculation")
-dover_indices <- foreach(i = seq_along(dover_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
-  print(paste("Processing index:", i))
-  result <- index_fn(dover_sdms[[i]], dover_dfs[[i]], dover_files[[i]])
-  print(paste("Result for index", i, ":", result))
-  result
-}
-stopCluster(cl)
-print("Parallel index calculation complete")
-
 ##### read in .rds if already fit
 dover_indices <- pull_files(dover, "index")
 dover_indices_df <- bind_index_fn(dover_indices)
@@ -405,7 +316,6 @@ write.csv(dover_indices_df, "dover_indices_df.csv", row.names = F)
 
 # Remove the rest of the files
 rm("dover_dfs", "dover_files", "dover_sdms", "dover_indices", "dover_indices_df")
-
 
 #### Lingcod North ############################################################################################################
 lingcod_n_dfs <- cleanup_by_species(df = catch, species = "lingcod")
@@ -455,23 +365,6 @@ rm(
   "lingcod_n_pars_df", "lingcod_n_fit_check", "lingcod_n_fit_check_df"
 )
 
-# lingcod_n_indices requires parallel processing for efficiency
-cores <- detectCores()
-cl <- makeCluster(cores[1] - 1) # to not overload your computer
-registerDoParallel(cl)
-
-setwd(lingcod_n)
-# with predefined function
-print("Starting parallel index calculation")
-lingcod_n_indices <- foreach(i = seq_along(lingcod_n_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
-  print(paste("Processing index:", i))
-  result <- index_fn(lingcod_n_sdms[[i]], lingcod_n_dfs[[i]], lingcod_n_files[[i]])
-  print(paste("Result for index", i, ":", result))
-  result
-}
-stopCluster(cl)
-print("Parallel index calculation complete")
-
 ##### read in .rds if already fit
 lingcod_n_indices <- pull_files(lingcod_n, "index")
 lingcod_n_indices_df <- bind_index_fn(lingcod_n_indices)
@@ -479,7 +372,6 @@ write.csv(lingcod_n_indices_df, "lingcod_n_indices_df.csv", row.names = F)
 
 # Remove the rest of the files
 rm("lingcod_n_dfs", "lingcod_n_files", "lingcod_n_sdms", "lingcod_n_indices", "lingcod_n_indices_df")
-
 
 #### Lingcod South ###############################################################################################
 lingcod_s_dfs <- cleanup_by_species(df = catch, species = "lingcod")
@@ -529,23 +421,6 @@ rm(
   "lingcod_s_pars_df", "lingcod_s_fit_check", "lingcod_s_fit_check_df"
 )
 
-# lingcod_s_indices requires parallel processing for efficiency
-cores <- detectCores()
-cl <- makeCluster(cores[1] - 1) # to not overload your computer
-registerDoParallel(cl)
-
-setwd(lingcod_s)
-# with predefined function
-print("Starting parallel index calculation")
-lingcod_s_indices <- foreach(i = seq_along(lingcod_s_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
-  print(paste("Processing index:", i))
-  result <- index_fn(lingcod_s_sdms[[i]], lingcod_s_dfs[[i]], lingcod_s_files[[i]])
-  print(paste("Result for index", i, ":", result))
-  result
-}
-stopCluster(cl)
-print("Parallel index calculation complete")
-
 ##### read in .rds if already fit
 lingcod_s_indices <- pull_files(lingcod_s, "index")
 lingcod_s_indices_df <- bind_index_fn(lingcod_s_indices)
@@ -553,7 +428,6 @@ write.csv(lingcod_s_indices_df, "lingcod_s_indices_df.csv", row.names = F)
 
 # Remove the rest of the files
 rm("lingcod_s_dfs", "lingcod_s_files", "lingcod_s_sdms", "lingcod_s_indices", "lingcod_s_indices_df")
-
 
 #### Longnose Skate ###########################################################################################################
 longnose_dfs <- cleanup_by_species(df = catch, species = "longnose skate")
@@ -600,23 +474,6 @@ rm(
   "longnose_pars_df", "longnose_fit_check", "longnose_fit_check_df"
 )
 
-# longnose_indices requires parallel processing for efficiency
-cores <- detectCores()
-cl <- makeCluster(cores[1] - 1) # to not overload your computer
-registerDoParallel(cl)
-
-setwd(longnose)
-# with predefined function
-print("Starting parallel index calculation")
-longnose_indices <- foreach(i = seq_along(longnose_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
-  print(paste("Processing index:", i))
-  result <- index_fn(longnose_sdms[[i]], longnose_dfs[[i]], longnose_files[[i]])
-  print(paste("Result for index", i, ":", result))
-  result
-}
-stopCluster(cl)
-print("Parallel index calculation complete")
-
 ##### read in .rds if already fit
 longnose_indices <- pull_files(longnose, "index")
 longnose_indices_df <- bind_index_fn(longnose_indices)
@@ -624,7 +481,6 @@ write.csv(longnose_indices_df, "longnose_indices_df.csv", row.names = F)
 
 # Remove the rest of the files
 rm("longnose_dfs", "longnose_files", "longnose_sdms", "longnose_indices", "longnose_indices_df")
-
 
 #### Pacific ocean perch ######################################################################################################
 pop_dfs <- cleanup_by_species(df = catch, species = "Pacific ocean perch")
@@ -673,23 +529,6 @@ rm(
   "pop_fit_check_df"
 )
 
-# pop_indices requires parallel processing for efficiency
-cores <- detectCores()
-cl <- makeCluster(cores[1] - 1) # to not overload your computer
-registerDoParallel(cl)
-
-setwd(pop)
-# with predefined function
-print("Starting parallel index calculation")
-pop_indices <- foreach(i = seq_along(pop_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
-  print(paste("Processing index:", i))
-  result <- index_fn(pop_sdms[[i]], pop_dfs[[i]], pop_files[[i]])
-  print(paste("Result for index", i, ":", result))
-  result
-}
-stopCluster(cl)
-print("Parallel index calculation complete")
-
 ##### read in .rds if already fit
 pop_indices <- pull_files(pop, "index")
 pop_indices_df <- bind_index_fn(pop_indices)
@@ -697,7 +536,6 @@ write.csv(pop_indices_df, "pop_indices_df.csv", row.names = F)
 
 # Remove the rest of the files
 rm("pop_dfs", "pop_files", "pop_sdms", "pop_indices", "pop_indices_df")
-
 
 #### Pacific spiny dogfish ########################################################################################################
 dogfish_dfs <- cleanup_by_species(df = catch, species = "Pacific spiny dogfish")
@@ -745,23 +583,6 @@ rm(
   "dogfish_fit_check", "dogfish_fit_check_df"
 )
 
-# dogfish_indices requires parallel processing for efficiency
-cores <- detectCores()
-cl <- makeCluster(cores[1] - 1) # to not overload your computer
-registerDoParallel(cl)
-
-setwd(output)
-# with predefined function
-print("Starting parallel index calculation")
-dogfish_indices <- foreach(i = seq_along(dogfish_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
-  print(paste("Processing index:", i))
-  result <- index_fn(dogfish_sdms[[i]], dogfish_dfs[[i]], dogfish_files[[i]])
-  print(paste("Result for index", i, ":", result))
-  result
-}
-stopCluster(cl)
-print("Parallel index calculation complete")
-
 ##### read in .rds if already fit
 dogfish_indices <- pull_files(dogfish, "index")
 dogfish_indices_df <- bind_index_fn(dogfish_indices)
@@ -769,7 +590,6 @@ write.csv(dogfish_indices_df, "dogfish_indices_df.csv", row.names = F)
 
 # Remove the rest of the files
 rm("dogfish_dfs", "dogfish_files", "dogfish_sdms", "dogfish_indices", "dogfish_indices_df")
-
 
 #### Petrale sole #############################################################################################################
 petrale_dfs <- cleanup_by_species(df = catch, species = "petrale sole")
@@ -817,23 +637,6 @@ rm(
   "petrale_fit_check", "petrale_fit_check_df"
 )
 
-# petrale_indices requires parallel processing for efficiency
-cores <- detectCores()
-cl <- makeCluster(cores[1] - 1) # to not overload your computer
-registerDoParallel(cl)
-
-setwd(petrale)
-# with predefined function
-print("Starting parallel index calculation")
-petrale_indices <- foreach(i = seq_along(petrale_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
-  print(paste("Processing index:", i))
-  result <- index_fn(petrale_sdms[[i]], petrale_dfs[[i]], petrale_files[[i]])
-  print(paste("Result for index", i, ":", result))
-  result
-}
-stopCluster(cl)
-print("Parallel index calculation complete")
-
 ##### read in .rds if already fit
 petrale_indices <- pull_files(petrale, "index")
 petrale_indices_df <- bind_index_fn(petrale_indices)
@@ -841,7 +644,6 @@ write.csv(petrale_indices_df, "petrale_indices_df.csv", row.names = F)
 
 # Remove the rest of the files
 rm("petrale_dfs", "petrale_files", "petrale_sdms", "petrale_indices", "petrale_indices_df")
-
 
 #### Rex sole #################################################################################################################
 rex_dfs <- cleanup_by_species(df = catch, species = "rex sole")
@@ -889,23 +691,6 @@ rm(
   "rex_fit_check_df"
 )
 
-# rex_indices requires parallel processing for efficiency
-cores <- detectCores()
-cl <- makeCluster(cores[1] - 1) # to not overload your computer
-registerDoParallel(cl)
-
-setwd(rex)
-# with predefined function
-print("Starting parallel index calculation")
-rex_indices <- foreach(i = seq_along(rex_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
-  print(paste("Processing index:", i))
-  result <- index_fn(rex_sdms[[i]], rex_dfs[[i]], rex_files[[i]])
-  print(paste("Result for index", i, ":", result))
-  result
-}
-stopCluster(cl)
-print("Parallel index calculation complete")
-
 ##### read in .rds if already fit
 rex_indices <- pull_files(rex, "index")
 rex_indices_df <- bind_index_fn(rex_indices)
@@ -913,7 +698,6 @@ write.csv(rex_indices_df, "rex_indices_df.csv", row.names = F)
 
 # Remove the rest of the files
 rm("rex_dfs", "rex_files", "rex_sdms", "rex_indices", "rex_indices_df")
-
 
 #### Sablefish ##################################################################################################################
 sablefish_dfs <- cleanup_by_species(df = catch, species = "sablefish")
@@ -960,23 +744,6 @@ rm(
   "sablefish_pars_df", "sablefish_fit_check", "sablefish_fit_check_df"
 )
 
-# sablefish_indices requires parallel processing for efficiency
-cores <- detectCores()
-cl <- makeCluster(cores[1] - 1) # to not overload your computer
-registerDoParallel(cl)
-
-setwd(sablefish)
-# with predefined function
-print("Starting parallel index calculation")
-sablefish_indices <- foreach(i = seq_along(sablefish_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
-  print(paste("Processing index:", i))
-  result <- index_fn(sablefish_sdms[[i]], sablefish_dfs[[i]], sablefish_files[[i]])
-  print(paste("Result for index", i, ":", result))
-  result
-}
-stopCluster(cl)
-print("Parallel index calculation complete")
-
 ##### read in .rds if already fit
 sablefish_indices <- pull_files(sablefish, "index")
 sablefish_indices_df <- bind_index_fn(sablefish_indices)
@@ -984,7 +751,6 @@ write.csv(sablefish_indices_df, "sablefish_indices_df.csv", row.names = F)
 
 # Remove the rest of the files
 rm("sablefish_dfs", "sablefish_files", "sablefish_sdms", "sablefish_indices", "sablefish_indices_df")
-
 
 #### Shortspine thornyhead ####################################################################################################
 shortspine_dfs <- cleanup_by_species(df = catch, species = "shortspine thornyhead")
@@ -1030,24 +796,6 @@ rm(
   "shortspine_fits", "shortspine_fits_df", "shortspine_pars",
   "shortspine_pars_df", "shortspine_fit_check", "shortspine_fit_check_df"
 )
-
-# shortspine_indices requires parallel processing for efficiency
-cores <- detectCores()
-cl <- makeCluster(cores[1] - 1) # to not overload your computer
-registerDoParallel(cl)
-
-setwd(shortspine)
-# with predefined function
-print("Starting parallel index calculation")
-shortspine_indices <- foreach(i = seq_along(shortspine_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
-  print(paste("Processing index:", i))
-  result <- index_fn(shortspine_sdms[[i]], shortspine_dfs[[i]], shortspine_files[[i]])
-  print(paste("Result for index", i, ":", result))
-  result
-}
-stopCluster(cl)
-print("Parallel index calculation complete")
-
 ##### read in .rds if already fit
 shortspine_indices <- pull_files(shortspine, "index")
 shortspine_indices_df <- bind_index_fn(shortspine_indices)
@@ -1055,7 +803,6 @@ write.csv(shortspine_indices_df, "shortspine_indices_df.csv", row.names = F)
 
 # Remove the rest of the files
 rm("shortspine_dfs", "shortspine_files", "shortspine_sdms", "shortspine_indices", "shortspine_indices_df")
-
 
 #### Widow rockfish ###########################################################################################################
 widow_dfs <- cleanup_by_species(df = catch, species = "widow rockfish")
@@ -1104,23 +851,6 @@ rm(
   "widow_fit_check", "widow_fit_check_df"
 )
 
-# widow_indices requires parallel processing for efficiency
-cores <- detectCores()
-cl <- makeCluster(cores[1] - 1) # to not overload your computer
-registerDoParallel(cl)
-
-setwd(widow)
-# with predefined function
-print("Starting parallel index calculation")
-widow_indices <- foreach(i = seq_along(widow_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
-  print(paste("Processing index:", i))
-  result <- index_fn(widow_sdms[[i]], widow_dfs[[i]], widow_files[[i]])
-  print(paste("Result for index", i, ":", result))
-  result
-}
-stopCluster(cl)
-print("Parallel index calculation complete")
-
 ##### read in .rds if already fit
 widow_indices <- pull_files(widow, "index")
 widow_indices_df <- bind_index_fn(widow_indices)
@@ -1128,7 +858,6 @@ write.csv(widow_indices_df, "widow_indices_df.csv", row.names = F)
 
 # Remove the rest of the files
 rm("widow_dfs", "widow_files", "widow_sdms", "widow_indices", "widow_indices_df")
-
 
 #### Yellowtail rockfish ######################################################################################################
 yellowtail_dfs <- cleanup_by_species(df = catch, species = "yellowtail rockfish")
@@ -1176,23 +905,6 @@ rm(
   "yellowtail_fits", "yellowtail_fits_df", "yellowtail_pars",
   "yellowtail_pars_df", "yellowtail_fit_check", "yellowtail_fit_check_df"
 )
-
-# yellowtail_indices requires parallel processing for efficiency
-cores <- detectCores()
-cl <- makeCluster(cores[1] - 1) # to not overload your computer
-registerDoParallel(cl)
-
-setwd(yellowtail)
-# with predefined function
-print("Starting parallel index calculation")
-yellowtail_indices <- foreach(i = seq_along(yellowtail_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
-  print(paste("Processing index:", i))
-  result <- index_fn(yellowtail_sdms[[i]], yellowtail_dfs[[i]], yellowtail_files[[i]])
-  print(paste("Result for index", i, ":", result))
-  result
-}
-stopCluster(cl)
-print("Parallel index calculation complete")
 
 ##### read in .rds if already fit
 yellowtail_indices <- pull_files(yellowtail, "index")
