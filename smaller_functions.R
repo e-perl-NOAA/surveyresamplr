@@ -103,22 +103,6 @@ fit_check_fn<- function(fit){
   write.csv(index, file = filename, row.names = F)
 }
 
-#get index
-index_fn<- function(fit, x, names){ 
-  p_grid<-predict(fit, newdata = x)
-  
-  grid_yrs <- replicate_df(p_grid, "year", unique(x$Year))
-  
-  p_sbf <- predict(fit, newdata = x, 
-                   return_tmb_object = TRUE)
-  
-  index <- get_index(p_sbf, area = 4, bias_correct = T)
-  
-  saveRDS(index, paste0("index_",names,".rds"))
-  
-  return(index)
-}
-
 #rbind and bring effort and replicates in as columns from rownames
 bind_fn<-function(x){
   y<- do.call(rbind, x)
