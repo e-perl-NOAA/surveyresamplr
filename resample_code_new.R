@@ -220,7 +220,7 @@ darkblotched_dfs <- lapply(darkblotched_dfs, lat_filter_335)
 darkblotched_dfs <- lapply(darkblotched_dfs, depth_filter_675)
 darkblotched_dfs <- darkblotched_dfs[90:91] # reduce DFs for testing
 # make the names file
-darkblotched_files <- as.list(names(darkblotched_names))
+darkblotched_files <- as.list(names(darkblotched_dfs))
 
 # setup parallel backend to use many processors
 cores <- detectCores()
@@ -273,7 +273,7 @@ rm("darkblotched_dfs", "darkblotched_files", "darkblotched_sdms", "darkblotched_
 dover_dfs <- cleanup_by_species(df = catch, species = "Dover sole")
 dover_dfs <- dover_dfs[90:91] # reduce DFs for testing
 # make the names file
-dover_files <- as.list(names(dover_names))
+dover_files <- as.list(names(dover_dfs))
 
 # setup parallel backend to use many processors
 cores <- detectCores()
