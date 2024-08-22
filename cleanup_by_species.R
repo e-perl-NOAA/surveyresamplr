@@ -1,7 +1,12 @@
 #' Cleanup species function
 #'
+#' Filter catch by species, create a vector of tows and give tows a random
+#' assignment to be resampled,
+#'
 #' @param df full catch df
 #' @param species The species which you want to do data cleanup for.
+#' @return List of resampled catch data frames
+#'
 cleanup_by_species <- function(df, species) {
   catch_species <- df |>
     dplyr::filter(`Common_name` == species)
@@ -23,7 +28,6 @@ cleanup_by_species <- function(df, species) {
     x <- x[1:91]
     return(x)
   })
-
 
   tows_assigned_resampled <- purrr::map(tows_assigned, function(x) {
     purrr::map(x, function(y) {

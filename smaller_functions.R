@@ -17,8 +17,8 @@ tow_fn <- function(x) {
 
 #' Include or Exclude
 #'
-#' Specify how to downsample. For simple random sampling, a proportion of stations
-#' should do.
+#' Specify how to downsample. For simple random sampling, a proportion of
+#' stations should do.
 #'
 #' @param df tows data frame
 #' @param proportions proportions developed using: props <- as.data.frame(seq
@@ -52,14 +52,15 @@ include_or_exclude <- function(df, proportions) {
 }
 
 
-
 #' Join Data Frames
 #'
-#' Function to join a list of data frames to a main data frame using a shared column.
+#' Function to join a list of data frames to a main data frame using a shared
+#' column.
 #'
-#' @param list_of_d.fs The list of data frames that you would like to join to the
-#' main data frame
-#' @param main_df The main data frame that you want to join the list of data frames
+#' @param list_of_d.fs The list of data frames that you would like to join to
+#' the main data frame
+#' @param main_df The main data frame that you want to join the list of data
+#' frames
 #' @param shared_column The column that all the data frames share which will be
 #' used to join the data frames together.
 #'
@@ -73,7 +74,14 @@ join_dfs <- function(list_of_dfs, main_df, shared_column) {
 
 ####### calculate model based indices for all species and effort levels ######################################
 ####### generic functions
-# dataframe of the fit
+#' Create data frame of the species distribution model fit.
+#'
+#' Function to take the species distribution model fit and write it to a csv.
+#'
+#' @param fit Species distribution model fit from whatever smd_fn was used
+#' (see species_sdms.R file for specifics on those sdm files).
+#' @return main model fit data frame
+#'
 fit_df_fn <- function(fit) {
   fit_df <- tidy(fit, conf.int = T)
   return(fit_df)
@@ -82,7 +90,15 @@ fit_df_fn <- function(fit) {
   write.csv(fit_df, file = filename, row.names = F)
 }
 
-# parameter estimates
+#' Create data frame of the species distribution model parameter estimates.
+#'
+#' Function to get the species distribution model parameter estimates and write
+#' it to a csv.
+#'
+#' @param fit Species distribution model fit from whatever smd_fn was used
+#' (see species_sdms.R file for specifics on those sdm files).
+#' @return parameter estimates data frame
+#'
 fit_pars_fn <- function(fit) {
   fit_pars <- tidy(fit, effects = "ran_pars", conf.int = T)
   return(fit_pars)
@@ -91,7 +107,15 @@ fit_pars_fn <- function(fit) {
   write.csv(index, file = filename, row.names = F)
 }
 
-# diagnostics
+#' Create data frame of the species distribution model diagnostics.
+#'
+#' Function to get the species distribution model diagnostics and write
+#' it to a csv.
+#'
+#' @param fit Species distribution model fit from whatever smd_fn was used
+#' (see species_sdms.R file for specifics on those sdm files).
+#' @return diagnostics data frame
+#'
 fit_check_fn <- function(fit) {
   fit_check <- sanity(fit)
   return(fit_check)
@@ -100,7 +124,15 @@ fit_check_fn <- function(fit) {
   write.csv(index, file = filename, row.names = F)
 }
 
-# rbind and bring effort and replicates in as columns from rownames
+#' Bind function for species distribution model fits and parameters
+#'
+#' Function to rbind and bring effort and replicates in as columns from
+#' rownames of species distribution model fits and parameters.
+#'
+#' @param x Species distribution model fits or parameters data frame after
+#' being read in by fit_df_fn or fit_pars_fn respectively.
+#' @return New data frame of fits or parameters with the rownames as columns
+#'
 bind_fn <- function(x) {
   y <- do.call(rbind, x)
   y$effort <- substr(row.names(y), start = 5, stop = 9)
@@ -115,6 +147,15 @@ bind_fn <- function(x) {
   return(y)
 }
 
+#' Bind function for species distribution model diagnostics
+#'
+#' Function to rbind and bring effort and replicates in as columns from
+#' rownames of species distribution model diagnostics.
+#'
+#' @param x Species distribution model diagnostics data frame after being read in
+#' by fit_df_fn.
+#' @return New data frame of diagnostics with the rownames as columns
+#'
 # special bind function for fit check dfs
 bind_fit_check <- function(x) {
   y <- do.call(rbind, x)
@@ -132,6 +173,14 @@ bind_fit_check <- function(x) {
   return(y)
 }
 
+#' Bind function for species distribution model index
+#'
+#' Function to rbind and bring effort and replicates in as columns from
+#' rownames of species distribution model index.
+#'
+#' @param x Species distribution model index data frame after being read in.
+#' @return New data frame of index with the rownames as columns
+#'
 bind_index_fn <- function(x) {
   y <- do.call(rbind, x)
   y$effort <- substr(row.names(y), start = 7, stop = 11)
@@ -146,7 +195,15 @@ bind_index_fn <- function(x) {
   return(y)
 }
 
-# read in files that contain specified character strings. To bring in fit and index files.
+#' Pull files with specified character strings
+#'
+#' Function to read (pull) files from the set species directory containing
+#' specified character strings.
+#'
+#' @param directory Species directory to look for files in.
+#' @param string Character string to search files for.
+#' @return Read in list of all files containing the character string searched for.
+#'
 pull_files <- function(directory, string) {
   # List all files in the directory
   files <- list.files(directory, pattern = "\\.rds$", full.names = TRUE)
@@ -160,7 +217,12 @@ pull_files <- function(directory, string) {
   return(data_list)
 }
 
-#### specific functions for filtering by latitude and depth
+#' Filter by latitutde or depth
+#'
+#' Functions to filter data by specified latitude or depth.
+#'
+#' @param x Data frame output of cleanup_by_species() function.
+#'
 # remove south of 33.5 lat
 lat_filter_335 <- function(x) {
   x[x$Latitude_dd > 33.5, ]
