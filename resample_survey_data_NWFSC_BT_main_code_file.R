@@ -399,15 +399,18 @@ fit_arrowtooth_sdms <- function(tows_assigned, catch) {
 }
 
 #fit arrowtooth sdms in parallel
-cores=detectCores()
-cl <- makeCluster(cores[1])#-1) #to not overload your computer
-registerDoParallel(cl)
+ncores <- parallelly::availableCores(omit = 1)
+future::plan(multisession, workers = ncores)
+# cores=detectCores()
+# cl <- makeCluster(cores[1])#-1) #to not overload your computer
+# registerDoParallel(cl)
 
 setwd(arrowtooth)
 
 fit_arrowtooth_sdms(tows_assigned_resampled,catch)
 
-stopCluster(cl)
+future::plan(sequential)
+# stopCluster(cl)
 
 #####read in fit and index files
 arrowtooth_sdms<-pull_files(arrowtooth,"fit")
