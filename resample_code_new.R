@@ -50,7 +50,7 @@ source(file.path(getwd(), "species_sdms.R"))
 #### Arrowtooth flounder ##########################################################################################################
 arrowtooth_dfs <- cleanup_by_species(df = catch, species = "arrowtooth flounder")
 arrowtooth_dfs <- lapply(arrowtooth_dfs, lat_filter_34)
-arrowtooth_dfs <- arrowtooth_dfs[90:91] # reduce DFs for testing
+# arrowtooth_dfs <- arrowtooth_dfs[90:91] # reduce DFs for testing
 # make the names file
 arrowtooth_files <- as.list(names(arrowtooth_dfs))
 
@@ -94,7 +94,7 @@ write.csv(arrowtooth_fit_check_df, "arrowtooth_fit_check_df.csv", row.names = F)
 
 # Remove some files to help with memory
 rm(
-  "arrowtooth_fits", "arrowtooth_fits_df", "arrowtooth_pars",
+  "arrowtooth_fits", "arrowtooth_fit_df", "arrowtooth_pars",
   "arrowtooth_pars_df", "arrowtooth_fit_check", "arrowtooth_fit_check_df"
 )
 
@@ -107,9 +107,10 @@ write.csv(arrowtooth_indices_df, "arrowtooth_indices_df.csv", row.names = F)
 rm("arrowtooth_dfs", "arrowtooth_files", "arrowtooth_sdms", "arrowtooth_indices", "arrowtooth_indices_df")
 
 #### Bocaccio #############################################################################################################
+setwd(bocaccio)
 bocaccio_dfs <- cleanup_by_species(df = catch, species = "bocaccio")
 bocaccio_dfs <- lapply(bocaccio_dfs, depth_filter_500)
-bocaccio_dfs <- bocaccio_dfs[90:91] # reduce DFs for testing
+# bocaccio_dfs <- bocaccio_dfs[90:91] # reduce DFs for testing
 # make the names file
 bocaccio_files <- as.list(names(bocaccio_dfs))
 
@@ -148,7 +149,7 @@ write.csv(bocaccio_fit_check_df, "bocaccio_fit_check_df.csv", row.names = F)
 
 # Remove some files to help with memory
 rm(
-  "bocaccio_fits", "bocaccio_fits_df", "bocaccio_pars", "bocaccio_pars_df",
+  "bocaccio_fits", "bocaccio_fit_df", "bocaccio_pars", "bocaccio_pars_df",
   "bocaccio_fit_check", "bocaccio_fit_check_df"
 )
 
@@ -161,9 +162,10 @@ write.csv(bocaccio_indices_df, "bocaccio_indices_df.csv", row.names = F)
 rm("bocaccio_dfs", "bocaccio_files", "bocaccio_sdms", "bocaccio_indices", "bocaccio_indices_df")
 
 #### Canary rockfish ##########################################################################################################
+setwd(canary)
 canary_dfs <- cleanup_by_species(df = catch, species = "canary rockfish")
 canary_dfs <- lapply(canary_dfs, depth_filter_275)
-canary_dfs <- canary_dfs[90:91] # reduce DFs for testing
+# canary_dfs <- canary_dfs[90:91] # reduce DFs for testing
 # make the names file
 canary_files <- as.list(names(canary_dfs))
 
@@ -202,7 +204,7 @@ write.csv(canary_fit_check_df, "canary_fit_check_df.csv", row.names = F)
 
 # Remove some files to help with memory
 rm(
-  "canary_fits", "canary_fits_df", "canary_pars", "canary_pars_df",
+  "canary_fits", "canary_fit_df", "canary_pars", "canary_pars_df",
   "canary_fit_check", "canary_fit_check_df"
 )
 
@@ -215,10 +217,11 @@ write.csv(canary_indices_df, "canary_indices_df.csv", row.names = F)
 rm("canary_dfs", "canary_files", "canary_sdms", "canary_indices", "canary_indices_df")
 
 #### Darkblotched rockfish ####################################################################################################
+setwd(darkblotched)
 darkblotched_dfs <- cleanup_by_species(df = catch, species = "darkblotched rockfish")
 darkblotched_dfs <- lapply(darkblotched_dfs, lat_filter_335)
 darkblotched_dfs <- lapply(darkblotched_dfs, depth_filter_675)
-darkblotched_dfs <- darkblotched_dfs[90:91] # reduce DFs for testing
+# darkblotched_dfs <- darkblotched_dfs[90:91] # reduce DFs for testing
 # make the names file
 darkblotched_files <- as.list(names(darkblotched_dfs))
 
@@ -257,7 +260,7 @@ write.csv(darkblotched_fit_check_df, "darkblotched_fit_check_df.csv", row.names 
 
 # Remove some files to help with memory
 rm(
-  "darkblotched_fits", "darkblotched_fits_df", "darkblotched_pars",
+  "darkblotched_fits", "darkblotched_fit_df", "darkblotched_pars",
   "darkblotched_pars_df", "darkblotched_fit_check", "darkblotched_fit_check_df"
 )
 
@@ -270,8 +273,9 @@ write.csv(darkblotched_indices_df, "darkblotched_indices_df.csv", row.names = F)
 rm("darkblotched_dfs", "darkblotched_files", "darkblotched_sdms", "darkblotched_indices", "darkblotched_indices_df")
 
 #### Dover sole ###############################################################################################################
+setwd(dover)
 dover_dfs <- cleanup_by_species(df = catch, species = "Dover sole")
-dover_dfs <- dover_dfs[90:91] # reduce DFs for testing
+# dover_dfs <- dover_dfs[90:91] # reduce DFs for testing
 # make the names file
 dover_files <- as.list(names(dover_dfs))
 
@@ -310,7 +314,7 @@ write.csv(dover_fit_check_df, "dover_fit_check_df.csv", row.names = F)
 
 # Remove some files to help with memory
 rm(
-  "dover_fits", "dover_fits_df", "dover_pars",
+  "dover_fits", "dover_fit_df", "dover_pars",
   "dover_pars_df", "dover_fit_check", "dover_fit_check_df"
 )
 
@@ -323,11 +327,12 @@ write.csv(dover_indices_df, "dover_indices_df.csv", row.names = F)
 rm("dover_dfs", "dover_files", "dover_sdms", "dover_indices", "dover_indices_df")
 
 #### Lingcod North ############################################################################################################
+setwd(lingcod_n)
 lingcod_n_dfs <- cleanup_by_species(df = catch, species = "lingcod")
 lingcod_n_dfs <- lapply(lingcod_n_dfs, lat_filter_34)
 lingcod_n_dfs <- lapply(lingcod_n_dfs, depth_filter_450)
 lingcod_n_dfs <- gsub("lingcod", "lingcod_n", lingcod_n_dfs)
-lingcod_n_dfs <- lingcod_n_dfs[90:91] # reduce DFs for testing
+# lingcod_n_dfs <- lingcod_n_dfs[90:91] # reduce DFs for testing
 # make the names file
 lingcod_n_files <- as.list(names(lingcod_n_dfs))
 
@@ -366,7 +371,7 @@ write.csv(lingcod_n_fit_check_df, "lingcod_n_fit_check_df.csv", row.names = F)
 
 # Remove some files to help with memory
 rm(
-  "lingcod_n_fits", "lingcod_n_fits_df", "lingcod_n_pars",
+  "lingcod_n_fits", "lingcod_n_fit_df", "lingcod_n_pars",
   "lingcod_n_pars_df", "lingcod_n_fit_check", "lingcod_n_fit_check_df"
 )
 
@@ -379,10 +384,11 @@ write.csv(lingcod_n_indices_df, "lingcod_n_indices_df.csv", row.names = F)
 rm("lingcod_n_dfs", "lingcod_n_files", "lingcod_n_sdms", "lingcod_n_indices", "lingcod_n_indices_df")
 
 #### Lingcod South ###############################################################################################
+setwd(lingcod_s)
 lingcod_s_dfs <- cleanup_by_species(df = catch, species = "lingcod")
 lingcod_s_dfs <- lapply(lingcod_s_dfs, lat_filter_34_max)
 lingcod_s_dfs <- lapply(lingcod_s_dfs, depth_filter_450)
-lingcod_s_dfs <- lingcod_s_dfs[90:91] # reduce DFs for testing
+# lingcod_s_dfs <- lingcod_s_dfs[90:91] # reduce DFs for testing
 # make the names file
 lingcod_s_dfs <- gsub("lingcod", "lingcod_s", lingcod_s_dfs)
 lingcod_s_files <- as.list(names(lingcod_s_dfs))
@@ -422,7 +428,7 @@ write.csv(lingcod_s_fit_check_df, "lingcod_s_fit_check_df.csv", row.names = F)
 
 # Remove some files to help with memory
 rm(
-  "lingcod_s_fits", "lingcod_s_fits_df", "lingcod_s_pars",
+  "lingcod_s_fits", "lingcod_s_fit_df", "lingcod_s_pars",
   "lingcod_s_pars_df", "lingcod_s_fit_check", "lingcod_s_fit_check_df"
 )
 
@@ -435,8 +441,9 @@ write.csv(lingcod_s_indices_df, "lingcod_s_indices_df.csv", row.names = F)
 rm("lingcod_s_dfs", "lingcod_s_files", "lingcod_s_sdms", "lingcod_s_indices", "lingcod_s_indices_df")
 
 #### Longnose Skate ###########################################################################################################
+setwd(longnose)
 longnose_dfs <- cleanup_by_species(df = catch, species = "longnose skate")
-longnose_dfs <- longnose_dfs[90:91] # reduce DFs for testing
+# longnose_dfs <- longnose_dfs[90:91] # reduce DFs for testing
 # make the names file
 longnose_files <- as.list(names(longnose_dfs))
 
@@ -475,7 +482,7 @@ write.csv(longnose_fit_check_df, "longnose_fit_check_df.csv", row.names = F)
 
 # Remove some files to help with memory
 rm(
-  "longnose_fits", "longnose_fits_df", "longnose_pars",
+  "longnose_fits", "longnose_fit_df", "longnose_pars",
   "longnose_pars_df", "longnose_fit_check", "longnose_fit_check_df"
 )
 
@@ -488,10 +495,11 @@ write.csv(longnose_indices_df, "longnose_indices_df.csv", row.names = F)
 rm("longnose_dfs", "longnose_files", "longnose_sdms", "longnose_indices", "longnose_indices_df")
 
 #### Pacific ocean perch ######################################################################################################
+setwd(pop)
 pop_dfs <- cleanup_by_species(df = catch, species = "Pacific ocean perch")
 pop_dfs <- lapply(pop_dfs, lat_filter_35)
 pop_dfs <- lapply(pop_dfs, depth_filter_500)
-pop_dfs <- pop_dfs[90:91] # reduce DFs for testing
+# pop_dfs <- pop_dfs[90:91] # reduce DFs for testing
 # make the names file
 pop_files <- as.list(names(pop_dfs))
 
@@ -530,7 +538,7 @@ write.csv(pop_fit_check_df, "pop_fit_check_df.csv", row.names = F)
 
 # Remove some files to help with memory
 rm(
-  "pop_fits", "pop_fits_df", "pop_pars", "pop_pars_df", "pop_fit_check",
+  "pop_fits", "pop_fit_df", "pop_pars", "pop_pars_df", "pop_fit_check",
   "pop_fit_check_df"
 )
 
@@ -543,9 +551,10 @@ write.csv(pop_indices_df, "pop_indices_df.csv", row.names = F)
 rm("pop_dfs", "pop_files", "pop_sdms", "pop_indices", "pop_indices_df")
 
 #### Pacific spiny dogfish ########################################################################################################
+setwd(dogfish)
 dogfish_dfs <- cleanup_by_species(df = catch, species = "Pacific spiny dogfish")
 dogfish_dfs <- lapply(dogfish_dfs, depth_filter_700)
-dogfish_dfs <- dogfish_dfs[90:91] # reduce DFs for testing
+# dogfish_dfs <- dogfish_dfs[90:91] # reduce DFs for testing
 # make the names file
 dogfish_files <- as.list(names(dogfish_dfs))
 
@@ -584,7 +593,7 @@ write.csv(dogfish_fit_check_df, "dogfish_fit_check_df.csv", row.names = F)
 
 # Remove some files to help with memory
 rm(
-  "dogfish_fits", "dogfish_fits_df", "dogfish_pars", "dogfish_pars_df",
+  "dogfish_fits", "dogfish_fit_df", "dogfish_pars", "dogfish_pars_df",
   "dogfish_fit_check", "dogfish_fit_check_df"
 )
 
@@ -597,9 +606,10 @@ write.csv(dogfish_indices_df, "dogfish_indices_df.csv", row.names = F)
 rm("dogfish_dfs", "dogfish_files", "dogfish_sdms", "dogfish_indices", "dogfish_indices_df")
 
 #### Petrale sole #############################################################################################################
+setwd(petrale)
 petrale_dfs <- cleanup_by_species(df = catch, species = "petrale sole")
 petrale_dfs <- lapply(petrale_dfs, depth_filter_675)
-petrale_dfs <- petrale_dfs[90:91] # reduce DFs for testing
+# petrale_dfs <- petrale_dfs[90:91] # reduce DFs for testing
 # make the names file
 petrale_files <- as.list(names(petrale_dfs))
 
@@ -638,7 +648,7 @@ write.csv(petrale_fit_check_df, "petrale_fit_check_df.csv", row.names = F)
 
 # Remove some files to help with memory
 rm(
-  "petrale_fits", "petrale_fits_df", "petrale_pars", "petrale_pars_df",
+  "petrale_fits","petrale_fit_df", "petrale_pars", "petrale_pars_df",
   "petrale_fit_check", "petrale_fit_check_df"
 )
 
@@ -651,9 +661,10 @@ write.csv(petrale_indices_df, "petrale_indices_df.csv", row.names = F)
 rm("petrale_dfs", "petrale_files", "petrale_sdms", "petrale_indices", "petrale_indices_df")
 
 #### Rex sole #################################################################################################################
+setwd(rex)
 rex_dfs <- cleanup_by_species(df = catch, species = "rex sole")
 rex_dfs <- lapply(rex_dfs, depth_filter_700)
-rex_dfs <- rex_dfs[90:91] # reduce DFs for testing
+# rex_dfs <- rex_dfs[90:91] # reduce DFs for testing
 # make the names file
 rex_files <- as.list(names(rex_dfs))
 
@@ -692,7 +703,7 @@ write.csv(rex_fit_check_df, "rex_fit_check_df.csv", row.names = F)
 
 # Remove some files to help with memory
 rm(
-  "rex_fits", "rex_fits_df", "rex_pars", "rex_pars_df", "rex_fit_check",
+  "rex_fits", "rex_fit_df", "rex_pars", "rex_pars_df", "rex_fit_check",
   "rex_fit_check_df"
 )
 
@@ -705,8 +716,9 @@ write.csv(rex_indices_df, "rex_indices_df.csv", row.names = F)
 rm("rex_dfs", "rex_files", "rex_sdms", "rex_indices", "rex_indices_df")
 
 #### Sablefish ##################################################################################################################
+setwd(sablefish)
 sablefish_dfs <- cleanup_by_species(df = catch, species = "sablefish")
-sablefish_dfs <- sablefish_dfs[90:91] # reduce DFs for testing
+# sablefish_dfs <- sablefish_dfs[90:91] # reduce DFs for testing
 # make the names file
 sablefish_files <- as.list(names(sablefish_dfs))
 
@@ -745,7 +757,7 @@ write.csv(sablefish_fit_check_df, "sablefish_fit_check_df.csv", row.names = F)
 
 # Remove some files to help with memory
 rm(
-  "sablefish_fits", "sablefish_fits_df", "sablefish_pars",
+  "sablefish_fits", "sablefish_fit_df", "sablefish_pars",
   "sablefish_pars_df", "sablefish_fit_check", "sablefish_fit_check_df"
 )
 
@@ -758,8 +770,10 @@ write.csv(sablefish_indices_df, "sablefish_indices_df.csv", row.names = F)
 rm("sablefish_dfs", "sablefish_files", "sablefish_sdms", "sablefish_indices", "sablefish_indices_df")
 
 #### Shortspine thornyhead ####################################################################################################
+# This took over 7.5 hours to run and still didn't finish
+setwd(shortspine)
 shortspine_dfs <- cleanup_by_species(df = catch, species = "shortspine thornyhead")
-shortspine_dfs <- shortspine_dfs[90:91] # reduce DFs for testing
+# shortspine_dfs <- shortspine_dfs[90:91] # reduce DFs for testing
 # make the names file
 shortspine_files <- as.list(names(shortspine_dfs))
 
@@ -798,7 +812,7 @@ write.csv(shortspine_fit_check_df, "shortspine_fit_check_df.csv", row.names = F)
 
 # Remove some files to help with memory
 rm(
-  "shortspine_fits", "shortspine_fits_df", "shortspine_pars",
+  "shortspine_fits", "shortspine_fit_df", "shortspine_pars",
   "shortspine_pars_df", "shortspine_fit_check", "shortspine_fit_check_df"
 )
 ##### read in .rds if already fit
@@ -810,10 +824,11 @@ write.csv(shortspine_indices_df, "shortspine_indices_df.csv", row.names = F)
 rm("shortspine_dfs", "shortspine_files", "shortspine_sdms", "shortspine_indices", "shortspine_indices_df")
 
 #### Widow rockfish ###########################################################################################################
+setwd(widow)
 widow_dfs <- cleanup_by_species(df = catch, species = "widow rockfish")
 widow_dfs <- lapply(widow_dfs, lat_filter_335)
 widow_dfs <- lapply(widow_dfs, depth_filter_675)
-widow_dfs <- widow_dfs[90:91] # reduce DFs for testing
+# widow_dfs <- widow_dfs[90:91] # reduce DFs for testing
 # make the names file
 widow_files <- as.list(names(widow_dfs))
 
@@ -852,7 +867,7 @@ write.csv(widow_fit_check_df, "widow_fit_check_df.csv", row.names = F)
 
 # Remove some files to help with memory
 rm(
-  "widow_fits", "widow_fits_df", "widow_pars", "widow_pars_df",
+  "widow_fits", "widow_fit_df", "widow_pars", "widow_pars_df",
   "widow_fit_check", "widow_fit_check_df"
 )
 
@@ -865,10 +880,11 @@ write.csv(widow_indices_df, "widow_indices_df.csv", row.names = F)
 rm("widow_dfs", "widow_files", "widow_sdms", "widow_indices", "widow_indices_df")
 
 #### Yellowtail rockfish ######################################################################################################
+setwd(yellowtail)
 yellowtail_dfs <- cleanup_by_species(df = catch, species = "yellowtail rockfish")
 yellowtail_dfs <- lapply(yellowtail_dfs, lat_filter_335)
 yellowtail_dfs <- lapply(yellowtail_dfs, depth_filter_425)
-yellowtail_dfs <- yellowtail_dfs[90:91] # reduce DFs for testing
+# yellowtail_dfs <- yellowtail_dfs[90:91] # reduce DFs for testing
 # make the names file
 yellowtail_files <- as.list(names(yellowtail_dfs))
 
@@ -907,7 +923,7 @@ write.csv(yellowtail_fit_check_df, "yellowtail_fit_check_df.csv", row.names = F)
 
 # Remove some files to help with memory
 rm(
-  "yellowtail_fits", "yellowtail_fits_df", "yellowtail_pars",
+  "yellowtail_fits", "yellowtail_fit_df", "yellowtail_pars",
   "yellowtail_pars_df", "yellowtail_fit_check", "yellowtail_fit_check_df"
 )
 
@@ -918,5 +934,3 @@ write.csv(yellowtail_indices_df, "yellowtail_indices_df.csv", row.names = F)
 
 # Remove the rest of the files
 rm("yellowtail_dfs", "yellowtail_files", "yellowtail_sdms", "yellowtail_indices", "yellowtail_indices_df")
-
-setwd(wd)
