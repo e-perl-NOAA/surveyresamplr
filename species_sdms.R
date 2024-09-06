@@ -72,7 +72,7 @@ species_sdm_lognormal_fn <- function(x, y) {
   )
 
   # get the index
-  index <- sdmTMB::get_index(fit, bias_correct = TRUE)
+  index <- sdmTMB::get_index(fit, bias_correct = FALSE) #these are running very slow, so turning bias correction off for now. 
 
   # save file
   saveRDS(fit, paste0("fit_", y, ".rds"))
