@@ -192,7 +192,7 @@ shortspine_sdm_fn <- function(x, y) {
   )
 
   # get the index
-  index <- sdmTMB::get_index(fit, bias_correct = TRUE)
+  index <- sdmTMB::get_index(fit, bias_correct = FALSE) # turn bias correct off because this might be causing model to run for a long time
 
   # save file
   saveRDS(fit, paste0("fit_", y, ".rds"))
