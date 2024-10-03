@@ -331,7 +331,7 @@ setwd(lingcod_n)
 lingcod_n_dfs <- cleanup_by_species(df = catch, species = "lingcod")
 lingcod_n_dfs <- lapply(lingcod_n_dfs, lat_filter_34)
 lingcod_n_dfs <- lapply(lingcod_n_dfs, depth_filter_450)
-lingcod_n_dfs <- gsub("lingcod", "lingcod_n", lingcod_n_dfs)
+# lingcod_n_dfs <- gsub("lingcod", "lingcod_n", lingcod_n_dfs)
 # lingcod_n_dfs <- lingcod_n_dfs[90:91] # reduce DFs for testing
 # make the names file
 lingcod_n_files <- as.list(names(lingcod_n_dfs))
@@ -390,7 +390,7 @@ lingcod_s_dfs <- lapply(lingcod_s_dfs, lat_filter_34_max)
 lingcod_s_dfs <- lapply(lingcod_s_dfs, depth_filter_450)
 # lingcod_s_dfs <- lingcod_s_dfs[90:91] # reduce DFs for testing
 # make the names file
-lingcod_s_dfs <- gsub("lingcod", "lingcod_s", lingcod_s_dfs)
+#lingcod_s_dfs <- gsub("lingcod", "lingcod_s", lingcod_s_dfs)
 lingcod_s_files <- as.list(names(lingcod_s_dfs))
 
 # setup parallel backend to use many processors
