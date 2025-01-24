@@ -7,9 +7,11 @@
 rm(list = ls())
 
 #### set wds
+#setwd("C:/Users/Derek.Bolser/Documents/Resample_survey_data/") #for local testing
 
 wd <- getwd()
 output <- file.path(wd, "Results")
+data <-file.path(wd, "data")
 arrowtooth <- file.path(output, "Arrowtooth_flounder")
 bocaccio <- file.path(output, "Bocaccio")
 canary <- file.path(output, "Canary_rockfish")
@@ -26,7 +28,6 @@ sablefish <- file.path(output, "Sablefish")
 shortspine <- file.path(output, "Shortspine_thornyhead")
 widow <- file.path(output, "Widow_rockfish")
 yellowtail <- file.path(output, "Yellowtail_rockfish")
-figures <- file.path(wd, "Figures")
 
 # load packages
 library(sampling)
@@ -41,17 +42,29 @@ library(sdmTMB)
 library(doParallel)
 
 # read in data
-catch <- read.csv(file.path(getwd(), "data", "nwfsc_bt_fmp_spp.csv"))
-source(file.path(getwd(), "smaller_functions.R"))
+catch <- read.csv(file.path(data,"nwfsc_bt_fmp_spp.csv"))
+load(file.path(data,"california_current_grid.rda"))
+
+source(file.path(getwd(), "smaller_functions.R")) #need to edit to specify the code directory if running locally
 source(file.path(getwd(), "cleanup_by_species.R"))
 source(file.path(getwd(), "species_sdms.R"))
 
+# set up grid
+#rename x and y cols
+california_current_grid$Longitude_dd<- california_current_grid$longitude
+california_current_grid$Latitude_dd<- california_current_grid$latitude
+california_current_grid$Pass<- california_current_grid$pass_scaled
+california_current_grid$Depth_m<- california_current_grid$depth
+
+#make gridyrs
+grid_yrs <- replicate_df(california_current_grid, "Year", unique(catch$Year))
 
 #### Arrowtooth flounder ##########################################################################################################
 arrowtooth_dfs <- cleanup_by_species(df = catch, species = "arrowtooth flounder")
 arrowtooth_dfs <- lapply(arrowtooth_dfs, lat_filter_34)
-# arrowtooth_dfs <- arrowtooth_dfs[90:91] # reduce DFs for testing
-# make the names file
+ #arrowtooth_dfs <- arrowtooth_dfs[90:91] # reduce DFs for testing
+
+ # make the names file
 arrowtooth_files <- as.list(names(arrowtooth_dfs))
 
 # Reduce the number of DFs for testing
@@ -69,7 +82,7 @@ setwd(arrowtooth)
 print("Starting parallel SDM processing")
 arrowtooth_sdms <- foreach(i = seq_along(arrowtooth_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
   print(paste("Processing SDM:", i))
-  result <- species_sdm_fn(arrowtooth_dfs[[i]], arrowtooth_files[[i]])
+  result <- species_sdm_fn(arrowtooth_dfs[[i]], arrowtooth_files[[i]], grid_yrs)
   print(paste("Result for SDM", i, ":", result))
   result
 }
@@ -110,7 +123,7 @@ rm("arrowtooth_dfs", "arrowtooth_files", "arrowtooth_sdms", "arrowtooth_indices"
 setwd(bocaccio)
 bocaccio_dfs <- cleanup_by_species(df = catch, species = "bocaccio")
 bocaccio_dfs <- lapply(bocaccio_dfs, depth_filter_500)
-# bocaccio_dfs <- bocaccio_dfs[90:91] # reduce DFs for testing
+ bocaccio_dfs <- bocaccio_dfs[90:91] # reduce DFs for testing
 # make the names file
 bocaccio_files <- as.list(names(bocaccio_dfs))
 
@@ -124,7 +137,7 @@ setwd(bocaccio)
 print("Starting parallel SDM processing")
 bocaccio_sdms <- foreach(i = seq_along(bocaccio_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
   print(paste("Processing SDM:", i))
-  result <- species_sdm_fn(bocaccio_dfs[[i]], bocaccio_files[[i]])
+  result <- species_sdm_fn(bocaccio_dfs[[i]], bocaccio_files[[i]], grid_yrs)
   print(paste("Result for SDM", i, ":", result))
   result
 }
@@ -179,7 +192,7 @@ setwd(canary)
 print("Starting parallel SDM processing")
 canary_sdms <- foreach(i = seq_along(canary_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
   print(paste("Processing SDM:", i))
-  result <- canary_sdm_fn(canary_dfs[[i]], canary_files[[i]])
+  result <- canary_sdm_fn(canary_dfs[[i]], canary_files[[i]], grid_yrs)
   print(paste("Result for SDM", i, ":", result))
   result
 }
@@ -235,7 +248,7 @@ setwd(darkblotched)
 print("Starting parallel SDM processing")
 darkblotched_sdms <- foreach(i = seq_along(darkblotched_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
   print(paste("Processing SDM:", i))
-  result <- darkblotched_sdm_fn(darkblotched_dfs[[i]], darkblotched_files[[i]])
+  result <- darkblotched_sdm_fn(darkblotched_dfs[[i]], darkblotched_files[[i]], grid_yrs)
   print(paste("Result for SDM", i, ":", result))
   result
 }
@@ -289,7 +302,7 @@ setwd(dover)
 print("Starting parallel SDM processing")
 dover_sdms <- foreach(i = seq_along(dover_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
   print(paste("Processing SDM:", i))
-  result <- species_sdm_fn(dover_dfs[[i]], dover_files[[i]])
+  result <- species_sdm_fn(dover_dfs[[i]], dover_files[[i]], grid_yrs)
   print(paste("Result for SDM", i, ":", result))
   result
 }
@@ -346,7 +359,7 @@ setwd(lingcod_n)
 print("Starting parallel SDM processing")
 lingcod_n_sdms <- foreach(i = seq_along(lingcod_n_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
   print(paste("Processing SDM:", i))
-  result <- species_sdm_fn(lingcod_n_dfs[[i]], lingcod_n_files[[i]])
+  result <- species_sdm_fn(lingcod_n_dfs[[i]], lingcod_n_files[[i]], grid_yrs)
   print(paste("Result for SDM", i, ":", result))
   result
 }
@@ -403,7 +416,7 @@ setwd(lingcod_s)
 print("Starting parallel SDM processing")
 lingcod_s_sdms <- foreach(i = seq_along(lingcod_s_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
   print(paste("Processing SDM:", i))
-  result <- species_sdm_fn(lingcod_s_dfs[[i]], lingcod_s_files[[i]])
+  result <- species_sdm_fn(lingcod_s_dfs[[i]], lingcod_s_files[[i]], grid_yrs)
   print(paste("Result for SDM", i, ":", result))
   result
 }
@@ -457,7 +470,7 @@ setwd(longnose)
 print("Starting parallel SDM processing")
 longnose_sdms <- foreach(i = seq_along(longnose_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
   print(paste("Processing SDM:", i))
-  result <- species_sdm_fn(longnose_dfs[[i]], longnose_files[[i]])
+  result <- species_sdm_fn(longnose_dfs[[i]], longnose_files[[i]], grid_yrs)
   print(paste("Result for SDM", i, ":", result))
   result
 }
@@ -513,7 +526,7 @@ setwd(pop)
 print("Starting parallel SDM processing")
 pop_sdms <- foreach(i = seq_along(pop_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
   print(paste("Processing SDM:", i))
-  result <- species_sdm_fn(pop_dfs[[i]], pop_files[[i]])
+  result <- species_sdm_fn(pop_dfs[[i]], pop_files[[i]], grid_yrs)
   print(paste("Result for SDM", i, ":", result))
   result
 }
@@ -568,7 +581,7 @@ setwd(dogfish)
 print("Starting parallel SDM processing")
 dogfish_sdms <- foreach(i = seq_along(dogfish_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
   print(paste("Processing SDM:", i))
-  result <- species_sdm_fn(dogfish_dfs[[i]], dogfish_files[[i]])
+  result <- species_sdm_fn(dogfish_dfs[[i]], dogfish_files[[i]], grid_yrs)
   print(paste("Result for SDM", i, ":", result))
   result
 }
@@ -623,7 +636,7 @@ setwd(petrale)
 print("Starting parallel SDM processing")
 petrale_sdms <- foreach(i = seq_along(petrale_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
   print(paste("Processing SDM:", i))
-  result <- species_sdm_lognormal_fn(petrale_dfs[[i]], petrale_files[[i]])
+  result <- species_sdm_lognormal_fn(petrale_dfs[[i]], petrale_files[[i]], grid_yrs)
   print(paste("Result for SDM", i, ":", result))
   result
 }
@@ -678,7 +691,7 @@ setwd(rex)
 print("Starting parallel SDM processing")
 rex_sdms <- foreach(i = seq_along(rex_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
   print(paste("Processing SDM:", i))
-  result <- species_sdm_fn(rex_dfs[[i]], rex_files[[i]])
+  result <- species_sdm_fn(rex_dfs[[i]], rex_files[[i]], grid_yrs)
   print(paste("Result for SDM", i, ":", result))
   result
 }
@@ -732,7 +745,7 @@ setwd(sablefish)
 print("Starting parallel SDM processing")
 sablefish_sdms <- foreach(i = seq_along(sablefish_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
   print(paste("Processing SDM:", i))
-  result <- species_sdm_lognormal_fn(sablefish_dfs[[i]], sablefish_files[[i]])
+  result <- species_sdm_lognormal_fn(sablefish_dfs[[i]], sablefish_files[[i]], grid_yrs)
   print(paste("Result for SDM", i, ":", result))
   result
 }
@@ -787,7 +800,7 @@ setwd(shortspine)
 print("Starting parallel SDM processing")
 shortspine_sdms <- foreach(i = seq_along(shortspine_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
   print(paste("Processing SDM:", i))
-  result <- shortspine_sdm_fn(shortspine_dfs[[i]], shortspine_files[[i]])
+  result <- shortspine_sdm_fn(shortspine_dfs[[i]], shortspine_files[[i]], grid_yrs)
   print(paste("Result for SDM", i, ":", result))
   result
 }
@@ -842,7 +855,7 @@ setwd(widow)
 print("Starting parallel SDM processing")
 widow_sdms <- foreach(i = seq_along(widow_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
   print(paste("Processing SDM:", i))
-  result <- widow_sdm_fn(widow_dfs[[i]], widow_files[[i]])
+  result <- widow_sdm_fn(widow_dfs[[i]], widow_files[[i]], grid_yrs)
   print(paste("Result for SDM", i, ":", result))
   result
 }
@@ -898,7 +911,7 @@ setwd(yellowtail)
 print("Starting parallel SDM processing")
 yellowtail_sdms <- foreach(i = seq_along(yellowtail_dfs), .combine = "list", .packages = c("foreach", "doParallel", "sdmTMB"), .errorhandling = "remove") %dopar% {
   print(paste("Processing SDM:", i))
-  result <- species_sdm_fn(yellowtail_dfs[[i]], yellowtail_files[[i]])
+  result <- species_sdm_fn(yellowtail_dfs[[i]], yellowtail_files[[i]], grid_yrs)
   print(paste("Result for SDM", i, ":", result))
   result
 }

@@ -13,7 +13,7 @@
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-species_sdm_fn <- function(x, y) {
+species_sdm_fn <- function(x, y, z) {
   # make mesh
   mesh <- sdmTMB::make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
 
@@ -25,20 +25,17 @@ species_sdm_fn <- function(x, y) {
     family = delta_gamma(),
     time = "Year",
     anisotropy = TRUE,
-    spatiotemporal = as.list(c("iid", "iid")),
-    do_index = TRUE,
-    predict_args = list(newdata = x),
-    index_args = list(area = 4) # this should be based on actual values?
+    spatiotemporal = as.list(c("iid", "iid"))
   )
 
   # get the index
-  index <- sdmTMB::get_index(fit, bias_correct = TRUE)
+  predictions <- predict(fit, newdata = z, return_tmb_object = TRUE)
+  index <- sdmTMB::get_index(predictions, area = z$area_km2_WCGBTS, bias_correct = TRUE)
 
   # save file
   saveRDS(fit, paste0("fit_", y, ".rds"))
   saveRDS(index, paste0("index_", y, ".rds"))
 }
-
 
 #' Species distribution model function using delta_lognormal family
 #'
@@ -53,7 +50,7 @@ species_sdm_fn <- function(x, y) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-species_sdm_lognormal_fn <- function(x, y) {
+species_sdm_lognormal_fn <- function(x, y, z) {
   # make mesh
   mesh <- sdmTMB::make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
 
@@ -65,15 +62,12 @@ species_sdm_lognormal_fn <- function(x, y) {
     family = delta_lognormal(),
     time = "Year",
     anisotropy = TRUE,
-    spatiotemporal = as.list(c("iid", "iid")),
-    do_index = TRUE,
-    predict_args = list(newdata = x),
-    index_args = list(area = 4) # this should be based on actual values?
+    spatiotemporal = as.list(c("iid", "iid"))
   )
 
   # get the index
-  index <- sdmTMB::get_index(fit, bias_correct = FALSE) #these are running very slow, so turning bias correction off for now. 
-
+  predictions <- predict(fit, newdata = z, return_tmb_object = TRUE)
+  index <- sdmTMB::get_index(predictions, area = z$area_km2_WCGBTS, bias_correct = FALSE) #bias correct off for now due to run time issues
   # save file
   saveRDS(fit, paste0("fit_", y, ".rds"))
   saveRDS(index, paste0("index_", y, ".rds"))
@@ -93,7 +87,7 @@ species_sdm_lognormal_fn <- function(x, y) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-canary_sdm_fn <- function(x, y) {
+canary_sdm_fn <- function(x, y, z) {
   # make mesh
   mesh <- sdmTMB::make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 200)
 
@@ -105,14 +99,12 @@ canary_sdm_fn <- function(x, y) {
     family = delta_lognormal(),
     time = "Year",
     anisotropy = FALSE,
-    spatiotemporal = as.list(c("iid", "off")),
-    do_index = TRUE,
-    predict_args = list(newdata = x),
-    index_args = list(area = 4) # this should be based on actual values?
+    spatiotemporal = as.list(c("iid", "off"))
   )
 
   # get the index
-  index <- sdmTMB::get_index(fit, bias_correct = TRUE)
+  predictions <- predict(fit, newdata = z, return_tmb_object = TRUE)
+  index <- sdmTMB::get_index(predictions, area = z$area_km2_WCGBTS, bias_correct = TRUE)
 
   # save file
   saveRDS(fit, paste0("fit_", y, ".rds"))
@@ -133,7 +125,7 @@ canary_sdm_fn <- function(x, y) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-darkblotched_sdm_fn <- function(x, y) {
+darkblotched_sdm_fn <- function(x, y, z) {
   # make mesh
   mesh <- sdmTMB::make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 250)
 
@@ -145,14 +137,12 @@ darkblotched_sdm_fn <- function(x, y) {
     family = delta_lognormal(),
     time = "Year",
     anisotropy = TRUE,
-    spatiotemporal = as.list(c("off", "iid")),
-    do_index = TRUE,
-    predict_args = list(newdata = x),
-    index_args = list(area = 4) # this should be based on actual values?
+    spatiotemporal = as.list(c("off", "iid"))
   )
 
   # get the index
-  index <- sdmTMB::get_index(fit, bias_correct = TRUE)
+  predictions <- predict(fit, newdata = z, return_tmb_object = TRUE)
+  index <- sdmTMB::get_index(predictions, area = z$area_km2_WCGBTS, bias_correct = TRUE)
 
   # save file
   saveRDS(fit, paste0("fit_", y, ".rds"))
@@ -173,7 +163,7 @@ darkblotched_sdm_fn <- function(x, y) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-shortspine_sdm_fn <- function(x, y) {
+shortspine_sdm_fn <- function(x, y, z) {
   # make mesh
   mesh <- sdmTMB::make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
 
@@ -185,14 +175,12 @@ shortspine_sdm_fn <- function(x, y) {
     family = delta_lognormal(),
     time = "Year",
     anisotropy = TRUE,
-    spatiotemporal = as.list(c("iid", "iid")),
-    do_index = TRUE,
-    predict_args = list(newdata = x),
-    index_args = list(area = 4) # this should be based on actual values?
+    spatiotemporal = as.list(c("iid", "iid"))
   )
 
   # get the index
-  index <- sdmTMB::get_index(fit, bias_correct = FALSE) # turn bias correct off because this might be causing model to run for a long time
+  predictions <- predict(fit, newdata = z, return_tmb_object = TRUE)
+  index <- sdmTMB::get_index(predictions, area = z$area_km2_WCGBTS, bias_correct = TRUE)
 
   # save file
   saveRDS(fit, paste0("fit_", y, ".rds"))
@@ -214,7 +202,7 @@ shortspine_sdm_fn <- function(x, y) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-widow_sdm_fn <- function(x, y) {
+widow_sdm_fn <- function(x, y, z) {
   # make mesh
   mesh <- sdmTMB::make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 200)
 
@@ -226,14 +214,12 @@ widow_sdm_fn <- function(x, y) {
     family = delta_gamma(),
     time = "Year",
     anisotropy = TRUE,
-    spatiotemporal = as.list(c("off", "off")),
-    do_index = TRUE,
-    predict_args = list(newdata = x),
-    index_args = list(area = 4) # this should be based on actual values?
+    spatiotemporal = as.list(c("off", "off"))
   )
 
   # get the index
-  index <- sdmTMB::get_index(fit, bias_correct = TRUE)
+  predictions <- predict(fit, newdata = z, return_tmb_object = TRUE)
+  index <- sdmTMB::get_index(predictions, area = z$area_km2_WCGBTS, bias_correct = TRUE)
 
   # save file
   saveRDS(fit, paste0("fit_", y, ".rds"))
