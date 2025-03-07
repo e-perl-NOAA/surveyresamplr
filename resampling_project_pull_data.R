@@ -1,9 +1,14 @@
 #### pull catch data
+#install NWFSCsurvey
+#remotes::install_github("pfmc-assessments/nwfscSurvey")
+
+#define wd
+wd <- getwd()
+data <-file.path(wd, "Resample-survey-data/data")
 
 #pull BT data for all spp
-
-allcatch<-PullCatch.fn(SurveyName = "NWFSC.Combo") 
-bio<-PullBio.fn(SurveyName = "NWFSC.Combo")
+allcatch<-nwfscSurvey::PullCatch.fn(SurveyName = "NWFSC.Combo") 
+#bio<-nwfscSurvey::PullBio.fn(SurveyName = "NWFSC.Combo")
 
 table(allcatch$Common_name)
 
@@ -123,5 +128,5 @@ test<-species[!species %in% catch$Common_name] #two missing
 catch<-unique(catch)
 
 #write csv
-setwd(output)
-#write.csv(catch,"nwfsc_bt_fmp_spp.csv",row.names = F)
+setwd(data)
+#write.csv(catch,"nwfsc_bt_fmp_spp_updated.csv",row.names = F)

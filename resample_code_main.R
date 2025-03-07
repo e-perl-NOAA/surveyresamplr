@@ -8,10 +8,10 @@ rm(list = ls())
 
 #### set wds
 #setwd("C:/Users/Derek.Bolser/Documents/Resample_survey_data/") #for local testing
-
-wd <- getwd()
-output <- file.path(wd, "Results")
-data <-file.path(wd, "data")
+wd <- "/home/user/"
+basedir<-file.path(wd,'Resample-survey-data')
+output <- file.path(wd, "Resample-survey-data/Results")
+data <-file.path(wd, "Resample-survey-data/data")
 arrowtooth <- file.path(output, "Arrowtooth_flounder")
 bocaccio <- file.path(output, "Bocaccio")
 canary <- file.path(output, "Canary_rockfish")
@@ -38,16 +38,17 @@ library(forcats)
 library(purrr)
 library(readr)
 library(tibble)
-library(sdmTMB)
 library(doParallel)
+library(sdmTMB)
 
 # read in data
-catch <- read.csv(file.path(data,"nwfsc_bt_fmp_spp.csv"))
+#catch <- read.csv(file.path(data,"nwfsc_bt_fmp_spp.csv"))
+catch <- read.csv(file.path(data,"nwfsc_bt_fmp_spp_updated.csv")) #pulled data again to get 2024
 load(file.path(data,"california_current_grid.rda"))
 
-source(file.path(getwd(), "smaller_functions.R")) #need to edit to specify the code directory if running locally
-source(file.path(getwd(), "cleanup_by_species.R"))
-source(file.path(getwd(), "species_sdms.R"))
+source(file.path(basedir, "smaller_functions.R")) #need to edit to specify the code directory if running locally
+source(file.path(basedir, "cleanup_by_species.R"))
+source(file.path(basedir, "species_sdms.R"))
 
 # set up grid
 #rename x and y cols
