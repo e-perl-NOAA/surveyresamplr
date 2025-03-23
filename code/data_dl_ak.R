@@ -214,31 +214,18 @@ save(noaa_afsc_ebs_pred_grid_depth, file = paste0("data/noaa_afsc_ebs_pred_grid_
 # Here, bottom temperature, and thereby the cold pool extent, have been show to drive the distribution of many species. This is especially true for walleye pollock. 
 # For this we are going to lean on our in-house prepared validated and pre-prepared [{coldpool} R package](https://github.com/afsc-gap-products/coldpool) (S. Rohan, L. Barnett, and N. Charriere). This data interpolates over the whole area of the survey so there are no missing data. 
 
-# plot(coldpool::ebs_bottom_temperature[[1]]) # Just so we can see what we are looking at: 
+noaa_afsc_ebs_pred_grid_temperature <- 
+  dplyr::bind_cols(terra::unwrap(coldpool::ebs_bottom_temperature) %>% 
+  terra::project(crs_latlon) %>%
+  terra::extract(st_as_sf(sp_extrap_raster))) 
 
-tmp <- c()
-for (i in 1:length(unique(noaa_afsc_cpue$year))) {
-  tmp <- c(tmp, 
-           grep(pattern = YEARS[i], x = names(coldpool::ebs_bottom_temperature)))
-}
+names(noaa_afsc_ebs_pred_grid_temperature) <- paste0("GEAR_TEMPERATURE_", names(noaa_afsc_ebs_pred_grid_temperature))
 
-extrap_data0 <- coldpool::ebs_bottom_temperature[[tmp]] %>% 
-  as(., Class = "SpatialPointsDataFrame") %>%
-  sf::st_as_sf() %>%
-  sf::st_transform(crs = crs_latlon)  %>%
-  stars::st_rasterize() %>% 
-  stars::st_extract(x = .,
-                    at = as.matrix(dat_cov[,c("lon", "lat")]))
-
-names(extrap_data0) <- paste0("GEAR_TEMPERATURE", YEARS)
-
-dat_cov <- dplyr::bind_cols(dat_cov, extrap_data0) %>% 
-  na.omit()
-
-# head(dat_cov)
-
-
-
+noaa_afsc_ebs_pred_grid_depth_temperature <- 
+  dplyr::bind_cols(noaa_afsc_ebs_pred_grid_depth, 
+                   noaa_afsc_ebs_pred_grid_temperature)
+  
+save(noaa_afsc_ebs_pred_grid_depth_temperature, file = paste0("data/noaa_afsc_ebs_pred_grid_depth_temp.rdata"))
 
 # Load Design-based biomass data for comparison --------------------------------
 
@@ -248,31 +235,6 @@ for (i in 1:length(locations)){
     source(locations[i])
   }
 }
-
-## Load column metadata table --------------------------------------------------
-
-# metadata_table_comment <- dplyr::bind_rows(
-#   # tables
-#   RODBC::sqlQuery(
-#     channel = channel_products,
-#     query = "SELECT table_name, comments
-# FROM all_tab_comments
-# WHERE owner = 'GAP_PRODUCTS'
-# ORDER BY table_name") %>%
-#   data.frame(),
-# # materialized view
-# RODBC::sqlQuery(
-#   channel = channel_products,
-#   query = "SELECT *FROM user_mview_comments") %>%
-#   data.frame() %>%
-#   dplyr::rename(TABLE_NAME = MVIEW_NAME) )
-# 
-# metadata_colname <- RODBC::sqlQuery(
-#   channel = channel_products,
-#   query = "SELECT * FROM GAP_PRODUCTS.METADATA_COLUMN") %>%
-#   janitor::clean_names()
-
-## Load biomass data from oracle -----------------------------------------------
 
 noaa_afsc_biomass_estimates <- RODBC::sqlQuery(
   channel = channel_products, 
@@ -289,7 +251,7 @@ bb.POPULATION_VAR
 FROM GAP_PRODUCTS.AKFIN_BIOMASS bb
 
 WHERE bb.AREA_ID IN (99901, 99902)
-AND bb.SPECIES_CODE IN (", paste0(test_species$species_code, collapse = ","),") 
+AND bb.SPECIES_CODE IN (", paste0(test_species1$species_code, collapse = ","),") 
 ")) %>% 
   #   -- WHERE bb.SURVEY_DEFINITION_ID = 98 
   # -- AND bb.SPECIES_CODE IN (21740, 10210, 69322) 
@@ -298,34 +260,5 @@ AND bb.SPECIES_CODE IN (", paste0(test_species$species_code, collapse = ","),")
   janitor::clean_names()
 
 # Save table to local directory
-save(noaa_afsc_biomass_estimates, file = here::here("data", "noaa_afsc_biomass_estimates.rda"))
-
-## Metadata file ---------------------------------------------------------------
-#' 
-#' column <- metadata_colname %>%
-#'   dplyr::filter(metadata_colname %in% toupper(names(noaa_afsc_biomass_estimates))) %>%
-#'   dplyr::mutate(metadata_colname = tolower(metadata_colname)) %>%
-#'   dplyr::distinct()
-#' 
-#' str0 <- paste0("#' @title Biomass Estimates from AKFIN for EBS walleye pollock, yellowfin sole, and red king crab from 1982 to present
-#' #' @description ",metadata_table_comment$COMMENT[metadata_table_comment$TABLE_NAME == "AKFIN_BIOMASS"]," 
-#' #' @usage data('noaa_afsc_biomass_estimates')
-#' #' @author AFSC Groundfish Assessment Program (nmfs.afsc.gap.metadata AT noaa.gov)
-#' #' @format A data frame with ",nrow(noaa_afsc_biomass_estimates)," observations on the following ",
-#' ncol(noaa_afsc_biomass_estimates)," variables.
-#' #' \\describe{
-#' ",
-#' paste0(paste0("#'   \\item{\\code{",column$metadata_colname,"}}{", column$metadata_colname_long, ". ", column$metadata_colname_desc,"}"), collapse = "\n"),
-#' "#'   }
-#' #' @source https://github.com/afsc-gap-products/gap_products
-#' #' @keywords species code data biomass
-#' #' @examples
-#' #' data(noaa_afsc_biomass_estimates)
-#' #' @details The Resource Assessment and Conservation Engineering (RACE) Division Groundfish Assessment Program (GAP) of the Alaska Fisheries Science Center (AFSC) conducts fisheries-independent bottom trawl surveys to assess the populations of demersal fish and crab stocks of Alaska. 
-#' 
-#' 'noaa_afsc_biomass_estimates'")
-#' 
-#' write.table(str0, 
-#'             file = here::here("R","noaa_afsc_biomass_estimates.R"), 
-#'             sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
+save(noaa_afsc_biomass_estimates, file = paste0(wd, "data/noaa_afsc_biomass_estimates.rda"))
 

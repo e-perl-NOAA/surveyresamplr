@@ -159,11 +159,11 @@ catch <- dplyr::bind_rows(catch_ak, catch_ca)
 
 ## Alaska ----------------------------------------------------------------------
 
-load(paste0(wd,"data/noaa_afsc_ebs_pred_grid_depth.rdata"))
-noaa_afsc_ebs_pred_grid_depth <- noaa_afsc_ebs_pred_grid_depth %>% 
+load(paste0(wd,"data/noaa_afsc_ebs_pred_grid_depth_temp.rdata"))
+noaa_afsc_ebs_pred_grid_depth_temp <- noaa_afsc_ebs_pred_grid_depth_temp %>% 
   dplyr::mutate(srvy = "EBS")
 #make gridyrs
-grid_yrs_ebs <- replicate_df(noaa_afsc_ebs_pred_grid_depth, "Year", unique(catch$Year))
+grid_yrs_ebs <- replicate_df(noaa_afsc_ebs_pred_grid_depth_temp, "Year", unique(catch$Year))
 
 ## California ------------------------------------------------------------------
 
@@ -185,7 +185,7 @@ grid_yrs <- dplyr::bind_rows(grid_yrs_ca, grid_yrs_ebs)
 
 #saveRDS(grid_yrs,"grid_yrs.rds")
 write_parquet(x = grid_yrs, paste0(wd, "data/grid_yrs.parquet"))
-rm(grid_yrs,california_current_grid, grid_yrs_ca, noaa_afsc_ebs_pred_grid_depth, grid_yrs_ebs)
+rm(grid_yrs,california_current_grid, grid_yrs_ca, noaa_afsc_ebs_pred_grid_depth_temp, grid_yrs_ebs)
 
 #get rid of memory limits
 options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
@@ -202,42 +202,54 @@ for (ii in 1:nrow(test_species)) {
   file <- test_species$file_name[ii]
   dir_spp <- paste0(wd_results_v, paste0(test_species$srvy[ii], "_", file, "/"))
   dir.create(dir_spp, showWarnings = FALSE)
-  
-  # Define output file paths
-  fit_df_path <- paste0(dir_spp, paste0(file, "_fit_df.csv"))
-  fit_pars_path <- paste0(dir_spp, paste0(file, "_pars_df.csv"))
-  fit_check_path <- paste0(dir_spp, paste0(file, "_fit_check_df.csv"))
+
+  # # Define output file paths
+  # fit_df_path <- paste0(dir_spp, paste0(file, "_fit_df.csv"))
+  # fit_pars_path <- paste0(dir_spp, paste0(file, "_pars_df.csv"))
+  # fit_check_path <- paste0(dir_spp, paste0(file, "_fit_check_df.csv"))
   
   all_fit_df <- list()
   all_fit_pars <- list()
   all_fit_check <- list()
   
   # Systematically filter data 
-  spp_dfs <- cleanup_by_species(
-    df = catch %>% 
+  df <- catch %>% 
     dplyr::filter(
       srvy == test_species$srvy[ii], 
-      Common_name == test_species$common_name[ii]), 
+      Common_name == test_species$common_name[ii])
+  
+  if (!is.na(test_species$filter_lat_lt[ii])) {
+    df <- df %>% dplyr::filter(Latitude_dd < test_species$filter_lat_lt[ii])
+  }
+  if (!is.na(test_species$filter_lat_gt[ii])) {
+    df <- df %>% dplyr::filter(Latitude_dd > test_species$filter_lat_gt[ii])
+  }
+  if (!is.na(test_species$filter_depth[ii])) {
+    df <- df %>% dplyr::filter(Depth_m < test_species$filter_depth[ii])
+  }
+  
+  spp_dfs <- cleanup_by_species(
+    df = df, 
     species = test_species$common_name[ii], 
     seq_from = test_species$seq_from[ii], 
     seq_to = test_species$seq_to[ii], 
     seq_by = test_species$seq_by[ii], 
     tot_dataframes = test_species$tot_dataframes[ii])
-  if (!is.na(test_species$filter_lat_lt[ii])) {
-    spp_dfs <- lapply(spp_dfs, 
-                      function(x, val){x[x$Latitude_dd > val, ]}, 
-                      val = test_species$filter_lat_lt[ii])
-  }
-  if (!is.na(test_species$filter_lat_gt[ii])) {
-    spp_dfs <- lapply(spp_dfs, 
-                      function(x, val){x[x$Latitude_dd < val, ]}, 
-                      val = test_species$filter_lat_gt[ii])
-  }
-  if (!is.na(test_species$filter_depth[ii])) {
-    spp_dfs <- lapply(spp_dfs, 
-                      function(x, val){x[x$Depth_m > val, ]}, 
-                      val = test_species$filter_depth[ii])
-  }
+  # if (!is.na(test_species$filter_lat_lt[ii])) {
+  #   spp_dfs <- lapply(spp_dfs, 
+  #                     function(x, val){x[x$Latitude_dd > val, ]}, 
+  #                     val = test_species$filter_lat_lt[ii])
+  # }
+  # if (!is.na(test_species$filter_lat_gt[ii])) {
+  #   spp_dfs <- lapply(spp_dfs, 
+  #                     function(x, val){x[x$Latitude_dd < val, ]}, 
+  #                     val = test_species$filter_lat_gt[ii])
+  # }
+  # if (!is.na(test_species$filter_depth[ii])) {
+  #   spp_dfs <- lapply(spp_dfs, 
+  #                     function(x, val){x[x$Depth_m > val, ]}, 
+  #                     val = test_species$filter_depth[ii])
+  # }
   spp_dfs <- spp_dfs[90:91] # reduce DFs for testing
   
   # make the names file
@@ -268,13 +280,13 @@ for (ii in 1:nrow(test_species)) {
     # Load grid_yrs once
     grid_yrs <- read_parquet(paste0(wd, "data/grid_yrs.parquet"))
     # Run species SDM function
-    species_sdm_fn(spp_df, spp_files[[i]], grid_yrs)
-    # # Ensure extracted objects are dataframes, Store results in lists
-    # all_fit_df[[file]] <- as.data.frame(fit_df_fn(fit))
-    # all_fit_pars[[file]] <- as.data.frame(fit_pars_fn(fit))
-    # all_fit_check[[file]] <- as.data.frame(fit_check_fn(fit))
-    # # Free memory
-    # rm(fit, fit_df, fit_pars, fit_check)
+    fit <- species_sdm_fn(x = spp_df, y = spp_files[[i]], z = grid_yrs)
+    # Ensure extracted objects are dataframes, Store results in lists
+    all_fit_df[[file]] <- as.data.frame(fit_df_fn(fit))
+    all_fit_pars[[file]] <- as.data.frame(fit_pars_fn(fit))
+    all_fit_check[[file]] <- as.data.frame(fit_check_fn(fit))
+    # Free memory
+    rm(fit)
     # Explicitly remove objects after processing
     rm(spp_df, grid_yrs)
     gc()
@@ -284,7 +296,16 @@ for (ii in 1:nrow(test_species)) {
   print("Parallel SDM processing complete")
   
   ##### process fit files
-  process_and_save_fits(dir_spp, test_species$file_name[ii])
+  # process_and_save_fits(dir_spp, test_species$file_name[ii])
+  # Combine lists into single dataframes
+  final_fit_df <- if (length(all_fit_df) > 0) rbindlist(all_fit_df, fill = TRUE) else NULL
+  final_fit_pars <- if (length(all_fit_pars) > 0) rbindlist(all_fit_pars, fill = TRUE) else NULL
+  final_fit_check <- if (length(all_fit_check) > 0) rbindlist(all_fit_check, fill = TRUE) else NULL
+  
+  # Write to CSV if there is data
+  if (!is.null(final_fit_df)) fwrite(final_fit_df, file = fit_df_path)
+  if (!is.null(final_fit_pars)) fwrite(final_fit_pars, file = fit_pars_path)
+  if (!is.null(final_fit_check)) fwrite(final_fit_check, file = fit_check_path)
   
   ##### process index files
   spp_indices <- pull_files(spp, "index")

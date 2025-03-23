@@ -35,6 +35,8 @@ species_sdm_fn <- function(x, y, z) {
   # save file
   saveRDS(fit, paste0("fit_", y, ".rds"))
   saveRDS(index, paste0("index_", y, ".rds"))
+  
+  return(list("fit" = fit, "predictions" = predictions))
 }
 
 #' Species distribution model function using delta_lognormal family
