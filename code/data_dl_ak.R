@@ -163,7 +163,8 @@ noaa_afsc_ebs_pred_grid <- pred_grid_ebs %>%
     # sx = ((lon - mean(lon, na.rm = TRUE))/1000),
     # sy = ((lat - mean(lat, na.rm = TRUE))/1000), 
     area_km2 = Shape_Area*0.0001) %>% 
-  dplyr::select(-Shape_Area)
+  dplyr::select(-Shape_Area) %>% 
+  dplyr::mutate(srvy = "EBS")
 
 sp_extrap_raster <- SpatialPoints(
   coords = coordinates(as.matrix(noaa_afsc_ebs_pred_grid[,c("Longitude_dd", "Latitude_dd")])), 
@@ -207,25 +208,25 @@ save(noaa_afsc_ebs_pred_grid_depth, file = paste0("data/noaa_afsc_ebs_pred_grid_
 
 ## Add temperature -------------------------------------------------------------
 
-### Coldpool temperature data --------------------------------------------------
-
-### Data that varies over space and time (bottom temperature)
-
-# Here, bottom temperature, and thereby the cold pool extent, have been show to drive the distribution of many species. This is especially true for walleye pollock. 
-# For this we are going to lean on our in-house prepared validated and pre-prepared [{coldpool} R package](https://github.com/afsc-gap-products/coldpool) (S. Rohan, L. Barnett, and N. Charriere). This data interpolates over the whole area of the survey so there are no missing data. 
-
-noaa_afsc_ebs_pred_grid_temperature <- 
-  dplyr::bind_cols(terra::unwrap(coldpool::ebs_bottom_temperature) %>% 
-  terra::project(crs_latlon) %>%
-  terra::extract(st_as_sf(sp_extrap_raster))) 
-
-names(noaa_afsc_ebs_pred_grid_temperature) <- paste0("GEAR_TEMPERATURE_", names(noaa_afsc_ebs_pred_grid_temperature))
-
-noaa_afsc_ebs_pred_grid_depth_temperature <- 
-  dplyr::bind_cols(noaa_afsc_ebs_pred_grid_depth, 
-                   noaa_afsc_ebs_pred_grid_temperature)
-  
-save(noaa_afsc_ebs_pred_grid_depth_temperature, file = paste0("data/noaa_afsc_ebs_pred_grid_depth_temperature.rdata"))
+# ### Coldpool temperature data --------------------------------------------------
+# 
+# ### Data that varies over space and time (bottom temperature)
+# 
+# # Here, bottom temperature, and thereby the cold pool extent, have been show to drive the distribution of many species. This is especially true for walleye pollock. 
+# # For this we are going to lean on our in-house prepared validated and pre-prepared [{coldpool} R package](https://github.com/afsc-gap-products/coldpool) (S. Rohan, L. Barnett, and N. Charriere). This data interpolates over the whole area of the survey so there are no missing data. 
+# 
+# noaa_afsc_ebs_pred_grid_temperature <-
+#   dplyr::bind_cols(terra::unwrap(coldpool::ebs_bottom_temperature) %>%
+#   terra::project(crs_latlon) %>%
+#   terra::extract(st_as_sf(sp_extrap_raster)))
+# 
+# names(noaa_afsc_ebs_pred_grid_temperature) <- paste0("GEAR_TEMPERATURE_", names(noaa_afsc_ebs_pred_grid_temperature))
+# 
+# noaa_afsc_ebs_pred_grid_depth_temperature <-
+#   dplyr::bind_cols(noaa_afsc_ebs_pred_grid_depth,
+#                    noaa_afsc_ebs_pred_grid_temperature)
+# 
+# save(noaa_afsc_ebs_pred_grid_depth_temperature, file = paste0("data/noaa_afsc_ebs_pred_grid_depth_temperature.rdata"))
 
 # Load Design-based biomass data for comparison --------------------------------
 

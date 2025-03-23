@@ -29,8 +29,8 @@ species_sdm_fn <- function(x, y, z) {
   )
 
   # get the index
-  predictions <- predict(fit, newdata = z, return_tmb_object = TRUE)
-  index <- sdmTMB::get_index(predictions, area = z$area_km2_WCGBTS, bias_correct = TRUE)
+  predictions <- predict(fit, newdata = z, return_tmb_object = TRUE) # 
+  index <- sdmTMB::get_index(predictions, area = z$area_km2, bias_correct = TRUE)
 
   # save file
   saveRDS(fit, paste0("fit_", y, ".rds"))
@@ -69,7 +69,7 @@ species_sdm_lognormal_fn <- function(x, y, z) {
 
   # get the index
   predictions <- predict(fit, newdata = z, return_tmb_object = TRUE)
-  index <- sdmTMB::get_index(predictions, area = z$area_km2_WCGBTS, bias_correct = FALSE) #bias correct off for now due to run time issues
+  index <- sdmTMB::get_index(predictions, area = z$area_km2, bias_correct = FALSE) #bias correct off for now due to run time issues
   # save file
   saveRDS(fit, paste0("fit_", y, ".rds"))
   saveRDS(index, paste0("index_", y, ".rds"))
@@ -106,7 +106,7 @@ canary_sdm_fn <- function(x, y, z) {
 
   # get the index
   predictions <- predict(fit, newdata = z, return_tmb_object = TRUE)
-  index <- sdmTMB::get_index(predictions, area = z$area_km2_WCGBTS, bias_correct = TRUE)
+  index <- sdmTMB::get_index(predictions, area = z$area_km2, bias_correct = TRUE)
 
   # save file
   saveRDS(fit, paste0("fit_", y, ".rds"))
@@ -144,7 +144,7 @@ darkblotched_sdm_fn <- function(x, y, z) {
 
   # get the index
   predictions <- predict(fit, newdata = z, return_tmb_object = TRUE)
-  index <- sdmTMB::get_index(predictions, area = z$area_km2_WCGBTS, bias_correct = TRUE)
+  index <- sdmTMB::get_index(predictions, area = z$area_km2, bias_correct = TRUE)
 
   # save file
   saveRDS(fit, paste0("fit_", y, ".rds"))
@@ -182,7 +182,7 @@ shortspine_sdm_fn <- function(x, y, z) {
 
   # get the index
   predictions <- predict(fit, newdata = z, return_tmb_object = TRUE)
-  index <- sdmTMB::get_index(predictions, area = z$area_km2_WCGBTS, bias_correct = TRUE)
+  index <- sdmTMB::get_index(predictions, area = z$area_km2, bias_correct = TRUE)
 
   # save file
   saveRDS(fit, paste0("fit_", y, ".rds"))
@@ -221,7 +221,7 @@ widow_sdm_fn <- function(x, y, z) {
 
   # get the index
   predictions <- predict(fit, newdata = z, return_tmb_object = TRUE)
-  index <- sdmTMB::get_index(predictions, area = z$area_km2_WCGBTS, bias_correct = TRUE)
+  index <- sdmTMB::get_index(predictions, area = z$area_km2, bias_correct = TRUE)
 
   # save file
   saveRDS(fit, paste0("fit_", y, ".rds"))
