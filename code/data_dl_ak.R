@@ -225,7 +225,7 @@ noaa_afsc_ebs_pred_grid_depth_temperature <-
   dplyr::bind_cols(noaa_afsc_ebs_pred_grid_depth, 
                    noaa_afsc_ebs_pred_grid_temperature)
   
-save(noaa_afsc_ebs_pred_grid_depth_temperature, file = paste0("data/noaa_afsc_ebs_pred_grid_depth_temp.rdata"))
+save(noaa_afsc_ebs_pred_grid_depth_temperature, file = paste0("data/noaa_afsc_ebs_pred_grid_depth_temperature.rdata"))
 
 # Load Design-based biomass data for comparison --------------------------------
 

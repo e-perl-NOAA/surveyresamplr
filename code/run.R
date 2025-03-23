@@ -159,11 +159,11 @@ catch <- dplyr::bind_rows(catch_ak, catch_ca)
 
 ## Alaska ----------------------------------------------------------------------
 
-load(paste0(wd,"data/noaa_afsc_ebs_pred_grid_depth_temp.rdata"))
-noaa_afsc_ebs_pred_grid_depth_temp <- noaa_afsc_ebs_pred_grid_depth_temp %>% 
+load(paste0(wd, "data/noaa_afsc_ebs_pred_grid_depth_temperature.rdata"))
+noaa_afsc_ebs_pred_grid_depth_temperature <- noaa_afsc_ebs_pred_grid_depth_temperature %>% 
   dplyr::mutate(srvy = "EBS")
 #make gridyrs
-grid_yrs_ebs <- replicate_df(noaa_afsc_ebs_pred_grid_depth_temp, "Year", unique(catch$Year))
+grid_yrs_ebs <- replicate_df(noaa_afsc_ebs_pred_grid_depth_temperature, "Year", unique(catch$Year))
 
 ## California ------------------------------------------------------------------
 
@@ -202,7 +202,7 @@ for (ii in 1:nrow(test_species)) {
   file <- test_species$file_name[ii]
   dir_spp <- paste0(wd_results_v, paste0(test_species$srvy[ii], "_", file, "/"))
   dir.create(dir_spp, showWarnings = FALSE)
-
+  
   # # Define output file paths
   # fit_df_path <- paste0(dir_spp, paste0(file, "_fit_df.csv"))
   # fit_pars_path <- paste0(dir_spp, paste0(file, "_pars_df.csv"))
@@ -282,9 +282,12 @@ for (ii in 1:nrow(test_species)) {
     # Run species SDM function
     fit <- species_sdm_fn(x = spp_df, y = spp_files[[i]], z = grid_yrs)
     # Ensure extracted objects are dataframes, Store results in lists
-    all_fit_df[[file]] <- as.data.frame(fit_df_fn(fit))
-    all_fit_pars[[file]] <- as.data.frame(fit_pars_fn(fit))
-    all_fit_check[[file]] <- as.data.frame(fit_check_fn(fit))
+    all_fit_df[[spp_files[[i]]]] <- cbind(test = spp_files[[i]], as.data.frame(fit_df_fn(fit)))
+    fwrite(rbindlist(all_fit_df, fill = TRUE), file = fit_df_path)
+    all_fit_pars[[spp_files[[i]]]] <- cbind(test = spp_files[[i]], as.data.frame(fit_pars_fn(fit)))
+    fwrite(rbindlist(all_fit_pars, fill = TRUE), file = fit_pars_path)
+    all_fit_check[[spp_files[[i]]]] <- cbind(test = spp_files[[i]], as.data.frame(fit_check_fn(fit)))
+    fwrite(rbindlist(all_fit_check, fill = TRUE), file = fit_check_path)
     # Free memory
     rm(fit)
     # Explicitly remove objects after processing
@@ -295,17 +298,17 @@ for (ii in 1:nrow(test_species)) {
   
   print("Parallel SDM processing complete")
   
-  ##### process fit files
-  # process_and_save_fits(dir_spp, test_species$file_name[ii])
-  # Combine lists into single dataframes
-  final_fit_df <- if (length(all_fit_df) > 0) rbindlist(all_fit_df, fill = TRUE) else NULL
-  final_fit_pars <- if (length(all_fit_pars) > 0) rbindlist(all_fit_pars, fill = TRUE) else NULL
-  final_fit_check <- if (length(all_fit_check) > 0) rbindlist(all_fit_check, fill = TRUE) else NULL
-  
-  # Write to CSV if there is data
-  if (!is.null(final_fit_df)) fwrite(final_fit_df, file = fit_df_path)
-  if (!is.null(final_fit_pars)) fwrite(final_fit_pars, file = fit_pars_path)
-  if (!is.null(final_fit_check)) fwrite(final_fit_check, file = fit_check_path)
+  # ##### process fit files
+  # # process_and_save_fits(dir_spp, test_species$file_name[ii])
+  # # Combine lists into single dataframes
+  # final_fit_df <- if (length(all_fit_df) > 0) rbindlist(all_fit_df, fill = TRUE) else NULL
+  # final_fit_pars <- if (length(all_fit_pars) > 0) rbindlist(all_fit_pars, fill = TRUE) else NULL
+  # final_fit_check <- if (length(all_fit_check) > 0) rbindlist(all_fit_check, fill = TRUE) else NULL
+  # 
+  # # Write to CSV if there is data
+  # if (!is.null(final_fit_df)) fwrite(final_fit_df, file = fit_df_path)
+  # if (!is.null(final_fit_pars)) fwrite(final_fit_pars, file = fit_pars_path)
+  # if (!is.null(final_fit_check)) fwrite(final_fit_check, file = fit_check_path)
   
   ##### process index files
   spp_indices <- pull_files(spp, "index")
