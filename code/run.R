@@ -283,7 +283,6 @@ include_or_exclude3 <- function(df, proportions, replicate_num = 3) {
   return(result_list)
 }
 
-
 #' Cleanup species function
 #'
 #' Filter catch by species, create a vector of tows and give tows a random
@@ -370,7 +369,7 @@ resample_tests <- function (spp_dfs = spp_dfs, spp_info, grid_yrs, dir_out) {
   dir_spp <- paste0(dir_out, paste0(test_species$srvy[ii], "_", test_species$file_name[ii], "/"))
   dir.create(dir_spp, showWarnings = FALSE)
   
-  all_fit_df <- all_fit_pars <- all_fit_check <- list()
+  all_fit_df <- all_fit_pars <- all_fit_check <- all_index <- list()
   
   spp_dfs <- spp_dfs[90:91] # reduce DFs for testing
   spp_files <- as.list(names(spp_dfs)) # make the names file
@@ -394,14 +393,16 @@ resample_tests <- function (spp_dfs = spp_dfs, spp_info, grid_yrs, dir_out) {
     # Load only the required dataframe
     spp_df <- read_parquet(paste0(dir_spp, paste0("df_", i, ".parquet")))
     # Run species SDM function
-    fit <- species_sdm_fn(x = spp_df, y = spp_files[[i]], z = grid_yrs)
+    fit <- species_sdm_fn(x = spp_df, y = spp_files[[i]], z = grid_yrs, dir_spp = dir_spp)
     # Ensure extracted objects are dataframes, Store results in lists
     all_fit_df[[spp_files[[i]]]] <- cbind(test = spp_files[[i]], as.data.frame(fit_df_fn(fit)))
-    fwrite(rbindlist(all_fit_df, fill = TRUE), file = fit_df_path)
+    fwrite(rbindlist(all_fit_df, fill = TRUE), file = paste0(dir_spp, "fit_df.csv"))
     all_fit_pars[[spp_files[[i]]]] <- cbind(test = spp_files[[i]], as.data.frame(fit_pars_fn(fit)))
-    fwrite(rbindlist(all_fit_pars, fill = TRUE), file = fit_pars_path)
+    fwrite(rbindlist(all_fit_pars, fill = TRUE), file = paste0(dir_spp, "pars_df.csv"))
     all_fit_check[[spp_files[[i]]]] <- cbind(test = spp_files[[i]], as.data.frame(fit_check_fn(fit)))
-    fwrite(rbindlist(all_fit_check, fill = TRUE), file = fit_check_path)
+    fwrite(rbindlist(all_fit_check, fill = TRUE), file = paste0(dir_spp, "fit_check_df.csv"))
+    all_index[[spp_files[[i]]]] <- cbind(test = spp_files[[i]], as.data.frame(fit_check_fn(fit$index)))
+    fwrite(rbindlist(all_index, fill = TRUE), file = paste0(dir_spp, "index_df.csv"))
     # Explicitly remove objects after processing
     rm(fit, spp_df, grid_yrs1)
     gc()
@@ -410,19 +411,19 @@ resample_tests <- function (spp_dfs = spp_dfs, spp_info, grid_yrs, dir_out) {
   
   print("...Parallel SDM processing complete")
   
-  ##### process index files
-  spp_indices <- pull_files(spp, "index")
-  spp_indices_df <- bind_index_fn(spp_indices)
-  write.csv(spp_indices_df, "spp_indices_df.csv", row.names = F)
+  # ##### process index files
+  # spp_indices <- pull_files(spp, "index")
+  # spp_indices_df <- bind_index_fn(spp_indices)
+  # write.csv(spp_indices_df, "spp_indices_df.csv", row.names = F)
   
   # Remove the rest of the files
   rm("spp_files", "spp_indices", "spp_indices_df")
   
-  #remove from memory
-  files_to_keep <- c("spp_fit_check_df.csv", "spp_fit_df.csv", "spp_pars_df.csv", "spp_indices_df.csv")
-  all_files <- list.files(path = ".", full.names = TRUE)  # Get all files
-  files_to_remove <- setdiff(all_files, file.path(".", files_to_keep))  # Exclude files to keep
-  file.remove(files_to_remove)  # Delete the files
+  # #remove from memory
+  # files_to_keep <- c("spp_fit_check_df.csv", "spp_fit_df.csv", "spp_pars_df.csv", "spp_indices_df.csv")
+  # all_files <- list.files(path = ".", full.names = TRUE)  # Get all files
+  # files_to_remove <- setdiff(all_files, file.path(".", files_to_keep))  # Exclude files to keep
+  # file.remove(files_to_remove)  # Delete the files
 }
 
 # Run scenarios ----------------------------------------------------------------
