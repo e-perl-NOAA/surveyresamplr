@@ -87,8 +87,8 @@ for (p in PKG) {
 # Set directories --------------------------------------------------------------
 #setwd("C:/Users/Derek.Bolser/Documents/Resample_survey_data/") #for local testing
 wd <- "Z:/Projects/Resample-survey-data/"
-wd_results <- paste0(wd, "/output/")
-dir.create(wd_results, showWarnings = FALSE)
+dir_out <- paste0(wd, "/output/")
+dir.create(dir_out, showWarnings = FALSE)
 
 #get rid of memory limits
 options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
@@ -220,7 +220,7 @@ cleanup_by_species <- function(catch,
 
 resample_tests <- function (spp_dfs = spp_dfs, test_species, grid_yrs, dir_out) {
   # set directories for outputs
-  dir_spp <- paste0(dir_out, paste0(test_species$srvy[ii], "_", test_species$file_name[ii], "/"))
+  dir_spp <- paste0(dir_out, paste0(test_species$srvy, "_", test_species$file_name, "/"))
   dir.create(dir_spp, showWarnings = FALSE)
   
   all_fit_df <- all_fit_pars <- all_fit_check <- all_index <- list()
@@ -258,7 +258,7 @@ resample_tests <- function (spp_dfs = spp_dfs, test_species, grid_yrs, dir_out) 
     all_index[[spp_files[[i]]]] <- cbind(test = spp_files[[i]], as.data.frame(fit_check_fn(fit$index)))
     fwrite(rbindlist(all_index, fill = TRUE), file = paste0(dir_spp, "index_df.csv"))
     # Explicitly remove objects after processing
-    rm(fit, spp_df, grid_yrs1)
+    rm(fit, spp_df, grid_yrs)
     gc()
     NULL
   }, .progress = TRUE, .options = furrr_options(seed = TRUE))
@@ -489,7 +489,7 @@ include_or_exclude <- function(df, proportions, replicate_num = 10) {
   result_list <- do.call(c, result_list)
   
   # Set names for the list elements based on proportions
-  names(result_list) <- paste0(rep(proportions, each = 10), "_", rep(1:10, times = length(proportions)))
+  names(result_list) <- paste0(rep(proportions, each = replicate_num), "_", rep(1:replicate_num, times = length(proportions)))
   
   # Return the list of dataframes
   return(result_list)
@@ -540,14 +540,14 @@ seq_from = 0.1
 seq_to = 1
 seq_by = 0.1
 tot_dataframes = 91
-grid_yrs1 <- grid_yrs_ca
+grid_yrs <- grid_yrs_ca
 replicate_num <- 10
 catch <- catch_ca
 
 ### Run ------------------------------------------------------------------------
 
 for (ii in 1:nrow(test_species)){
-  print(test_species$srvy[ii], " ", test_species$common_name[ii])
+  print(paste0(test_species$srvy[ii], " ", test_species$common_name[ii]))
   spp_dfs <- cleanup_by_species(
     catch = catch, 
     test_species = test_species[ii,], 
@@ -561,8 +561,8 @@ for (ii in 1:nrow(test_species)){
     resample_tests(
       spp_dfs = spp_dfs, 
       test_species = test_species[ii,], 
-      grid_yrs = grid_yrs1, 
-      dir_out = wd_results) 
+      grid_yrs = grid_yrs, 
+      dir_out = dir_out) 
   }, silent = FALSE)      # end of try function
 }
 
@@ -598,7 +598,7 @@ include_or_exclude <- function(df, proportions, replicate_num = 3) {
   result_list <- do.call(c, result_list)
   
   # Set names for the list elements based on proportions
-  names(result_list) <- paste0(rep(proportions, each = 10), "_", rep(1:10, times = length(proportions)))
+  names(result_list) <- paste0(rep(proportions, each = replicate_num), "_", rep(1:replicate_num, times = length(proportions)))
   
   # Return the list of dataframes
   return(result_list)
@@ -645,15 +645,14 @@ seq_from = 0.2
 seq_to = 1.0
 seq_by = 0.2 
 tot_dataframes = 13
-grid_yrs1 <- grid_yrs_ebs
+grid_yrs <- grid_yrs_ebs
 replicate_num <- 3
-catch <- catch_ak %>% dplyr::filter(srvy == "BS")
+catch <- catch_ak
 
 ### Run ------------------------------------------------------------------------
 
 for (ii in 1:nrow(test_species)){
-  print(test_species$srvy[ii], " ", test_species$common_name[ii])
-  
+  print(paste0(test_species$srvy[ii], " ", test_species$common_name[ii]))
   spp_dfs <- cleanup_by_species(
     catch = catch, 
     test_species = test_species[ii,], 
@@ -666,9 +665,9 @@ for (ii in 1:nrow(test_species)){
   try({
     resample_tests(
       spp_dfs = spp_dfs, 
-      test_species = test_species[,ii], 
-      grid_yrs = grid_yrs1, 
-      dir_out = wd_results) 
+      test_species = test_species[ii,], 
+      grid_yrs = grid_yrs, 
+      dir_out = dir_out) 
   }, silent = FALSE)      # end of try function
 }
 
