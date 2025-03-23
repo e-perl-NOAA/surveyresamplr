@@ -115,7 +115,7 @@ yellowtail <- file.path(output, "Yellowtail_rockfish")
 # Define study species ---------------------------------------------------------
 
 test_species <- data.frame(
-  SRVY = "BS",
+  srvy = "BS",
   common_name = c("walleye pollock", "snow crab", "Pacific cod", 
                   "red king crab", "blue king crab", 
                   "yellowfin sole", "Pacific halibut", 
@@ -129,7 +129,7 @@ test_species <- data.frame(
   )
 
 test_species <- dplyr::bind_rows(
-  data.frame(SRVY = "CA", 
+  data.frame(srvy = "CA", 
              common_name = "arrowtooth flounder", 
              species_code = NA, 
              file_name = "arrowtooth_flounder"), 

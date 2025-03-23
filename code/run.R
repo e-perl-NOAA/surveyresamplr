@@ -88,15 +88,19 @@ for (p in PKG) {
 
 # Alaska
 test_species <- data.frame(
-  SRVY = "BS",
+  srvy = "EBS",
   common_name = c("walleye pollock", "snow crab", "Pacific cod", 
                   "red king crab", "blue king crab", 
                   "yellowfin sole", "Pacific halibut", 
                   "Alaska plaice", "flathead sole", "northern rock sole"), 
   species_code = as.character(c(21740, 68580, 21720, 
-                   69322, 69323, 
-                   10210, 10120, 
-                   10285, 10130, 10261)), 
+                                69322, 69323, 
+                                10210, 10120, 
+                                10285, 10130, 10261), 
+                              seq_from = 0.2, 
+                              seq_to = 1.0, 
+                              seq_by = 0.2, 
+                              tot_dataframes = 13), 
   test = "partial") %>% 
   dplyr::mutate( 
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))
@@ -105,7 +109,7 @@ test_species <- data.frame(
 
 # California
 test_species <- dplyr::bind_rows(
-  data.frame(SRVY = "CA", 
+  data.frame(srvy = "CA", 
              common_name = c("arrowtooth flounder", "bocaccio", "canary rockfish", "darkblotched rockfish", 
                              "Dover sole", "lingcod", "lingcod", "longnose skate", 
                              "Pacific ocean perch", "Pacific spiny dogfish", 
@@ -114,7 +118,11 @@ test_species <- dplyr::bind_rows(
              filter_lat_gt = c(34, NA, NA, 335, NA, 35, NA, NA, 35, NA, NA, NA, NA, NA, 35.5, 33.5), 
              filter_lat_lt = c(NA, NA, NA, NA, NA, NA, 35, NA, NA, NA, NA, NA, NA, NA, NA, NA), 
              filter_depth = c(NA, 500, 275, 675, NA, 450, 450, NA, 500, 700, 675, 700, NA, NA, 425, 675), 
-             test = "full") %>% 
+             test = "full", 
+             seq_from = 0.1, 
+             seq_to = 1.0, 
+             seq_by = 0.1, 
+             tot_dataframes = 91) %>% 
     dplyr::mutate( 
       file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name))), 
       species_code = common_name), 
@@ -128,45 +136,93 @@ dir.create(wd_results, showWarnings = FALSE)
 wd_results_v <- paste0(wd_results, "/", Sys.Date() ,"/")
 dir.create(wd_results_v, showWarnings = FALSE)
 
-# Load data --------------------------------------------------------------------
+# Load survey data -------------------------------------------------------------
 
+## Alaska ----------------------------------------------------------------------
 
 # source(paste0(wd, "code/data_dl_ak.r"))
+load(file = paste0(wd, "/data/noaa_afsc_cpue.rda"))
+catch_ak <- noaa_afsc_cpue
 
 ## California ------------------------------------------------------------------
 
-#catch <- read.csv(file.path(data,"nwfsc_bt_fmp_spp.csv"))
-catch <- read.csv(paste0(wd,"data/nwfsc_bt_fmp_spp_updated.csv")) #pulled data again to get 2024
-load(file.path(wd,"data/california_current_grid.rda"))
+catch_ca <- read.csv(paste0(wd,"data/nwfsc_bt_fmp_spp_updated.csv")) #pulled data again to get 2024
+catch_ca <- catch_ca %>% 
+  dplyr::select(Trawl_id, Common_name, Longitude_dd, Latitude_dd, Year, Pass, total_catch_wt_kg) %>% 
+  dplyr::mutate(srvy = "CA")
 
-# source(paste0(wd, "code/smaller_functions_updated.R")) #need to edit to specify the code directory if running locally
-source(paste0(wd, "code/smaller_functions.R")) #need to edit to specify the code directory if running locally
-source(paste0(wd, "code/cleanup_by_species.R"))
-source(paste0(wd, "code/species_sdms.R"))
+## Combine ---------------------------------------------------------------------
 
+catch <- dplyr::bind_rows(catch_ak, catch_ca)
+
+# Load grid data -------------------------------------------------------------
+
+## Alaska ----------------------------------------------------------------------
+
+load(paste0(wd,"data/noaa_afsc_ebs_pred_grid_depth.rdata"))
+noaa_afsc_ebs_pred_grid_depth <- noaa_afsc_ebs_pred_grid_depth %>% 
+  dplyr::mutate(srvy = "EBS")
+#make gridyrs
+grid_yrs_ebs <- replicate_df(noaa_afsc_ebs_pred_grid_depth, "Year", unique(catch$Year))
+
+## California ------------------------------------------------------------------
+
+load(paste0(wd,"data/california_current_grid.rda"))
 ## set up grid
 #rename x and y cols
-california_current_grid$Longitude_dd<- california_current_grid$longitude
-california_current_grid$Latitude_dd<- california_current_grid$latitude
-california_current_grid$Pass<- california_current_grid$pass_scaled
-california_current_grid$Depth_m<- california_current_grid$depth
-
+california_current_grid <- california_current_grid %>% 
+  dplyr::select(Longitude_dd = longitude, 
+                Latitude_dd = latitude, 
+                Pass = pass_scaled, 
+                Depth_m = depth) %>% 
+  dplyr::mutate(srvy = "CA")
 #make gridyrs
-grid_yrs <- replicate_df(california_current_grid, "Year", unique(catch$Year))
+grid_yrs_ca <- replicate_df(california_current_grid, "Year", unique(catch$Year))
+
+## Combine ---------------------------------------------------------------------
+
+grid_yrs <- dplyr::bind_rows(grid_yrs_ca, grid_yrs_ebs)
 
 #saveRDS(grid_yrs,"grid_yrs.rds")
 write_parquet(x = grid_yrs, paste0(wd, "data/grid_yrs.parquet"))
-rm(grid_yrs,california_current_grid)
+rm(grid_yrs,california_current_grid, grid_yrs_ca, noaa_afsc_ebs_pred_grid_depth, grid_yrs_ebs)
 
 #get rid of memory limits
 options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
 
+# Load support files -----------------------------------------------------------
+
+source(paste0(wd, "code/smaller_functions_updated.R")) #need to edit to specify the code directory if running locally
+# source(paste0(wd, "code/smaller_functions.R")) #need to edit to specify the code directory if running locally
+source(paste0(wd, "code/cleanup_by_species.R"))
+source(paste0(wd, "code/species_sdms.R"))
+
 # Run scenarios ----------------------------------------------------------------
 for (ii in 1:nrow(test_species)) {
-  dir_spp <- paste0(wd_results_v, paste0(test_species$SRVY[ii], "_", test_species$file_name[ii], "/"))
+  file <- test_species$file_name[ii]
+  dir_spp <- paste0(wd_results_v, paste0(test_species$srvy[ii], "_", file, "/"))
   dir.create(dir_spp, showWarnings = FALSE)
-
-  spp_dfs <- cleanup_by_species(df = catch, species = test_species$common_name[ii])
+  
+  # Define output file paths
+  fit_df_path <- paste0(dir_spp, paste0(file, "_fit_df.csv"))
+  fit_pars_path <- paste0(dir_spp, paste0(file, "_pars_df.csv"))
+  fit_check_path <- paste0(dir_spp, paste0(file, "_fit_check_df.csv"))
+  
+  all_fit_df <- list()
+  all_fit_pars <- list()
+  all_fit_check <- list()
+  
+  # Systematically filter data 
+  spp_dfs <- cleanup_by_species(
+    df = catch %>% 
+    dplyr::filter(
+      srvy == test_species$srvy[ii], 
+      Common_name == test_species$common_name[ii]), 
+    species = test_species$common_name[ii], 
+    seq_from = test_species$seq_from[ii], 
+    seq_to = test_species$seq_to[ii], 
+    seq_by = test_species$seq_by[ii], 
+    tot_dataframes = test_species$tot_dataframes[ii])
   if (!is.na(test_species$filter_lat_lt[ii])) {
     spp_dfs <- lapply(spp_dfs, 
                       function(x, val){x[x$Latitude_dd > val, ]}, 
@@ -186,7 +242,7 @@ for (ii in 1:nrow(test_species)) {
   
   # make the names file
   spp_files <- as.list(names(spp_dfs))
-
+  
   # Save each dataframe separately
   for (i in seq_along(spp_dfs)) {
     write_parquet(spp_dfs[[i]], paste0(dir_spp, paste0("df_", i, ".parquet")))
@@ -203,7 +259,7 @@ for (ii in 1:nrow(test_species)) {
   gc()
   
   print("Starting parallel SDM processing")
-
+  
   # Run SDMs in parallel
   future_map(seq_along(spp_files), function(i) {
     gc()  # Free memory
@@ -213,6 +269,12 @@ for (ii in 1:nrow(test_species)) {
     grid_yrs <- read_parquet(paste0(wd, "data/grid_yrs.parquet"))
     # Run species SDM function
     species_sdm_fn(spp_df, spp_files[[i]], grid_yrs)
+    # # Ensure extracted objects are dataframes, Store results in lists
+    # all_fit_df[[file]] <- as.data.frame(fit_df_fn(fit))
+    # all_fit_pars[[file]] <- as.data.frame(fit_pars_fn(fit))
+    # all_fit_check[[file]] <- as.data.frame(fit_check_fn(fit))
+    # # Free memory
+    # rm(fit, fit_df, fit_pars, fit_check)
     # Explicitly remove objects after processing
     rm(spp_df, grid_yrs)
     gc()

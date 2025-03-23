@@ -25,7 +25,7 @@ tow_fn <- function(x) {
 #' (0.1,1.0, by = 0.1)) replicated by the length of the tows dataframe. The name
 #' of the props is "Trawl_id".
 #'
-include_or_exclude <- function(df, proportions) {
+include_or_exclude <- function(df, proportions, replicate_num = 10) {
   # Get the number of rows in the dataframe
   num_rows <- nrow(df)
   
@@ -33,7 +33,7 @@ include_or_exclude <- function(df, proportions) {
   result_list <- lapply(proportions, function(p) {
     # Generate a random vector of 1s and 0s based on the specified proportion
     set.seed(1)
-    random_vectors <- replicate(10, sample(c(1, 0), size = num_rows, replace = TRUE, prob = c(p, 1 - p)), simplify = F)
+    random_vectors <- replicate(replicate_num, sample(c(1, 0), size = num_rows, replace = TRUE, prob = c(p, 1 - p)), simplify = F)
     
     # Create a new dataframe with the random assignments
     lapply(random_vectors, function(rv) {
@@ -214,62 +214,6 @@ pull_files <- function(directory, string) {
   return(data_list)
 }
 
-#' Filter by latitutde or depth
-#'
-#' Functions to filter data by specified latitude or depth.
-#'
-#' @param x Data frame output of cleanup_by_species() function.
-#'
-# remove south of 33.5 lat
-lat_filter_335 <- function(x) {
-  x[x$Latitude_dd > 33.5, ]
-}
-
-# remove south of 34 lat
-lat_filter_34 <- function(x) {
-  x[x$Latitude_dd > 34, ]
-}
-
-# remove north of 34 lat
-lat_filter_34_max <- function(x) {
-  x[x$Latitude_dd < 34, ]
-}
-
-lat_filter_35 <- function(x) {
-  x[x$Latitude_dd > 35, ]
-}
-
-# remove deeper than 275 m
-depth_filter_275 <- function(x) {
-  x[x$Depth_m < 275, ]
-}
-
-# remove deeper than 425 m
-depth_filter_425 <- function(x) {
-  x[x$Depth_m < 425, ]
-}
-
-# remove deeper than 450 m
-depth_filter_450 <- function(x) {
-  x[x$Depth_m < 450, ]
-}
-
-# remove deeper than 500 m
-depth_filter_500 <- function(x) {
-  x[x$Depth_m < 500, ]
-}
-
-# remove deeper than 675 m
-depth_filter_675 <- function(x) {
-  x[x$Depth_m < 675, ]
-}
-
-# remove deeper than 700 m
-depth_filter_700 <- function(x) {
-  x[x$Depth_m < 700, ]
-}
-
-###### modified function to summarize fit files ################
 process_and_save_fits <- function(directory, name) {
   # Get all RDS files that contain "fit" in their names
   files <- list.files(directory, pattern = ".*fit.*\\.rds$", full.names = TRUE)
