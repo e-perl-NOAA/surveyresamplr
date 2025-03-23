@@ -70,7 +70,7 @@ dat_haul <- dat
 api_link_species <- 'https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_species/'
 
 ## query the API link
-res <- httr::GET(url = api_link_species)
+res <- httr::GET(url = paste0(api_link_species, "?offset=0&limit=10000"))
 ## convert from JSON format
 data <- jsonlite::fromJSON(base::rawToChar(res$content)) 
 
@@ -81,11 +81,9 @@ dat_species <- data$items %>%
 ## Load catch data from FOSS ---------------------------------------------------
 api_link_catch <- 'https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_catch/'
 
-test_species1 <- test_species[test_species$srvy == "EBS",]
-
 dat <- data.frame()
-for (ii in 1:nrow(test_species1)) {
-  print(test_species1$common_name[ii])
+for (ii in 1:nrow(test_species)) {
+  print(test_species$common_name[ii])
   for (i in seq(0, 1000000, 10000)){
     ## find how many iterations it takes to cycle through the data
     print(i)
@@ -93,7 +91,7 @@ for (ii in 1:nrow(test_species1)) {
     # res <- httr::GET(url = paste0(api_link_catch, "?offset=",i,"&limit=10000"))
     # res <- httr::GET(url = paste0(api_link_haul, '?limit=10000&q={"species_code":2023,"srvy":"EBS"}'))
     res <- httr::GET(url = paste0(api_link_catch, 
-                                  '?offset=',i,'&limit=10000&q={"species_code":',test_species1$species_code[ii],'}'))
+                                  '?offset=',i,'&limit=10000&q={"species_code":',test_species$species_code[ii],'}'))
     # res <- httr::GET(url = 'https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_catch/?offset=0&limit=10000&q={%22species_code%22:21740,%22species_code%22:21720}')
     ## convert from JSON format
     data <- jsonlite::fromJSON(base::rawToChar(res$content)) 
@@ -129,10 +127,11 @@ noaa_afsc_cpue <- dplyr::full_join(
   # get full data 
   dplyr::left_join(dat_catch) %>% 
   dplyr::left_join(dat_haul)  %>% 
-  dplyr::left_join(dat_species) %>% 
+  dplyr::left_join(dat_species %>% 
+                     dplyr::select(species_code, common_name) %>% 
+                     dplyr::mutate(species_code = as.numeric(species_code))) %>% 
   dplyr::filter(srvy == "EBS") %>% 
   dplyr::mutate(
-    srvy = "BS", 
     Pass = 1, 
                 Area_swept_ha = area_swept_km2/100) %>%
   dplyr::select(
@@ -252,7 +251,7 @@ bb.POPULATION_VAR
 FROM GAP_PRODUCTS.AKFIN_BIOMASS bb
 
 WHERE bb.AREA_ID IN (99901, 99902)
-AND bb.SPECIES_CODE IN (", paste0(test_species1$species_code, collapse = ","),") 
+AND bb.SPECIES_CODE IN (", paste0(test_species$species_code, collapse = ","),") 
 ")) %>% 
   #   -- WHERE bb.SURVEY_DEFINITION_ID = 98 
   # -- AND bb.SPECIES_CODE IN (21740, 10210, 69322) 

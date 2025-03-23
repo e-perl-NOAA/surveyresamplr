@@ -1,9 +1,9 @@
 # NOTES ------------------------------------------------------------------------
 # Resample_survey_data: Multiple species, multiple years
-# Em Markowitz March 2025
-# Alaska Fisheries
-#### Resample_survey_data: Multiple species, multiple years
-# ------------------------------------------------------------------------------
+# Em Markowitz, Alaska Fisheries Science Center
+# Derek Bolser, Office of Science and Technology
+# March 2025
+# Resample_survey_data: Multiple species, multiple years
 
 # Install Libraries ------------------------------------------------------------
 
@@ -84,203 +84,63 @@ for (p in PKG) {
     require(p,character.only = TRUE)}
 }
 
-# Define study species ---------------------------------------------------------
-
-# Alaska
-test_species <- data.frame(
-  srvy = "EBS",
-  common_name = c("walleye pollock", "snow crab", "Pacific cod", 
-                  "red king crab", "blue king crab", 
-                  "yellowfin sole", "Pacific halibut", 
-                  "Alaska plaice", "flathead sole", "northern rock sole"), 
-  species_code = as.character(c(21740, 68580, 21720, 
-                                69322, 69323, 
-                                10210, 10120, 
-                                10285, 10130, 10261))) %>% 
-  dplyr::mutate( 
-    file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))
-  )
-
-
-# California
-test_species <- dplyr::bind_rows(
-  data.frame(srvy = "CA", 
-             common_name = c("arrowtooth flounder", "bocaccio", "canary rockfish", "darkblotched rockfish", 
-                             "Dover sole", "lingcod", "lingcod", "longnose skate", 
-                             "Pacific ocean perch", "Pacific spiny dogfish", 
-                             "petrale sole", "rex sole", "sablefish", 
-                             "shortspine thornyhead", "yellowtail rockfish", "widow rockfish"), 
-             filter_lat_gt = c(34, NA, NA, 335, NA, 35, NA, NA, 35, NA, NA, NA, NA, NA, 35.5, 33.5), 
-             filter_lat_lt = c(NA, NA, NA, NA, NA, NA, 35, NA, NA, NA, NA, NA, NA, NA, NA, NA), 
-             filter_depth = c(NA, 500, 275, 675, NA, 450, 450, NA, 500, 700, 675, 700, NA, NA, 425, 675)
-  ) %>% 
-    dplyr::mutate( 
-      file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name))), 
-      species_code = common_name), 
-  test_species) 
-
 # Set directories --------------------------------------------------------------
 #setwd("C:/Users/Derek.Bolser/Documents/Resample_survey_data/") #for local testing
 wd <- "Z:/Projects/Resample-survey-data/"
 wd_results <- paste0(wd, "/output/")
 dir.create(wd_results, showWarnings = FALSE)
-wd_results_v <- paste0(wd_results, "/", Sys.Date() ,"/")
-dir.create(wd_results_v, showWarnings = FALSE)
-
-# Load survey data -------------------------------------------------------------
-
-## Alaska ----------------------------------------------------------------------
-
-# source(paste0(wd, "code/data_dl_ak.r"))
-load(file = paste0(wd, "/data/noaa_afsc_cpue.rda"))
-catch_ak <- noaa_afsc_cpue
-
-## California ------------------------------------------------------------------
-
-catch_ca <- read.csv(paste0(wd,"data/nwfsc_bt_fmp_spp_updated.csv")) #pulled data again to get 2024
-catch_ca <- catch_ca %>% 
-  dplyr::select(Trawl_id, Common_name, Longitude_dd, Latitude_dd, Year, Pass, total_catch_wt_kg) %>% 
-  dplyr::mutate(srvy = "CA")
-
-## Combine ---------------------------------------------------------------------
-
-catch <- dplyr::bind_rows(catch_ak, catch_ca)
-
-# Load grid data -------------------------------------------------------------
-
-## Alaska ----------------------------------------------------------------------
-
-load(paste0(wd, "data/noaa_afsc_ebs_pred_grid_depth.rdata"))
-noaa_afsc_ebs_pred_grid_depth <- noaa_afsc_ebs_pred_grid_depth %>% 
-  dplyr::mutate(srvy = "EBS")
-#make gridyrs
-grid_yrs_ebs <- replicate_df(noaa_afsc_ebs_pred_grid_depth, "Year", unique(catch_ak$Year))
-
-## California ------------------------------------------------------------------
-
-load(paste0(wd,"data/california_current_grid.rda"))
-## set up grid
-#rename x and y cols
-california_current_grid <- california_current_grid %>% 
-  dplyr::select(Longitude_dd = longitude, 
-                Latitude_dd = latitude, 
-                Pass = pass_scaled, 
-                Depth_m = depth, 
-                area_km2 = area_km2_WCGBTS) %>% 
-  dplyr::mutate(srvy = "CA")
-#make gridyrs
-grid_yrs_ca <- replicate_df(california_current_grid, "Year", unique(catch_ca$Year))
-
-## Combine ---------------------------------------------------------------------
-
-grid_yrs <- dplyr::bind_rows(grid_yrs_ca, grid_yrs_ebs)
-
-#saveRDS(grid_yrs,"grid_yrs.rds")
-write_parquet(x = grid_yrs, paste0(wd, "data/grid_yrs.parquet"))
-rm(california_current_grid, grid_yrs_ca, noaa_afsc_ebs_pred_grid_depth, grid_yrs_ebs)
 
 #get rid of memory limits
 options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
 
 # Load support files -----------------------------------------------------------
 
-source(paste0(wd, "code/smaller_functions_updated.R")) #need to edit to specify the code directory if running locally
-# source(paste0(wd, "code/smaller_functions.R")) #need to edit to specify the code directory if running locally
-source(paste0(wd, "code/cleanup_by_species.R"))
-source(paste0(wd, "code/species_sdms.R"))
+# source(paste0(wd, "code/functions.R")) 
+# source(paste0(wd, "code/cleanup_by_species.R"))
+# source(paste0(wd, "code/species_sdms.R"))
 
 # Additional functions ---------------------------------------------------------
 
-#' Include or Exclude
+
+#' Species distribution model function
 #'
-#' Specify how to downsample. For simple random sampling, a proportion of
-#' stations should do.
+#' Function to create a mesh, fit the sdmTMB model, and get the index.
+#' Exports fit.rds and index.rds files to the designated species folder.
+#' Used for arrowtooth flounder, bocaccio, dover sole, lingcod north, lingcod
+#' south, longnose skate, pacific ocean perch (pop), pacific spiny dogfish, rex
+#' sole, yellowtail.
 #'
-#' @param df tows data frame
-#' @param proportions proportions developed using: props <- as.data.frame(seq
-#' (0.1,1.0, by = 0.1)) replicated by the length of the tows dataframe. The name
-#' of the props is "Trawl_id".
+#' @param x speciesname_df[[i]] which is a data frame from a list of data frames
+#' created from the cleanup_by_species() function and any further post-processing
+#' of depth filters (see the smaller_function.R file for those).
+#' @param y speciesname_files[[i]] which is an item in a list created from
+#' names(speciesname_df)
+#' @import sdmTMB
 #'
-
-include_or_exclude <- function(df, proportions, replicate_num = 10) {
-  # Get the number of rows in the dataframe
-  num_rows <- nrow(df)
+species_sdm_fn <- function(x, y, z, dir_spp) {
+  # make mesh
+  mesh <- sdmTMB::make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
   
-  # Use lapply to create a list of dataframes
-  result_list <- lapply(proportions, function(p) {
-    # Generate a random vector of 1s and 0s based on the specified proportion
-    set.seed(1)
-    random_vectors <- replicate(replicate_num, sample(c(1, 0), size = num_rows, replace = TRUE, prob = c(p, 1 - p)), simplify = F)
-    
-    # Create a new dataframe with the random assignments
-    lapply(random_vectors, function(rv) {
-      cbind(df, RandomAssignment = rv)
-    })
-  })
+  # fit model
+  fit <- sdmTMB::sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year) + Pass,
+    data = x,
+    mesh = mesh,
+    family = delta_gamma(),
+    time = "Year",
+    anisotropy = TRUE,
+    spatiotemporal = as.list(c("iid", "iid"))
+  )
   
-  # flatten into single list
-  result_list <- do.call(c, result_list)
+  # get the index
+  predictions <- predict(fit, newdata = z, return_tmb_object = TRUE) # 
+  index <- sdmTMB::get_index(predictions, area = z$area_km2, bias_correct = TRUE)
   
-  # Set names for the list elements based on proportions
-  names(result_list) <- paste0(rep(proportions, each = 10), "_", rep(1:10, times = length(proportions)))
+  # save file
+  saveRDS(fit, paste0(dir_spp, "fit_", y, ".rds"))
+  saveRDS(index, paste0(dir_spp, "index_", y, ".rds"))
   
-  # Return the list of dataframes
-  return(result_list)
-}
-
-include_or_exclude10 <- function(df, proportions, replicate_num = 10) {
-  # Get the number of rows in the dataframe
-  num_rows <- nrow(df)
-  
-  # Use lapply to create a list of dataframes
-  result_list <- lapply(proportions, function(p) {
-    # Generate a random vector of 1s and 0s based on the specified proportion
-    set.seed(1)
-    random_vectors <- replicate(replicate_num, sample(c(1, 0), size = num_rows, replace = TRUE, prob = c(p, 1 - p)), simplify = F)
-    
-    # Create a new dataframe with the random assignments
-    lapply(random_vectors, function(rv) {
-      cbind(df, RandomAssignment = rv)
-    })
-  })
-  
-  # flatten into single list
-  result_list <- do.call(c, result_list)
-  
-  # Set names for the list elements based on proportions
-  names(result_list) <- paste0(rep(proportions, each = 10), "_", rep(1:10, times = length(proportions)))
-  
-  # Return the list of dataframes
-  return(result_list)
-}
-
-
-
-
-include_or_exclude3 <- function(df, proportions, replicate_num = 3) {
-  # Get the number of rows in the dataframe
-  num_rows <- nrow(df)
-  
-  # Use lapply to create a list of dataframes
-  result_list <- lapply(proportions, function(p) {
-    # Generate a random vector of 1s and 0s based on the specified proportion
-    set.seed(1)
-    random_vectors <- replicate(replicate_num, sample(c(1, 0), size = num_rows, replace = TRUE, prob = c(p, 1 - p)), simplify = F)
-    
-    # Create a new dataframe with the random assignments
-    lapply(random_vectors, function(rv) {
-      cbind(df, RandomAssignment = rv)
-    })
-  })
-  
-  # flatten into single list
-  result_list <- do.call(c, result_list)
-  
-  # Set names for the list elements based on proportions
-  names(result_list) <- paste0(rep(proportions, each = 10), "_", rep(1:10, times = length(proportions)))
-  
-  # Return the list of dataframes
-  return(result_list)
+  return(list("fit" = fit, "predictions" = predictions, "index" = index))
 }
 
 #' Cleanup species function
@@ -294,7 +154,7 @@ include_or_exclude3 <- function(df, proportions, replicate_num = 3) {
 #' @return List of resampled catch data frames
 #'
 cleanup_by_species <- function(catch, 
-                               spp_info, 
+                               test_species, 
                                seq_from = 0.1, 
                                seq_to = 1.0, 
                                seq_by = 0.1, 
@@ -303,17 +163,16 @@ cleanup_by_species <- function(catch,
   
   df <- catch %>% 
     dplyr::filter(
-      Common_name == spp_info$common_name[ii],
-      srvy == spp_info$srvy[ii])
+      Common_name == test_species$common_name)
   
-  if (!is.na(spp_info$filter_lat_lt[ii])) {
-    df <- df %>% dplyr::filter(Latitude_dd < spp_info$filter_lat_lt[ii])
+  if (!is.na(test_species$filter_lat_lt) | is.null(test_species$filter_lat_lt)) {
+    df <- df %>% dplyr::filter(Latitude_dd < test_species$filter_lat_lt)
   }
-  if (!is.na(spp_info$filter_lat_gt[ii])) {
-    df <- df %>% dplyr::filter(Latitude_dd > spp_info$filter_lat_gt[ii])
+  if (!is.na(test_species$filter_lat_gt) | is.null(test_species$filter_lat_gt)) {
+    df <- df %>% dplyr::filter(Latitude_dd > test_species$filter_lat_gt)
   }
-  if (!is.na(spp_info$filter_depth[ii])) {
-    df <- df %>% dplyr::filter(Depth_m < spp_info$filter_depth[ii])
+  if (!is.na(test_species$filter_depth) | is.null(test_species$filter_depth)) {
+    df <- df %>% dplyr::filter(Depth_m < test_species$filter_depth)
   }
   
   catch_split <- split(df, df$Year)
@@ -327,12 +186,7 @@ cleanup_by_species <- function(catch,
   # match the structure of the catch data
   props <- rep(props, length(tows))
   
-  if (replicate_num == 10){
-    tows_assigned <- map2(tows, props, include_or_exclude10)
-  }
-  if (replicate_num == 3){
-    tows_assigned <- map2(tows, props, include_or_exclude3)
-  }
+  tows_assigned <- map2(tows, props, include_or_exclude)
   # tows_assigned <- purrr::pmap(list(.x = tows, .y = props, .z = replicate_num), include_or_exclude)
   
   # remove replicates of the 1 effort level
@@ -364,7 +218,7 @@ cleanup_by_species <- function(catch,
 }
 
 
-resample_tests <- function (spp_dfs = spp_dfs, spp_info, grid_yrs, dir_out) {
+resample_tests <- function (spp_dfs = spp_dfs, test_species, grid_yrs, dir_out) {
   # set directories for outputs
   dir_spp <- paste0(dir_out, paste0(test_species$srvy[ii], "_", test_species$file_name[ii], "/"))
   dir.create(dir_spp, showWarnings = FALSE)
@@ -426,24 +280,277 @@ resample_tests <- function (spp_dfs = spp_dfs, spp_info, grid_yrs, dir_out) {
   # file.remove(files_to_remove)  # Delete the files
 }
 
+#' Tow Function
+#'
+#' Create a vector of tows for including or excluding.
+#'
+#' @param x catch_split data frame
+#'
+tow_fn <- function(x) {
+  tows <- as.data.frame(x$Trawl_id)
+  tows <- unique(tows)
+  tows <- as.data.frame(tows[!is.na(tows)])
+  names(tows) <- "Trawl_id"
+  return(tows)
+}
+
+#' Join Data Frames
+#'
+#' Function to join a list of data frames to a main data frame using a shared
+#' column.
+#'
+#' @param list_of_d.fs The list of data frames that you would like to join to
+#' the main data frame
+#' @param main_df The main data frame that you want to join the list of data
+#' frames
+#' @param shared_column The column that all the data frames share which will be
+#' used to join the data frames together.
+#'
+join_dfs <- function(list_of_dfs, main_df, shared_column) {
+  merged_dfs <- lapply(list_of_dfs, function(df) {
+    merged_df <- merge(df, main_df, by = shared_column)
+    return(merged_df)
+  })
+  return(merged_dfs)
+}
+
+#' Create data frame of the species distribution model fit.
+#'
+#' Function to take the species distribution model fit and write it to a csv.
+#'
+#' @param fit Species distribution model fit from whatever smd_fn was used
+#' (see species_sdms.R file for specifics on those sdm files).
+#' @return main model fit data frame
+#'
+fit_df_fn <- function(fit) {
+  fit_df <- tidy(fit, conf.int = T)
+  return(fit_df)
+  
+  filename <- paste0(name(fit), "_fit_df.csv")
+  write.csv(fit_df, file = filename, row.names = F)
+}
+
+#' Create data frame of the species distribution model parameter estimates.
+#'
+#' Function to get the species distribution model parameter estimates and write
+#' it to a csv.
+#'
+#' @param fit Species distribution model fit from whatever smd_fn was used
+#' (see species_sdms.R file for specifics on those sdm files).
+#' @return parameter estimates data frame
+#'
+fit_pars_fn <- function(fit) {
+  fit_pars <- tidy(fit, effects = "ran_pars", conf.int = T)
+  return(fit_pars)
+  
+  filename <- paste0(name(fit), "_fit_pars.csv")
+  write.csv(index, file = filename, row.names = F)
+}
+
+#' Create data frame of the species distribution model diagnostics.
+#'
+#' Function to get the species distribution model diagnostics and write
+#' it to a csv.
+#'
+#' @param fit Species distribution model fit from whatever smd_fn was used
+#' (see species_sdms.R file for specifics on those sdm files).
+#' @return diagnostics data frame
+#'
+fit_check_fn <- function(fit) {
+  fit_check <- sanity(fit)
+  return(fit_check)
+  
+  filename <- paste0(name(fit), "_fit_check.csv")
+  write.csv(index, file = filename, row.names = F)
+}
+
+#' Bind function for species distribution model fits and parameters
+#'
+#' Function to rbind and bring effort and replicates in as columns from
+#' rownames of species distribution model fits and parameters.
+#'
+#' @param x Species distribution model fits or parameters data frame after
+#' being read in by fit_df_fn or fit_pars_fn respectively.
+#' @return New data frame of fits or parameters with the rownames as columns
+#'
+bind_fn <- function(x) {
+  y <- do.call(rbind, x)
+  y$effort <- gsub("fit_", "", row.names(y))
+  y$replicate <- gsub(".*_", "", y$effort)
+  y$effort <- gsub("_.*", "", y$effort)
+  y$replicate <- gsub("\\..*", "", y$replicate)
+  y$effort <- as.numeric(y$effort)
+  y$replicate <- as.numeric(y$replicate)
+  return(y)
+}
+
+#' Bind function for species distribution model diagnostics
+#'
+#' Function to rbind and bring effort and replicates in as columns from
+#' rownames of species distribution model diagnostics.
+#'
+#' @param x Species distribution model diagnostics data frame after being read in
+#' by fit_df_fn.
+#' @return New data frame of diagnostics with the rownames as columns
+#'
+# special bind function for fit check dfs
+bind_fit_check <- function(x) {
+  y <- do.call(rbind, x)
+  y <- as.data.frame(y)
+  y$effort <- gsub("fit_", "", row.names(y))
+  y$replicate <- gsub(".*_", "", y$effort)
+  y$effort <- gsub("_.*", "", y$effort)
+  y$replicate <- gsub("\\..*", "", y$replicate)
+  y$effort <- as.numeric(y$effort)
+  y$replicate <- as.numeric(y$replicate)
+  y <- apply(y, 2, as.character)
+  return(y)
+}
+
+#' Bind function for species distribution model index
+#'
+#' Function to rbind and bring effort and replicates in as columns from
+#' rownames of species distribution model index.
+#'
+#' @param x Species distribution model index data frame after being read in.
+#' @return New data frame of index with the rownames as columns
+#'
+bind_index_fn <- function(x) {
+  y <- do.call(rbind, x)
+  y$effort <- gsub(".rds.*", "", row.names(y))
+  y$effort <- gsub("index_", "", y$effort)
+  y$replicate <- gsub(".*_", "", y$effort)
+  y$effort <- gsub("_.*", "", y$effort)
+  y$effort <- as.numeric(y$effort)
+  y$replicate <- as.numeric(y$replicate)
+  return(y)
+}
+
+#' Pull files with specified character strings
+#'
+#' Function to read (pull) files from the set species directory containing
+#' specified character strings.
+#'
+#' @param directory Species directory to look for files in.
+#' @param string Character string to search files for.
+#' @return Read in list of all files containing the character string searched for.
+#'
+pull_files <- function(directory, string) {
+  # List all RDS files in the directory
+  files <- list.files(directory, pattern = "\\.rds$", full.names = TRUE)
+  
+  # Filter files that contain the search string
+  filtered_files <- files[grepl(string, files)]
+  
+  # Read in files and avoid unnecessary memory copies
+  data_list <- vector("list", length(filtered_files))
+  names(data_list) <- basename(filtered_files)
+  
+  for (i in seq_along(filtered_files)) {
+    data_list[[i]] <- readRDS(filtered_files[i])
+  }
+  
+  gc()  # Force garbage collection
+  return(data_list)
+}
+
+
 # Run scenarios ----------------------------------------------------------------
 
 ## California Current ----------------------------------------------------------
+
+#' Include or Exclude
+#'
+#' Specify how to downsample. For simple random sampling, a proportion of
+#' stations should do.
+#'
+#' @param df tows data frame
+#' @param proportions proportions developed using: props <- as.data.frame(seq
+#' (0.1,1.0, by = 0.1)) replicated by the length of the tows dataframe. The name
+#' of the props is "Trawl_id".
+#'
+include_or_exclude <- function(df, proportions, replicate_num = 10) {
+  # Get the number of rows in the dataframe
+  num_rows <- nrow(df)
+  
+  # Use lapply to create a list of dataframes
+  result_list <- lapply(proportions, function(p) {
+    # Generate a random vector of 1s and 0s based on the specified proportion
+    set.seed(1)
+    random_vectors <- replicate(replicate_num, sample(c(1, 0), size = num_rows, replace = TRUE, prob = c(p, 1 - p)), simplify = F)
+    
+    # Create a new dataframe with the random assignments
+    lapply(random_vectors, function(rv) {
+      cbind(df, RandomAssignment = rv)
+    })
+  })
+  
+  # flatten into single list
+  result_list <- do.call(c, result_list)
+  
+  # Set names for the list elements based on proportions
+  names(result_list) <- paste0(rep(proportions, each = 10), "_", rep(1:10, times = length(proportions)))
+  
+  # Return the list of dataframes
+  return(result_list)
+}
+
+
+### Define study species -------------------------------------------------------
+
+test_species <- data.frame(srvy = "CA", 
+             common_name = c("arrowtooth flounder", "bocaccio", "canary rockfish", "darkblotched rockfish", 
+                             "Dover sole", "lingcod", "lingcod", "longnose skate", 
+                             "Pacific ocean perch", "Pacific spiny dogfish", 
+                             "petrale sole", "rex sole", "sablefish", 
+                             "shortspine thornyhead", "yellowtail rockfish", "widow rockfish"), 
+             filter_lat_gt = c(34, NA, NA, 335, NA, 35, NA, NA, 35, NA, NA, NA, NA, NA, 35.5, 33.5), 
+             filter_lat_lt = c(NA, NA, NA, NA, NA, NA, 35, NA, NA, NA, NA, NA, NA, NA, NA, NA), 
+             filter_depth = c(NA, 500, 275, 675, NA, 450, 450, NA, 500, 700, 675, 700, NA, NA, 425, 675)
+  ) %>% 
+    dplyr::mutate( 
+      file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name))), 
+      species_code = common_name)
+
+### Load survey data -----------------------------------------------------------
+
+catch_ca <- read.csv(paste0(wd,"data/nwfsc_bt_fmp_spp_updated.csv")) #pulled data again to get 2024
+catch_ca <- catch_ca %>% 
+  dplyr::select(Trawl_id, Common_name, Longitude_dd, Latitude_dd, Year, Pass, total_catch_wt_kg) %>% 
+  dplyr::mutate(srvy = "CA")
+
+### Load grid data -------------------------------------------------------------
+
+load(paste0(wd,"data/california_current_grid.rda"))
+## set up grid
+#rename x and y cols
+california_current_grid <- california_current_grid %>% 
+  dplyr::select(Longitude_dd = longitude, 
+                Latitude_dd = latitude, 
+                Pass = pass_scaled, 
+                Depth_m = depth, 
+                area_km2 = area_km2_WCGBTS) %>% 
+  dplyr::mutate(srvy = "CA")
+#make gridyrs
+grid_yrs_ca <- replicate_df(california_current_grid, "Year", unique(catch_ca$Year))
+
+### Variables ------------------------------------------------------------------
 
 seq_from = 0.1
 seq_to = 1
 seq_by = 0.1
 tot_dataframes = 91
-grid_yrs1 <- grid_yrs %>% dplyr::filter(srvy == "CA")
-test_species1 <- test_species %>% dplyr::filter(srvy == "CA")
+grid_yrs1 <- grid_yrs_ca
 replicate_num <- 10
 catch <- catch_ca
 
+### Run ------------------------------------------------------------------------
+
 for (ii in 1:nrow(test_species)){
-  print(test_species$common_name[ii])
+  print(test_species$srvy[ii], " ", test_species$common_name[ii])
   spp_dfs <- cleanup_by_species(
     catch = catch, 
-    spp_info = test_species1[ii,], 
+    test_species = test_species[ii,], 
     seq_from = seq_from, 
     seq_to = seq_to, 
     seq_by = seq_by, 
@@ -453,7 +560,7 @@ for (ii in 1:nrow(test_species)){
   try({
     resample_tests(
       spp_dfs = spp_dfs, 
-      spp_info = test_species[ii,], 
+      test_species = test_species[ii,], 
       grid_yrs = grid_yrs1, 
       dir_out = wd_results) 
   }, silent = FALSE)      # end of try function
@@ -461,21 +568,95 @@ for (ii in 1:nrow(test_species)){
 
 ## Alaska ----------------------------------------------------------------------
 
+#' Include or Exclude
+#'
+#' Specify how to downsample. For simple random sampling, a proportion of
+#' stations should do.
+#'
+#' @param df tows data frame
+#' @param proportions proportions developed using: props <- as.data.frame(seq
+#' (0.1,1.0, by = 0.1)) replicated by the length of the tows dataframe. The name
+#' of the props is "Trawl_id".
+#'
+include_or_exclude <- function(df, proportions, replicate_num = 3) {
+  # Get the number of rows in the dataframe
+  num_rows <- nrow(df)
+  
+  # Use lapply to create a list of dataframes
+  result_list <- lapply(proportions, function(p) {
+    # Generate a random vector of 1s and 0s based on the specified proportion
+    set.seed(1)
+    random_vectors <- replicate(replicate_num, sample(c(1, 0), size = num_rows, replace = TRUE, prob = c(p, 1 - p)), simplify = F)
+    
+    # Create a new dataframe with the random assignments
+    lapply(random_vectors, function(rv) {
+      cbind(df, RandomAssignment = rv)
+    })
+  })
+  
+  # flatten into single list
+  result_list <- do.call(c, result_list)
+  
+  # Set names for the list elements based on proportions
+  names(result_list) <- paste0(rep(proportions, each = 10), "_", rep(1:10, times = length(proportions)))
+  
+  # Return the list of dataframes
+  return(result_list)
+}
+
+
+### Define study species -------------------------------------------------------
+
+test_species <- data.frame(
+  srvy = "EBS",
+  common_name = c("walleye pollock", "snow crab", "Pacific cod", 
+                  "red king crab", "blue king crab", 
+                  "yellowfin sole", "Pacific halibut", 
+                  "Alaska plaice", "flathead sole", "northern rock sole"), 
+  species_code = as.character(c(21740, 68580, 21720, 
+                                69322, 69323, 
+                                10210, 10120, 
+                                10285, 10130, 10261)), 
+  filter_lat_lt = NA, 
+  filter_lat_gt = NA, 
+  filter_depth = NA) %>% 
+  dplyr::mutate( 
+    file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))
+  )
+
+### Load survey data -----------------------------------------------------------
+
+# source(paste0(wd, "code/data_dl_ak.r"))
+
+load(file = paste0(wd, "/data/noaa_afsc_cpue.rda"))
+catch_ak <- noaa_afsc_cpue
+
+### Load grid data -------------------------------------------------------------
+
+load(paste0(wd, "data/noaa_afsc_ebs_pred_grid_depth.rdata"))
+noaa_afsc_ebs_pred_grid_depth <- noaa_afsc_ebs_pred_grid_depth %>% 
+  dplyr::mutate(srvy = "EBS")
+#make gridyrs
+grid_yrs_ebs <- replicate_df(noaa_afsc_ebs_pred_grid_depth, "Year", unique(catch_ak$Year))
+
+### Variables ------------------------------------------------------------------
+
 seq_from = 0.2
 seq_to = 1.0
 seq_by = 0.2 
 tot_dataframes = 13
-grid_yrs1 <- grid_yrs %>% dplyr::filter(srvy == "EBS")
-test_species1 <- test_species %>% dplyr::filter(srvy == "EBS")
+grid_yrs1 <- grid_yrs_ebs
 replicate_num <- 3
-catch <- catch_ak %>% dplyr::filter(srvy == "EBS")
+catch <- catch_ak %>% dplyr::filter(srvy == "BS")
+
+### Run ------------------------------------------------------------------------
 
 for (ii in 1:nrow(test_species)){
-  print(test_species$common_name[ii])
+  print(test_species$srvy[ii], " ", test_species$common_name[ii])
   
   spp_dfs <- cleanup_by_species(
     catch = catch, 
-    spp_info = test_species[ii,], 
+    test_species = test_species[ii,], 
     seq_from = seq_from, 
     seq_to = seq_to, 
     seq_by = seq_by, 
@@ -485,7 +666,7 @@ for (ii in 1:nrow(test_species)){
   try({
     resample_tests(
       spp_dfs = spp_dfs, 
-      spp_info = test_species[,ii], 
+      test_species = test_species[,ii], 
       grid_yrs = grid_yrs1, 
       dir_out = wd_results) 
   }, silent = FALSE)      # end of try function
