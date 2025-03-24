@@ -225,7 +225,7 @@ resample_tests <- function (spp_dfs = spp_dfs, test_species, grid_yrs, dir_out) 
   
   all_fit_df <- all_fit_pars <- all_fit_check <- all_index <- list()
   
-  spp_dfs <- spp_dfs[90:91] # reduce DFs for testing
+  spp_dfs <- spp_dfs[names(spp_dfs)[(length(names(spp_dfs))-1):length(names(spp_dfs))]] # reduce DFs for testing
   spp_files <- as.list(names(spp_dfs)) # make the names file
   for (i in seq_along(spp_dfs)) { # Save each dataframe separately
     write_parquet(spp_dfs[[i]], paste0(dir_spp, paste0("df_", i, ".parquet")))
