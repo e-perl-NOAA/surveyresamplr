@@ -87,7 +87,7 @@ resample_tests <- function (spp_dfs, test_species, grid_yrs, dir_out) {
   dir_spp <- paste0(dir_out, paste0(test_species$srvy, "_", test_species$file_name, "/"))
   dir.create(dir_spp, showWarnings = FALSE)
   
-  all_fit_df <- all_fit_pars <- all_fit_check <- all_index <- data.frame()
+  fit <- fit_pars <- fit_check <- index <- data.frame()
   
   spp_dfs <- spp_dfs[names(spp_dfs)[(length(names(spp_dfs))-1):length(names(spp_dfs))]] # reduce DFs for testing
   spp_files <- as.list(names(spp_dfs)) # make the names file
@@ -109,42 +109,42 @@ resample_tests <- function (spp_dfs, test_species, grid_yrs, dir_out) {
   
   # Run SDMs in parallel
   future_map(seq_along(spp_files), function(i) {
-    print(spp_files[[i]])
+    message(spp_files[[i]])
     gc()  # Free memory
     # Load only the required dataframe
     spp_df <- read_parquet(paste0(dir_spp, paste0("df_", i, ".parquet")))
     # Run species SDM function
-    fit <- model_function(x = spp_df, y = spp_files[[i]], z = grid_yrs, dir_spp = dir_spp)
+    fit0 <- model_function(x = spp_df, y = spp_files[[i]], z = grid_yrs, dir_spp = dir_spp)
     # fit <- readRDS(file = paste0(dir_spp, "fit_", spp_files[[i]], ".rds")) # oor testing
     # Ensure extracted objects are dataframes, Store results in lists
-    all_fit_df <- all_fit_df %>% 
+    fit <- fit %>% 
       dplyr::bind_rows(
         data.frame(
-            org = test_species$file_name,
-            test = spp_files[[i]],
-            data.frame(fit_df_fn(fit$fit))))
-    fwrite(all_fit_df, file = paste0(dir_spp, "fit_df.csv"))
-    all_fit_pars <- all_fit_pars %>% 
+          species = test_species$file_name,
+          effort = spp_files[[i]],
+          data.frame(fit_df_fn(fit0$fit))))
+    fwrite(fit, file = paste0(dir_spp, "fit_df.csv"))
+    fit_pars <- fit_pars %>% 
       dplyr::bind_rows(
         data.frame(
-          org = test_species$file_name,
-          test = spp_files[[i]],
-            data.frame(fit_pars_fn(fit$fit))))
-    fwrite(all_fit_pars, file = paste0(dir_spp, "pars_df.csv"))
-    all_fit_check <- all_fit_check %>% 
+          species = test_species$file_name,
+          effort = spp_files[[i]],
+          data.frame(fit_pars_fn(fit0$fit))))
+    fwrite(fit_pars, file = paste0(dir_spp, "fit_pars.csv"))
+    fit_check <- fit_check %>% 
       dplyr::bind_rows(
         data.frame(
-          org = test_species$file_name,
-          test = spp_files[[i]],
-            data.frame(fit_check_fn(fit$fit))))
-    fwrite(all_fit_check, file = paste0(dir_spp, "fit_check_df.csv"))
-    all_index <- all_index %>% 
+          species = test_species$file_name,
+          effort = spp_files[[i]],
+          data.frame(fit_check_fn(fit0$fit))))
+    fwrite(fit_check, file = paste0(dir_spp, "fit_check.csv"))
+    index <- index %>% 
       dplyr::bind_rows(
         data.frame(
-          org = test_species$file_name,
-          test = spp_files[[i]],
-            data.frame(fit$index)))
-    fwrite(all_index, file = paste0(dir_spp, "index_df.csv"))
+          species = test_species$file_name,
+          effort = spp_files[[i]],
+          data.frame(fit0$index)))
+    fwrite(index, file = paste0(dir_spp, "index.csv"))
     # Explicitly remove objects after processing
     rm("fit", "spp_df")
     gc()
@@ -152,23 +152,9 @@ resample_tests <- function (spp_dfs, test_species, grid_yrs, dir_out) {
   }, .progress = TRUE, .options = furrr_options(seed = TRUE))
   
   print("...Parallel SDM processing complete")
-  
-  # ##### process index files
-  # spp_indices <- pull_files(spp, "index")
-  # spp_indices_df <- bind_index_fn(spp_indices)
-  # write.csv(spp_indices_df, "spp_indices_df.csv", row.names = F)
-  
-  # Remove the rest of the files
-  rm("spp_files", "spp_indices", "spp_indices_df")
-  
-  # #remove from memory
-  # files_to_keep <- c("spp_fit_check_df.csv", "spp_fit_df.csv", "spp_pars_df.csv", "spp_indices_df.csv")
-  # all_files <- list.files(path = ".", full.names = TRUE)  # Get all files
-  # files_to_remove <- setdiff(all_files, file.path(".", files_to_keep))  # Exclude files to keep
-  # file.remove(files_to_remove)  # Delete the files
 }
 
-plot_indx <- function(srvy, dir_out) {
+plot_index <- function(srvy, dir_out) {
   
   # create directory for images to be saved to
   dir_fig <- paste0(dir_out, paste0(srvy, "_figures/"))
@@ -176,81 +162,92 @@ plot_indx <- function(srvy, dir_out) {
   
   # find files
   aaa <- list.files(path = dir_out, pattern = srvy, full.names = TRUE)
-  
-  # compile files for each species
+  aaa <- aaa[!grepl(pattern = "figures", x = aaa)]
+    
+  # compile files for each org
   data_index <- c()
   for (i in 1:length(aaa)) {
-    if (exists(paste0(aaa[i], "/index_df.csv"))) {
+    if (file.exists(paste0(aaa[i], "/index.csv"))) {
       data_index <- data_index %>% 
-        dplyr::bind_rows(read.csv(paste0(aaa[i], "/index_df.csv")))
+        dplyr::bind_rows(read.csv(paste0(aaa[i], "/index.csv")))
     }
   }
   
-  write.csv(x = data_index, file = paste0(dir_fig, "/index_df.csv"))
+  write.csv(x = data_index, file = paste0(dir_fig, "/index.csv"))
   
-  # plotting
-  ## log biomass estimates
+  # plotting -------------------------------------------------------------------
+  
+  plot_list <- c()
+  i <- 1
+  theme_custom <- theme_bw(
+    strip.text = element_text(size = 12, face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "none"
+  )
+  
+  ## log biomass estimates boxplot ---------------------------------------------
   p1 <- ggplot(data_index, aes(x = as.factor(effort), y = log_est)) +
     geom_boxplot() +
     facet_wrap(~ species) +
     labs(x = "Proprotion of effort",
          y = "Log biomass estimate") +
     theme_minimal() +
-    theme(
-      strip.text = element_text(size = 12, face = "bold"),
-      axis.text.x = element_text(angle = 45, hjust = 1),
-      legend.position = "none"
-    )
+    theme_custom
   
-  ggsave(filename = 'data_index_boxplot_log_biomass.png',
-         plot = p1 , 
-         path = dir_fig, 
-         width = 8, 
-         height = 8, 
-         device = 'png', 
-         dpi = 300)
+  i <- i + 1
+  plot_list[i] <- p1
+  names(plot_list)[i] <- 'data_index_boxplot_log_biomass.png'
   
-  #log(?) SE
-  p2 <- ggplot(data_index, aes(x = as.factor(effort), y = se)) +
+  # log(?) SE boxplot ----------------------------------------------------------
+  p1 <- ggplot(data_index, aes(x = as.factor(effort), y = se)) +
     geom_boxplot() +
     facet_wrap(~ species) +
     labs(x = "Proprotion of effort",
          y = "Standard error of log biomass estimate") +
     theme_minimal() +
-    theme(
-      strip.text = element_text(size = 12, face = "bold"),
-      axis.text.x = element_text(angle = 45, hjust = 1),
-      legend.position = "none"
-    )
+    theme_custom
   
-  ggsave(filename = 'data_index_boxplot_log_biomass_SE.png',
-         plot = p2, 
-         path = dir_fig, 
-         width = 8, 
-         height = 8, 
-         device = 'png', 
-         dpi = 300)
+  i <- i + 1
+  plot_list[i] <- p1
+  names(plot_list)[i] <- 'data_index_boxplot_log_biomass_SE.png'
   
-  #biomass estimates
-  p3 <- ggplot(data_index, aes(x = as.factor(effort), y = est)) +
+  # biomass estimates boxplot --------------------------------------------------
+  p1 <- ggplot(data_index, aes(x = as.factor(effort), y = est)) +
     geom_boxplot() +
     facet_wrap(~ species) +
     labs(x = "Proprotion of effort",
          y = "Biomass estimate") +
     theme_minimal() +
-    theme(
-      strip.text = element_text(size = 12, face = "bold"),
-      axis.text.x = element_text(angle = 45, hjust = 1),
-      legend.position = "none"
-    )
+    theme_custom
   
-  ggsave(filename = 'data_index_boxplot_biomass.png',
-         plot = p3, 
+  i <- i + 1
+  plot_list[i] <- p1
+  names(plot_list)[i] <- 'data_index_boxplot_biomass.png'
+  
+  # biomass estimates over time ---------------------------------------------------
+  p1 <- ggplot(data_index, aes(x = Year, y = est, color = effort)) +
+    geom_line() +
+    facet_wrap(~ species) +
+    labs(x = "Proprotion of effort",
+         y = "Biomass estimate") +
+    theme_minimal() +
+    theme_custom
+  
+  i <- i + 1
+  plot_list[i] <- p1
+  names(plot_list)[i] <- 'data_index_timeseries_biomass.png'
+  
+  for (ii in 1:length(plot_list)) {
+  ggsave(filename = names(plot_list)[ii],
+         plot = plot_list[ii], 
          path = dir_fig, 
          width = 8, 
          height = 8, 
          device = 'png', 
          dpi = 300)
+  }
+  
+  save(plot_list, file = paste0(dir_fig, "figures.rdata"))
 }
 
 

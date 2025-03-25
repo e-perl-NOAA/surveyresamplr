@@ -244,7 +244,7 @@ for (ii in 1:nrow(test_species)){
 
 ### Plot indices --------------------------------------------------------------
 
-plot_indx(srvy = "CA", dir_out = dir_out) 
+plot_index(srvy = "CA", dir_out = dir_out) 
 
 ## Alaska ----------------------------------------------------------------------
 
@@ -355,7 +355,7 @@ for (ii in 1:nrow(test_species)){
 
 ### Plot indices --------------------------------------------------------------
 
-plot_indx(srvy = "EBS", dir_out = dir_out) 
+plot_index(srvy = "EBS", dir_out = dir_out) 
 
 # Scrap ------------------------------------------------------------------------
 
