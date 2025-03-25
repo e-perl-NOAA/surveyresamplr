@@ -11,7 +11,15 @@
 ## This code is primarally maintained by:
 
 **Derek Bolser** (Derek.Bolser AT noaa.gov;
-[@zoyafuso-NOAA](https://github.com/zoyafuso-NOAA))
+[@dgbolser](https://github.com/dgbolser))
+
+Office of Science and Technology,
+
+National Marine Fisheries Service,
+
+National Oceanic and Atmospheric Administration,
+
+Silver Spring, MD 98195
 
 **Emily Markowitz** (Emily.Markowitz AT noaa.gov;
 [@EmilyMarkowitz-NOAA](https://github.com/EmilyMarkowitz-NOAA))
@@ -24,10 +32,33 @@ National Oceanic and Atmospheric Administration,
 
 Seattle, WA 98195
 
+**Ian Taylor** (Ian.Taylor AT noaa.gov;
+[@iantaylor-NOAA](https://github.com/iantaylor-NOAA))
+
+Northwest Fisheries Science Center,
+
+National Marine Fisheries Service,
+
+National Oceanic and Atmospheric Administration,
+
+Seattle, WA 98195
+
+**Elizabeth Perl** (Elizabeth.Perl AT noaa.gov;
+[@e-perl-NOAA](https://github.com/e-perl-NOAA))
+
+/Affiliate with ECS Federal in support of the Office of Science and
+Technology,
+
+National Marine Fisheries Service,
+
+National Oceanic and Atmospheric Administration,
+
+Silver Spring, MD 98195
+
 # Table of contents
 
 > - [*Purpose*](#purpose)
->   - [*User Resources*](#user-resources)
+> - [*User Resources*](#user-resources)
 > - [*Cite data used in analysis*](#cite-data-used-in-analysis)
 > - [*Suggestions and Comments*](#suggestions-and-comments)
 > - [*R Version Metadata*](#r-version-metadata)
@@ -45,7 +76,7 @@ number of species, effort scenarios, and replicates, the script is very
 computationally intensive. Reduce the number of species/effort
 scenarios/replicates when testing.
 
-## User Resources
+# User Resources
 
 - [GitHub repository](https://github.com/dgbolser/Resample-survey-data).
 

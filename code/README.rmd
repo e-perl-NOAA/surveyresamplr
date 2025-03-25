@@ -19,7 +19,15 @@ link_repo <- "https://github.com/dgbolser/Resample-survey-data"
 
 ## This code is primarally maintained by:
 
-**Derek Bolser** (Derek.Bolser AT noaa.gov; [\@zoyafuso-NOAA](https://github.com/zoyafuso-NOAA))  
+**Derek Bolser** (Derek.Bolser AT noaa.gov; [\@dgbolser](https://github.com/dgbolser))  
+
+Office of Science and Technology,
+
+National Marine Fisheries Service,
+
+National Oceanic and Atmospheric Administration,
+
+Silver Spring, MD 98195
 
 **Emily Markowitz** (Emily.Markowitz AT noaa.gov; [\@EmilyMarkowitz-NOAA](https://github.com/EmilyMarkowitz-NOAA))
 
@@ -30,6 +38,26 @@ National Marine Fisheries Service,
 National Oceanic and Atmospheric Administration,
 
 Seattle, WA 98195
+
+**Ian Taylor** (Ian.Taylor AT noaa.gov; [\@iantaylor-NOAA](https://github.com/iantaylor-NOAA))
+
+Northwest Fisheries Science Center,
+
+National Marine Fisheries Service,
+
+National Oceanic and Atmospheric Administration,
+
+Seattle, WA 98195
+
+**Elizabeth Perl** (Elizabeth.Perl AT noaa.gov; [\@e-perl-NOAA](https://github.com/e-perl-NOAA))  
+
+/Affiliate with ECS Federal in support of the Office of Science and Technology,
+
+National Marine Fisheries Service,
+
+National Oceanic and Atmospheric Administration,
+
+Silver Spring, MD 98195
 
 # Table of contents
 
@@ -55,7 +83,7 @@ toc <- paste0(toc_list, "*](#", toc_link, ")", collapse = "\n")
 The 'get prediction grid' script should be run before running other scripts. Use the 'pull data' file or go to the 'data' folder to get the data we are working with then run the 'main' file. Other scripts provide supporting functions that are run in the 'main' file. Due to the high number of species, effort scenarios, and replicates, the script is very computationally intensive. Reduce the number of species/effort scenarios/replicates when testing.
 
 
-## User Resources
+# User Resources
 
 - [GitHub repository](`r link_repo`).
 

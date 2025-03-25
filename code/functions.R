@@ -6,48 +6,6 @@
 ## Date:          March 2025
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-#' Species distribution model function
-#'
-#' Function to create a mesh, fit the sdmTMB model, and get the index.
-#' Exports fit.rds and index.rds files to the designated species folder.
-#' Used for arrowtooth flounder, bocaccio, dover sole, lingcod north, lingcod
-#' south, longnose skate, pacific ocean perch (pop), pacific spiny dogfish, rex
-#' sole, yellowtail.
-#'
-#' @param x speciesname_df[[i]] which is a data frame from a list of data frames
-#' created from the cleanup_by_species() function and any further post-processing
-#' of depth filters (see the smaller_function.R file for those).
-#' @param y speciesname_files[[i]] which is an item in a list created from
-#' names(speciesname_df)
-#' @import sdmTMB
-#'
-species_sdm_fn <- function(x, y, z, dir_spp) {
-  # make mesh
-  mesh <- sdmTMB::make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
-  
-  # fit model
-  fit <- sdmTMB::sdmTMB(
-    total_catch_wt_kg ~ 0 + factor(Year) + Pass,
-    data = x,
-    mesh = mesh,
-    family = delta_gamma(),
-    time = "Year",
-    anisotropy = TRUE,
-    spatiotemporal = as.list(c("iid", "iid"))
-  )
-  
-  # get the index
-  predictions <- predict(fit, newdata = z, return_tmb_object = TRUE) # 
-  index <- sdmTMB::get_index(predictions, area = z$area_km2, bias_correct = TRUE)
-  
-  # save file
-  saveRDS(fit, paste0(dir_spp, "fit_", y, ".rds"))
-  saveRDS(index, paste0(dir_spp, "index_", y, ".rds"))
-  
-  return(list("fit" = fit, "predictions" = predictions, "index" = index))
-}
-
 #' Cleanup species function
 #'
 #' Filter catch by species, create a vector of tows and give tows a random
@@ -129,7 +87,7 @@ resample_tests <- function (spp_dfs, test_species, grid_yrs, dir_out) {
   dir_spp <- paste0(dir_out, paste0(test_species$srvy, "_", test_species$file_name, "/"))
   dir.create(dir_spp, showWarnings = FALSE)
   
-  all_fit_df <- all_fit_pars <- all_fit_check <- all_index <- c()
+  all_fit_df <- all_fit_pars <- all_fit_check <- all_index <- data.frame()
   
   spp_dfs <- spp_dfs[names(spp_dfs)[(length(names(spp_dfs))-1):length(names(spp_dfs))]] # reduce DFs for testing
   spp_files <- as.list(names(spp_dfs)) # make the names file
@@ -157,27 +115,35 @@ resample_tests <- function (spp_dfs, test_species, grid_yrs, dir_out) {
     spp_df <- read_parquet(paste0(dir_spp, paste0("df_", i, ".parquet")))
     # Run species SDM function
     fit <- model_function(x = spp_df, y = spp_files[[i]], z = grid_yrs, dir_spp = dir_spp)
-    # fit <- readRDS(file = paste0(dir_spp, "fit_", spp_files[[i]], ".rds")) # testing
+    # fit <- readRDS(file = paste0(dir_spp, "fit_", spp_files[[i]], ".rds")) # oor testing
     # Ensure extracted objects are dataframes, Store results in lists
     all_fit_df <- all_fit_df %>% 
-      dplyr::bind_rows(test = spp_files[[i]],
+      dplyr::bind_rows(
+        data.frame(
             org = test_species$file_name,
-            data.frame(fit_df_fn(fit)))
+            test = spp_files[[i]],
+            data.frame(fit_df_fn(fit$fit))))
     fwrite(all_fit_df, file = paste0(dir_spp, "fit_df.csv"))
     all_fit_pars <- all_fit_pars %>% 
-      dplyr::bind_rows(test = spp_files[[i]],
-            org = test_species$file_name,
-            data.frame(fit_pars_fn(fit)))
+      dplyr::bind_rows(
+        data.frame(
+          org = test_species$file_name,
+          test = spp_files[[i]],
+            data.frame(fit_pars_fn(fit$fit))))
     fwrite(all_fit_pars, file = paste0(dir_spp, "pars_df.csv"))
     all_fit_check <- all_fit_check %>% 
-      dplyr::bind_rows(test = spp_files[[i]],
-            org = test_species$file_name,
-            data.frame(fit_check_fn(fit)))
+      dplyr::bind_rows(
+        data.frame(
+          org = test_species$file_name,
+          test = spp_files[[i]],
+            data.frame(fit_check_fn(fit$fit))))
     fwrite(all_fit_check, file = paste0(dir_spp, "fit_check_df.csv"))
     all_index <- all_index %>% 
-      dplyr::bind_rows(test = spp_files[[i]],
-            org = test_species$file_name,
-            data.frame(fit_check_fn(fit$index)))
+      dplyr::bind_rows(
+        data.frame(
+          org = test_species$file_name,
+          test = spp_files[[i]],
+            data.frame(fit$index)))
     fwrite(all_index, file = paste0(dir_spp, "index_df.csv"))
     # Explicitly remove objects after processing
     rm("fit", "spp_df")
