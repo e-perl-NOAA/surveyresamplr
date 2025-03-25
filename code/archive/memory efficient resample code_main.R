@@ -11,7 +11,7 @@ rm(list = ls())
 wd<- "Z:/Projects"
 # wd <- "/home/user"
 basedir<-file.path(wd,'Resample-survey-data')
-output <- file.path(wd, "Resample-survey-data/Results")
+output <- file.path(wd, "Resample-survey-data/output")
 data <-file.path(wd, "Resample-survey-data/data")
 arrowtooth <- file.path(output, "Arrowtooth_flounder")
 bocaccio <- file.path(output, "Bocaccio")
@@ -54,9 +54,9 @@ library(TMB)
 catch <- read.csv(file.path(data,"nwfsc_bt_fmp_spp_updated.csv")) #pulled data again to get 2024
 load(file.path(data,"california_current_grid.rda"))
 
-source(file.path(basedir, "smaller_functions.R")) #need to edit to specify the code directory if running locally
-source(file.path(basedir, "cleanup_by_species.R"))
-source(file.path(basedir, "species_sdms.R"))
+source(file.path(basedir, "code/smaller_functions.R")) #need to edit to specify the code directory if running locally
+source(file.path(basedir, "code/cleanup_by_species.R"))
+source(file.path(basedir, "code/species_sdms.R"))
 
 # set up grid
 #rename x and y cols
@@ -69,7 +69,7 @@ california_current_grid$Depth_m<- california_current_grid$depth
 grid_yrs <- replicate_df(california_current_grid, "Year", unique(catch$Year))
 setwd(basedir)
 #saveRDS(grid_yrs,"grid_yrs.rds")
-write_parquet(grid_yrs, "grid_yrs.parquet")
+write_parquet(grid_yrs, "data/grid_yrs.parquet")
 rm(grid_yrs,california_current_grid)
 
 #get rid of memory limits
@@ -78,7 +78,7 @@ options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
 #### Arrowtooth flounder ##########################################################################################################
 arrowtooth_dfs <- cleanup_by_species(df = catch, species = "arrowtooth flounder")
 arrowtooth_dfs <- lapply(arrowtooth_dfs, lat_filter_34)
-#arrowtooth_dfs <- arrowtooth_dfs[90:91] # reduce DFs for testing
+arrowtooth_dfs <- arrowtooth_dfs[90:91] # reduce DFs for testing
 
 # make the names file
 arrowtooth_files <- as.list(names(arrowtooth_dfs))

@@ -1,9 +1,10 @@
-# NOTES ------------------------------------------------------------------------
-# Resample_survey_data: Multiple species, multiple years
-# Em Markowitz March 2025
-# Alaska Fisheries
-#### Resample_survey_data: Multiple species, multiple years
-# ------------------------------------------------------------------------------
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## Project:       Resample_survey_data: Multiple species, multiple years
+## Authors:       Em Markowitz, Alaska Fisheries Science Center (emily.markowitz@noaa.gov)
+## Description:   Resample_survey_data: Multiple species, multiple years.
+## Date:          March 2025
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 # Install Libraries ------------------------------------------------------------
 
