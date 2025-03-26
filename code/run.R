@@ -195,6 +195,8 @@ catch_ca <- catch_ca %>%
   dplyr::select(Trawl_id, Common_name, Longitude_dd, Latitude_dd, Year, Pass, total_catch_wt_kg, Depth_m) %>% 
   dplyr::mutate(srvy = "CA")
 
+catch_ca <- catch_ca %>% dplyr::filter(Year > 2010) # Testing
+
 ### Load grid data -------------------------------------------------------------
 
 load(paste0(wd,"data/california_current_grid.rda"))
@@ -312,6 +314,7 @@ test_species <- data.frame(
 
 load(file = paste0(wd, "/data/noaa_afsc_cpue.rda"))
 catch_ak <- noaa_afsc_cpue
+catch_ak <- catch_ak %>% dplyr::filter(Year > 2010) # Testing
 
 ### Load grid data -------------------------------------------------------------
 

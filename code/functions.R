@@ -123,7 +123,7 @@ resample_tests <- function (spp_dfs, test_species, grid_yrs, dir_out) {
           species = test_species$file_name,
           effort = spp_files[[i]],
           data.frame(fit_df_fn(fit0$fit))))
-    fwrite(fit, file = paste0(dir_spp, "fit_df.csv"))
+    fwrite(fit_df, file = paste0(dir_spp, "fit_df.csv"))
     fit_pars <- fit_pars %>% 
       dplyr::bind_rows(
         data.frame(

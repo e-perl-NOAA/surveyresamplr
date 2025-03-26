@@ -53,7 +53,7 @@ species_sdm_fn <- function(x, y, z, dir_spp) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-species_sdm_lognormal_fn <- function(x, y, z) {
+species_sdm_lognormal_fn <- function(x, y, z, dir_spp) {
   # make mesh
   mesh <- sdmTMB::make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
 
@@ -71,9 +71,12 @@ species_sdm_lognormal_fn <- function(x, y, z) {
   # get the index
   predictions <- predict(fit, newdata = z, return_tmb_object = TRUE)
   index <- sdmTMB::get_index(predictions, area = z$area_km2, bias_correct = FALSE) #bias correct off for now due to run time issues
+
   # save file
-  saveRDS(fit, paste0("fit_", y, ".rds"))
-  saveRDS(index, paste0("index_", y, ".rds"))
+  saveRDS(fit, paste0(dir_spp, "fit_", y, ".rds"))
+  saveRDS(index, paste0(dir_spp, "index_", y, ".rds"))
+  
+  return(list("fit" = fit, "predictions" = predictions, "index" = index))
 }
 
 #' Canary species distribution model function
@@ -90,7 +93,7 @@ species_sdm_lognormal_fn <- function(x, y, z) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-canary_sdm_fn <- function(x, y, z) {
+canary_sdm_fn <- function(x, y, z, dir_spp) {
   # make mesh
   mesh <- sdmTMB::make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 200)
 
@@ -110,8 +113,10 @@ canary_sdm_fn <- function(x, y, z) {
   index <- sdmTMB::get_index(predictions, area = z$area_km2, bias_correct = TRUE)
 
   # save file
-  saveRDS(fit, paste0("fit_", y, ".rds"))
-  saveRDS(index, paste0("index_", y, ".rds"))
+  saveRDS(fit, paste0(dir_spp, "fit_", y, ".rds"))
+  saveRDS(index, paste0(dir_spp, "index_", y, ".rds"))
+  
+  return(list("fit" = fit, "predictions" = predictions, "index" = index))
 }
 
 #' Darkbloched species distribution model function
@@ -128,7 +133,7 @@ canary_sdm_fn <- function(x, y, z) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-darkblotched_sdm_fn <- function(x, y, z) {
+darkblotched_sdm_fn <- function(x, y, z, dir_spp) {
   # make mesh
   mesh <- sdmTMB::make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 250)
 
@@ -148,8 +153,10 @@ darkblotched_sdm_fn <- function(x, y, z) {
   index <- sdmTMB::get_index(predictions, area = z$area_km2, bias_correct = TRUE)
 
   # save file
-  saveRDS(fit, paste0("fit_", y, ".rds"))
-  saveRDS(index, paste0("index_", y, ".rds"))
+  saveRDS(fit, paste0(dir_spp, "fit_", y, ".rds"))
+  saveRDS(index, paste0(dir_spp, "index_", y, ".rds"))
+  
+  return(list("fit" = fit, "predictions" = predictions, "index" = index))
 }
 
 #' Shortspine species distribution model function
@@ -166,7 +173,7 @@ darkblotched_sdm_fn <- function(x, y, z) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-shortspine_sdm_fn <- function(x, y, z) {
+shortspine_sdm_fn <- function(x, y, z, dir_spp) {
   # make mesh
   mesh <- sdmTMB::make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
 
@@ -186,8 +193,10 @@ shortspine_sdm_fn <- function(x, y, z) {
   index <- sdmTMB::get_index(predictions, area = z$area_km2, bias_correct = TRUE)
 
   # save file
-  saveRDS(fit, paste0("fit_", y, ".rds"))
-  saveRDS(index, paste0("index_", y, ".rds"))
+  saveRDS(fit, paste0(dir_spp, "fit_", y, ".rds"))
+  saveRDS(index, paste0(dir_spp, "index_", y, ".rds"))
+  
+  return(list("fit" = fit, "predictions" = predictions, "index" = index))
 }
 
 
@@ -205,7 +214,7 @@ shortspine_sdm_fn <- function(x, y, z) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-widow_sdm_fn <- function(x, y, z) {
+widow_sdm_fn <- function(x, y, z, dir_spp) {
   # make mesh
   mesh <- sdmTMB::make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 200)
 
@@ -225,6 +234,8 @@ widow_sdm_fn <- function(x, y, z) {
   index <- sdmTMB::get_index(predictions, area = z$area_km2, bias_correct = TRUE)
 
   # save file
-  saveRDS(fit, paste0("fit_", y, ".rds"))
-  saveRDS(index, paste0("index_", y, ".rds"))
+  saveRDS(fit, paste0(dir_spp, "fit_", y, ".rds"))
+  saveRDS(index, paste0(dir_spp, "index_", y, ".rds"))
+  
+  return(list("fit" = fit, "predictions" = predictions, "index" = index))
 }
