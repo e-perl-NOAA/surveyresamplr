@@ -244,7 +244,7 @@ for (ii in 1:nrow(test_species)){
 
 ### Plot indices --------------------------------------------------------------
 
-plot_index(srvy = "CA", dir_out = dir_out) 
+plot_results(srvy = "CA", dir_out = dir_out) 
 
 ## Alaska ----------------------------------------------------------------------
 
@@ -355,15 +355,15 @@ for (ii in 1:nrow(test_species)){
 
 ### Plot indices --------------------------------------------------------------
 
-plot_index(srvy = "EBS", dir_out = dir_out) 
+plot_results(srvy = "EBS", dir_out = dir_out) 
 
 # Scrap ------------------------------------------------------------------------
 
-result <- 0
-for(i in 1:10){
-  try({                # start code block
-    result = result + i
-    log("a")             # I do not care about this error
-    result = result + i
-  }, silent=TRUE)      # end of try function
-}
+# result <- 0
+# for(i in 1:10){
+#   try({                # start code block
+#     result = result + i
+#     log("a")             # I do not care about this error
+#     result = result + i
+#   }, silent=TRUE)      # end of try function
+# }
