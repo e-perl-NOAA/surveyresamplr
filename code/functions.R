@@ -266,21 +266,6 @@ plot_results <- function(srvy, dir_out) {
   save(plot_list, file = paste0(dir_fig, "figures.rdata"))
 }
 
-
-#' Tow Function
-#'
-#' Create a vector of tows for including or excluding.
-#'
-#' @param x catch_split data frame
-#'
-tow_fn <- function(x) {
-  tows <- as.data.frame(x$Trawl_id)
-  tows <- unique(tows)
-  tows <- as.data.frame(tows[!is.na(tows)])
-  names(tows) <- "Trawl_id"
-  return(tows)
-}
-
 #' Join Data Frames
 #'
 #' Function to join a list of data frames to a main data frame using a shared
@@ -351,93 +336,5 @@ fit_check_fn <- function(fit) {
   write.csv(index, file = filename, row.names = F)
 }
 
-#' Bind function for species distribution model fits and parameters
-#'
-#' Function to rbind and bring effort and replicates in as columns from
-#' rownames of species distribution model fits and parameters.
-#'
-#' @param x Species distribution model fits or parameters data frame after
-#' being read in by fit_df_fn or fit_pars_fn respectively.
-#' @return New data frame of fits or parameters with the rownames as columns
-#'
-bind_fn <- function(x) {
-  y <- do.call(rbind, x)
-  y$effort <- gsub("fit_", "", row.names(y))
-  y$replicate <- gsub(".*_", "", y$effort)
-  y$effort <- gsub("_.*", "", y$effort)
-  y$replicate <- gsub("\\..*", "", y$replicate)
-  y$effort <- as.numeric(y$effort)
-  y$replicate <- as.numeric(y$replicate)
-  return(y)
-}
 
-#' Bind function for species distribution model diagnostics
-#'
-#' Function to rbind and bring effort and replicates in as columns from
-#' rownames of species distribution model diagnostics.
-#'
-#' @param x Species distribution model diagnostics data frame after being read in
-#' by fit_df_fn.
-#' @return New data frame of diagnostics with the rownames as columns
-#'
-# special bind function for fit check dfs
-bind_fit_check <- function(x) {
-  y <- do.call(rbind, x)
-  y <- as.data.frame(y)
-  y$effort <- gsub("fit_", "", row.names(y))
-  y$replicate <- gsub(".*_", "", y$effort)
-  y$effort <- gsub("_.*", "", y$effort)
-  y$replicate <- gsub("\\..*", "", y$replicate)
-  y$effort <- as.numeric(y$effort)
-  y$replicate <- as.numeric(y$replicate)
-  y <- apply(y, 2, as.character)
-  return(y)
-}
-
-#' Bind function for species distribution model index
-#'
-#' Function to rbind and bring effort and replicates in as columns from
-#' rownames of species distribution model index.
-#'
-#' @param x Species distribution model index data frame after being read in.
-#' @return New data frame of index with the rownames as columns
-#'
-bind_index_fn <- function(x) {
-  y <- do.call(rbind, x)
-  y$effort <- gsub(".rds.*", "", row.names(y))
-  y$effort <- gsub("index_", "", y$effort)
-  y$replicate <- gsub(".*_", "", y$effort)
-  y$effort <- gsub("_.*", "", y$effort)
-  y$effort <- as.numeric(y$effort)
-  y$replicate <- as.numeric(y$replicate)
-  return(y)
-}
-
-#' Pull files with specified character strings
-#'
-#' Function to read (pull) files from the set species directory containing
-#' specified character strings.
-#'
-#' @param directory Species directory to look for files in.
-#' @param string Character string to search files for.
-#' @return Read in list of all files containing the character string searched for.
-#'
-pull_files <- function(directory, string) {
-  # List all RDS files in the directory
-  files <- list.files(directory, pattern = "\\.rds$", full.names = TRUE)
-  
-  # Filter files that contain the search string
-  filtered_files <- files[grepl(string, files)]
-  
-  # Read in files and avoid unnecessary memory copies
-  data_list <- vector("list", length(filtered_files))
-  names(data_list) <- basename(filtered_files)
-  
-  for (i in seq_along(filtered_files)) {
-    data_list[[i]] <- readRDS(filtered_files[i])
-  }
-  
-  gc()  # Force garbage collection
-  return(data_list)
-}
 
