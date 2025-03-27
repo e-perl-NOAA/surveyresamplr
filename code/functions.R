@@ -5,6 +5,71 @@
 ## Description:   Resample_survey_data: Multiple species, multiple years.
 ## Date:          March 2025
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#' Package install
+#' 
+#' @param p name of package
+#' On google workstations you can use the library install bash script Elizabeth created. 
+#' Copy that into you working
+#' directory, run 'chmod u+x ubuntu_libraries.sh' and then run './ubuntu_libraries.sh'
+#' @example 
+#' pkgs <- c("dplyr, "nwfscSurvey", "sdmTMB)
+#' lapply(pkgs, pkg_install)
+#' 
+pkg_install <- function(p){
+  if(grepl("/home/user/", getwd())){
+    system("chmod a+x ubuntu_libraries.sh")
+    system("./ubuntu_libraries.sh")
+  }
+  if(!require(p, character.only = TRUE)) {
+    if (p == 'coldpool') {
+        devtools::install_github("afsc-gap-products/coldpool")
+      } else if (p == "akgfmapas") {
+        devtools::install_github("afsc-gap-products/akgfmaps", build_vignettes = TRUE)
+      } else if (p == 'nwfscSurvey') {
+        remotes::install_github("pfmc-assessments/nwfscSurvey")
+      } else {
+        install.packages(p)
+    }
+    require(p, character.only = TRUE)}
+}
+
+#' Include or Exclude
+#'
+#' Specify how to downsample. For simple random sampling, a proportion of
+#' stations should do.
+#'
+#' @param df tows data frame
+#' @param proportions proportions developed using: props <- as.data.frame(seq
+#' (0.1,1.0, by = 0.1)) replicated by the length of the tows dataframe. The name
+#' of the props is "Trawl_id".
+#' @param replicate_num going to be 10 for NWFSC and 3 for AK
+#'
+include_or_exclude <- function(df, proportions, replicate_num) {
+  # Get the number of rows in the dataframe
+  num_rows <- nrow(df)
+  
+  # Use lapply to create a list of dataframes
+  result_list <- lapply(proportions, function(p) {
+    # Generate a random vector of 1s and 0s based on the specified proportion
+    set.seed(1)
+    random_vectors <- replicate(replicate_num, sample(c(1, 0), size = num_rows, replace = TRUE, prob = c(p, 1 - p)), simplify = F)
+    
+    # Create a new dataframe with the random assignments
+    lapply(random_vectors, function(rv) {
+      cbind(df, RandomAssignment = rv)
+    })
+  })
+  
+  # flatten into single list
+  result_list <- do.call(c, result_list)
+  
+  # Set names for the list elements based on proportions
+  names(result_list) <- paste0(rep(proportions, each = replicate_num), "_", rep(1:replicate_num, times = length(proportions)))
+  
+  # Return the list of dataframes
+  return(result_list)
+}
+
 
 #' Cleanup species function
 #'
@@ -49,7 +114,7 @@ cleanup_by_species <- function(catch,
   # match the structure of the catch data
   props <- rep(props, length(tows))
   
-  tows_assigned <- map2(tows, props, include_or_exclude)
+  tows_assigned <- map2(tows, props, include_or_exclude, replicate_num = replicate_num)
   # tows_assigned <- purrr::pmap(list(.x = tows, .y = props, .z = replicate_num), include_or_exclude)
   
   # remove replicates of the 1 effort level
@@ -82,6 +147,26 @@ cleanup_by_species <- function(catch,
 }
 
 
+#' Resample Tests and Run SDM Processing
+#'
+#' This function resamples species data frames, runs species distribution models (SDMs) in parallel, and saves the results.
+#'
+#' @param spp_dfs A list of species data frames.
+#' @param test_species A data frame containing information about the test species.
+#' @param grid_yrs A data frame or list containing grid years information.
+#' @param dir_out A character string specifying the directory for output files.
+#' 
+#' #' @details
+#' This function performs the following steps:
+#' \itemize{
+#'   \item Sets up directories for output files.
+#'   \item Reduces the list of data frames to the last two entries for testing purposes.
+#'   \item Saves each data frame in Parquet format.
+#'   \item Sets up parallel processing using the \code{furrr} package.
+#'   \item Runs species distribution models (SDMs) in parallel.
+#'   \item Saves the results of the SDM processing into CSV files.
+#' }
+#' 
 resample_tests <- function (spp_dfs, test_species, grid_yrs, dir_out) {
   # set directories for outputs
   dir_spp <- paste0(dir_out, paste0(test_species$srvy, "_", test_species$file_name, "/"))
@@ -154,6 +239,70 @@ resample_tests <- function (spp_dfs, test_species, grid_yrs, dir_out) {
   print("...Parallel SDM processing complete")
 }
 
+#' Clean and Resample Species Data
+#'
+#' This function cleans up the catch data for a specific species and then performs resampling tests.
+#'
+#' @param species_row A data frame row containing information about the species.
+#' @param catch A data frame containing the catch data.
+#' @param seq_from A numeric value specifying the start of the sequence for data frames.
+#' @param seq_to A numeric value specifying the end of the sequence for data frames.
+#' @param seq_by A numeric value specifying the step size of the sequence for data frames.
+#' @param tot_dataframes An integer specifying the total number of data frames to generate.
+#' @param replicate_num An integer specifying the number of replicates.
+#' @param grid_yrs A data frame or list containing grid years information.
+#' @param dir_out A character string specifying the directory for output files.
+#'
+#' @details
+#' This function performs the following steps:
+#' \itemize{
+#'   \item Cleans up the catch data for the specified species using `cleanup_by_species`.
+#'   \item Performs resampling tests on the cleaned data using `resample_tests`.
+#' }
+#' 
+clean_and_resample <- function(species_row, catch, seq_from, seq_to, seq_by, tot_dataframes, replicate_num, grid_yrs, dir_out) {
+  print(paste0(species_row$srvy, " ", species_row$common_name))
+  
+  spp_dfs <- cleanup_by_species(
+    catch = catch, 
+    test_species = species_row, 
+    seq_from = seq_from, 
+    seq_to = seq_to, 
+    seq_by = seq_by, 
+    tot_dataframes = tot_dataframes, 
+    replicate_num = replicate_num
+  )
+  
+  try({
+    resample_tests(
+      spp_dfs = spp_dfs, 
+      test_species = species_row, 
+      grid_yrs = grid_yrs, 
+      dir_out = dir_out
+    ) 
+  }, silent = FALSE)
+}
+
+
+#' Plot Results and Save Figures
+#'
+#' This function compiles results from species distribution models (SDMs), generates plots, and saves the figures.
+#'
+#' @param srvy A character string specifying the survey identifier.
+#' @param dir_out A character string specifying the directory for output files.
+#'
+#' @details
+#' This function performs the following steps:
+#' \itemize{
+#'   \item Creates a directory for saving images.
+#'   \item Searches for relevant files in the output directory.
+#'   \item Compiles data from the found files.
+#'   \item Saves the compiled data into CSV files.
+#'   \item Generates various plots such as boxplots and time series of biomass estimates.
+#'   \item Saves the generated plots as PNG files.
+#'   \item Saves the list of plots in an RData file.
+#' }
+#'
 plot_results <- function(srvy, dir_out) {
   
   # create directory for images to be saved to
@@ -265,8 +414,6 @@ plot_results <- function(srvy, dir_out) {
   
   save(plot_list, file = paste0(dir_fig, "figures.rdata"))
 }
-
-
 
 
 #' Tow Function
