@@ -13,7 +13,7 @@ source(paste0(wd, "code/functions.R"))
 # Here we list all the packages we will need for this whole process
 # We'll also use this in our works cited page. 
 PKG <- c(
-  
+  "here",
   "devtools", 
   "Require",
   "nwfscSurvey", 
@@ -28,7 +28,7 @@ PKG <- c(
 
 PKG <- unique(PKG)
 
-lapply(PKG, lib = "/home/user/R/x86_64-pc-linux-gnu-library/4.4", pkg_install)
+lapply(PKG, pkg_install)
 
 
 # Get cpue data ----------------------------------------------------------------
@@ -64,7 +64,7 @@ catch<-unique(catch)
 
 #write csv
 setwd(data)
-write.csv(catch,"nwfsc_bt_fmp_spp_updated.csv",row.names = F)
+write.csv(catch,here::here("data", "nwfsc_bt_fmp_spp_updated.csv"), row.names = F)
 
 
 # Get grid ---------------------------------------------------------------------

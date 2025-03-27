@@ -93,8 +93,8 @@ lapply(PKG, pkg_install)
 
 #setwd("C:/Users/Derek.Bolser/Documents/Resample_survey_data/") #for local testing
 # wd <- "Z:/Projects/Resample-survey-data/"
-wd <- paste0(getwd(),"/")
-dir_out <- paste0(wd, "/output2/")
+wd <- paste0(here::here(),"/")
+dir_out <- paste0(wd, "/output/")
 dir.create(dir_out, showWarnings = FALSE)
 
 #get rid of memory limits
