@@ -2,6 +2,7 @@
 ## Project:       Resample_survey_data: Multiple species, multiple years
 ## Authors:       Derek Bolser, Office of Science and Technology (derek.bolser@noaa.gov)
 ##                Em Markowitz, Alaska Fisheries Science Center (emily.markowitz@noaa.gov)
+##                Elizabeth Perl, ECS Federal contracted to Office of Science and Technology (elizabeth.gugliotti@noaa.gov)
 ## Description:   Resample_survey_data: Multiple species, multiple years.
 ## Date:          March 2025
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
