@@ -266,6 +266,24 @@ plot_results <- function(srvy, dir_out) {
   save(plot_list, file = paste0(dir_fig, "figures.rdata"))
 }
 
+
+
+
+#' Tow Function
+#'
+#' Create a vector of tows for including or excluding.
+#'
+#' @param x catch_split data frame
+#'
+tow_fn <- function(x) {
+  tows <- as.data.frame(x$Trawl_id)
+  tows <- unique(tows)
+  tows <- as.data.frame(tows[!is.na(tows)])
+  names(tows) <- "Trawl_id"
+  return(tows)
+}
+
+
 #' Join Data Frames
 #'
 #' Function to join a list of data frames to a main data frame using a shared
