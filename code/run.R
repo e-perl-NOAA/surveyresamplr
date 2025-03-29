@@ -2,9 +2,14 @@
 ## Project:       Resample_survey_data: Multiple species, multiple years
 ## Authors:       Derek Bolser, Office of Science and Technology (derek.bolser@noaa.gov)
 ##                Em Markowitz, Alaska Fisheries Science Center (emily.markowitz@noaa.gov)
+##                Elizabeth Perl, ECS Federal contracted to Office of Science and Technology (elizabeth.gugliotti@noaa.gov)
 ## Description:   Resample_survey_data: Multiple species, multiple years.
 ## Date:          March 2025
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Load support files -----------------------------------------------------------
+
+source(paste0(wd, "code/functions.R"))
+source(paste0(wd, "code/functions_sdms.R"))
 
 # Install Libraries ------------------------------------------------------------
 
@@ -80,35 +85,20 @@ PKG <- c(
 )
 
 PKG <- unique(PKG)
-for (p in PKG) {
-  if(!require(p, character.only = TRUE)) {
-    if (p == 'coldpool') {
-      devtools::install_github("afsc-gap-products/coldpool")
-    } else if (p == "akgfmapas") {
-      devtools::install_github("afsc-gap-products/akgfmaps", build_vignettes = TRUE)
-    } else if (p == 'nwfscSurvey') {
-      remotes::install_github("pfmc-assessments/nwfscSurvey")
-    } else {
-      install.packages(p)
-    }
-    require(p,character.only = TRUE)}
-}
+
+# Use pkg_install() function found in functions.R file to load packages
+lapply(PKG, pkg_install)
 
 # Set directories --------------------------------------------------------------
 
 #setwd("C:/Users/Derek.Bolser/Documents/Resample_survey_data/") #for local testing
-wd <- "Z:/Projects/Resample-survey-data/"
+# wd <- "Z:/Projects/Resample-survey-data/"
+wd <- paste0(here::here(),"/")
 dir_out <- paste0(wd, "/output/")
 dir.create(dir_out, showWarnings = FALSE)
 
 #get rid of memory limits
 options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
-
-# Load support files -----------------------------------------------------------
-
-source(paste0(wd, "code/functions.R"))
-source(paste0(wd, "code/functions_sdms.R"))
-
 
 # Update README ----------------------------------------------------------------
 
@@ -121,43 +111,6 @@ source(paste0(wd, "code/functions_sdms.R"))
 # Run scenarios ----------------------------------------------------------------
 
 ## NWFSC California Current ----------------------------------------------------
-
-#' Include or Exclude
-#'
-#' Specify how to downsample. For simple random sampling, a proportion of
-#' stations should do.
-#'
-#' @param df tows data frame
-#' @param proportions proportions developed using: props <- as.data.frame(seq
-#' (0.1,1.0, by = 0.1)) replicated by the length of the tows dataframe. The name
-#' of the props is "Trawl_id".
-#'
-include_or_exclude <- function(df, proportions, replicate_num = 10) {
-  # Get the number of rows in the dataframe
-  num_rows <- nrow(df)
-  
-  # Use lapply to create a list of dataframes
-  result_list <- lapply(proportions, function(p) {
-    # Generate a random vector of 1s and 0s based on the specified proportion
-    set.seed(1)
-    random_vectors <- replicate(replicate_num, sample(c(1, 0), size = num_rows, replace = TRUE, prob = c(p, 1 - p)), simplify = F)
-    
-    # Create a new dataframe with the random assignments
-    lapply(random_vectors, function(rv) {
-      cbind(df, RandomAssignment = rv)
-    })
-  })
-  
-  # flatten into single list
-  result_list <- do.call(c, result_list)
-  
-  # Set names for the list elements based on proportions
-  names(result_list) <- paste0(rep(proportions, each = replicate_num), "_", rep(1:replicate_num, times = length(proportions)))
-  
-  # Return the list of dataframes
-  return(result_list)
-}
-
 
 ### Define study species -------------------------------------------------------
 
@@ -181,7 +134,8 @@ test_species <- data.frame(
     "species_sdm_fn", "species_sdm_fn", 
     "species_sdm_lognormal_fn", "species_sdm_fn", "species_sdm_lognormal_fn", 
     "shortspine_sdm_fn", "species_sdm_fn", "species_sdm_fn")
-) # %>% 
+) 
+# %>% 
 #   dplyr::mutate( 
 #     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name))), 
 #     species_code = common_name)
@@ -224,68 +178,34 @@ catch <- catch_ca
 
 ### Run ------------------------------------------------------------------------
 
-for (ii in 1:nrow(test_species)){
-  print(paste0(test_species$srvy[ii], " ", test_species$common_name[ii]))
-  spp_dfs <- cleanup_by_species(
-    catch = catch, 
-    test_species = test_species[ii,], 
-    seq_from = seq_from, 
-    seq_to = seq_to, 
-    seq_by = seq_by, 
-    tot_dataframes = tot_dataframes, 
-    replicate_num = replicate_num)
-  
-  try({
-    resample_tests(
-      spp_dfs = spp_dfs, 
-      test_species = test_species[ii,], 
-      grid_yrs = grid_yrs, 
-      dir_out = dir_out) 
-  }, silent = FALSE)      # end of try function
-}
+# for (ii in 1:nrow(test_species)){
+#   print(paste0(test_species$srvy[ii], " ", test_species$common_name[ii]))
+#   spp_dfs <- cleanup_by_species(
+#     catch = catch, 
+#     test_species = test_species[ii,], 
+#     seq_from = seq_from, 
+#     seq_to = seq_to, 
+#     seq_by = seq_by, 
+#     tot_dataframes = tot_dataframes, 
+#     replicate_num = replicate_num)
+#   
+#   try({
+#     resample_tests(
+#       spp_dfs = spp_dfs, 
+#       test_species = test_species[ii,], 
+#       grid_yrs = grid_yrs, 
+#       dir_out = dir_out) 
+#   }, silent = FALSE)      # end of try function
+# }
+
+map(1:nrow(test_species), ~ clean_and_resample(test_species[.x,], catch, seq_from, seq_to, seq_by, tot_dataframes, replicate_num, grid_yrs, dir_out))
+
 
 ### Plot indices --------------------------------------------------------------
 
 plot_results(srvy = "CA", dir_out = dir_out) 
 
 ## Alaska ----------------------------------------------------------------------
-
-#' Include or Exclude
-#'
-#' Specify how to downsample. For simple random sampling, a proportion of
-#' stations should do.
-#'
-#' @param df tows data frame
-#' @param proportions proportions developed using: props <- as.data.frame(seq
-#' (0.1,1.0, by = 0.1)) replicated by the length of the tows dataframe. The name
-#' of the props is "Trawl_id".
-#'
-include_or_exclude <- function(df, proportions, replicate_num = 3) {
-  # Get the number of rows in the dataframe
-  num_rows <- nrow(df)
-  
-  # Use lapply to create a list of dataframes
-  result_list <- lapply(proportions, function(p) {
-    # Generate a random vector of 1s and 0s based on the specified proportion
-    set.seed(1)
-    random_vectors <- replicate(replicate_num, sample(c(1, 0), size = num_rows, replace = TRUE, prob = c(p, 1 - p)), simplify = F)
-    
-    # Create a new dataframe with the random assignments
-    lapply(random_vectors, function(rv) {
-      cbind(df, RandomAssignment = rv)
-    })
-  })
-  
-  # flatten into single list
-  result_list <- do.call(c, result_list)
-  
-  # Set names for the list elements based on proportions
-  names(result_list) <- paste0(rep(proportions, each = replicate_num), "_", rep(1:replicate_num, times = length(proportions)))
-  
-  # Return the list of dataframes
-  return(result_list)
-}
-
 
 ### Define study species -------------------------------------------------------
 
@@ -336,26 +256,27 @@ catch <- catch_ak
 
 ### Run ------------------------------------------------------------------------
 
-for (ii in 1:nrow(test_species)){
-  print(paste0(test_species$srvy[ii], " ", test_species$common_name[ii]))
-  spp_dfs <- cleanup_by_species(
-    catch = catch, 
-    test_species = test_species[ii,], 
-    seq_from = seq_from, 
-    seq_to = seq_to, 
-    seq_by = seq_by, 
-    tot_dataframes = tot_dataframes, 
-    replicate_num = replicate_num)
-  
-  try({
-    resample_tests(
-      spp_dfs = spp_dfs, 
-      test_species = test_species[ii,], 
-      grid_yrs = grid_yrs, 
-      dir_out = dir_out) 
-  }, silent = FALSE)      # end of try function
-}
+# for (ii in 1:nrow(test_species)){
+#   print(paste0(test_species$srvy[ii], " ", test_species$common_name[ii]))
+#   spp_dfs <- cleanup_by_species(
+#     catch = catch, 
+#     test_species = test_species[ii,], 
+#     seq_from = seq_from, 
+#     seq_to = seq_to, 
+#     seq_by = seq_by, 
+#     tot_dataframes = tot_dataframes, 
+#     replicate_num = replicate_num)
+#   
+#   try({
+#     resample_tests(
+#       spp_dfs = spp_dfs, 
+#       test_species = test_species[ii,], 
+#       grid_yrs = grid_yrs, 
+#       dir_out = dir_out) 
+#   }, silent = FALSE)      # end of try function
+# }
 
+map(1:nrow(test_species), ~ clean_and_resample(test_species[.x,], catch, seq_from, seq_to, seq_by, tot_dataframes, replicate_num, grid_yrs, dir_out))
 ### Plot indices --------------------------------------------------------------
 
 plot_results(srvy = "EBS", dir_out = dir_out) 
