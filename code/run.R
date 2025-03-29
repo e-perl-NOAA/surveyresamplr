@@ -6,6 +6,18 @@
 ## Description:   Resample_survey_data: Multiple species, multiple years.
 ## Date:          March 2025
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#get rid of memory limits
+options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
+
+# Set directories --------------------------------------------------------------
+library(here)
+# wd <- "C:/Users/Derek.Bolser/Documents/Resample_survey_data/" #for local testing
+# wd <- "Z:/Projects/Resample-survey-data/"
+wd <- paste0(here::here(),"/")
+dir_out <- paste0(wd, "/output/")
+dir.create(dir_out, showWarnings = FALSE)
+
 # Load support files -----------------------------------------------------------
 
 source(paste0(wd, "code/functions.R"))
@@ -59,8 +71,6 @@ PKG <- c(
   # sampling
   "sampling",
   
-  
-  
   # modeling
   "arrow", 
   "future.apply", 
@@ -84,25 +94,10 @@ PKG <- c(
   
 )
 
-PKG <- unique(PKG)
-
 # Use pkg_install() function found in functions.R file to load packages
-lapply(PKG, pkg_install)
+lapply(unique(PKG), pkg_install)
 
-# Set directories --------------------------------------------------------------
-
-#setwd("C:/Users/Derek.Bolser/Documents/Resample_survey_data/") #for local testing
-# wd <- "Z:/Projects/Resample-survey-data/"
-wd <- paste0(here::here(),"/")
-dir_out <- paste0(wd, "/output/")
-dir.create(dir_out, showWarnings = FALSE)
-
-#get rid of memory limits
-options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
-
-# Update README ----------------------------------------------------------------
-
-# (sometimes) 
+# Update README (sometimes) ----------------------------------------------------
 
 # rmarkdown::render(here::here("code/README.Rmd"),
 #                   output_dir = "./",
@@ -135,10 +130,6 @@ test_species <- data.frame(
     "species_sdm_lognormal_fn", "species_sdm_fn", "species_sdm_lognormal_fn", 
     "shortspine_sdm_fn", "species_sdm_fn", "species_sdm_fn")
 ) 
-# %>% 
-#   dplyr::mutate( 
-#     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name))), 
-#     species_code = common_name)
 
 ### Load survey data -----------------------------------------------------------
 
@@ -154,16 +145,13 @@ catch_ca <- catch_ca %>% dplyr::filter(Year > 2010) # Testing
 ### Load grid data -------------------------------------------------------------
 
 load(paste0(wd,"data/california_current_grid.rda"))
-## set up grid
-#rename x and y cols
-california_current_grid <- california_current_grid %>% 
+california_current_grid <- california_current_grid %>% # rename x and y cols
   dplyr::select(Longitude_dd = longitude, 
                 Latitude_dd = latitude, 
                 Pass = pass_scaled, 
                 Depth_m = depth, 
                 area_km2 = area_km2_WCGBTS) %>% 
   dplyr::mutate(srvy = "CA")
-#make gridyrs
 grid_yrs_ca <- replicate_df(california_current_grid, "Year", unique(catch_ca$Year))
 
 ### Variables ------------------------------------------------------------------
@@ -172,34 +160,17 @@ seq_from = 0.1
 seq_to = 1
 seq_by = 0.1
 tot_dataframes = 91
-grid_yrs <- grid_yrs_ca
 replicate_num <- 10
 catch <- catch_ca
+grid_yrs <- grid_yrs_ca
 
 ### Run ------------------------------------------------------------------------
 
-# for (ii in 1:nrow(test_species)){
-#   print(paste0(test_species$srvy[ii], " ", test_species$common_name[ii]))
-#   spp_dfs <- cleanup_by_species(
-#     catch = catch, 
-#     test_species = test_species[ii,], 
-#     seq_from = seq_from, 
-#     seq_to = seq_to, 
-#     seq_by = seq_by, 
-#     tot_dataframes = tot_dataframes, 
-#     replicate_num = replicate_num)
-#   
-#   try({
-#     resample_tests(
-#       spp_dfs = spp_dfs, 
-#       test_species = test_species[ii,], 
-#       grid_yrs = grid_yrs, 
-#       dir_out = dir_out) 
-#   }, silent = FALSE)      # end of try function
-# }
-
-map(1:nrow(test_species), ~ clean_and_resample(test_species[.x,], catch, seq_from, seq_to, seq_by, tot_dataframes, replicate_num, grid_yrs, dir_out))
-
+map(
+  1:nrow(test_species), 
+  ~ clean_and_resample(test_species[.x,], 
+                       catch, seq_from, seq_to, seq_by, 
+                       tot_dataframes, replicate_num, grid_yrs, dir_out))
 
 ### Plot indices --------------------------------------------------------------
 
@@ -225,8 +196,7 @@ test_species <- data.frame(
   model_fn = "species_sdm_fn" # name of funcion for sdm. Will build in specificity for this later
 ) %>% 
   dplyr::mutate( 
-    file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))
-  )
+    file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
 
 ### Load survey data -----------------------------------------------------------
 
@@ -241,7 +211,6 @@ catch_ak <- catch_ak %>% dplyr::filter(Year > 2010) # Testing
 load(paste0(wd, "data/noaa_afsc_ebs_pred_grid_depth.rdata"))
 noaa_afsc_ebs_pred_grid_depth <- noaa_afsc_ebs_pred_grid_depth %>% 
   dplyr::mutate(srvy = "EBS")
-#make gridyrs
 grid_yrs_ebs <- replicate_df(noaa_afsc_ebs_pred_grid_depth, "Year", unique(catch_ak$Year))
 
 ### Variables ------------------------------------------------------------------
@@ -250,44 +219,19 @@ seq_from = 0.2
 seq_to = 1.0
 seq_by = 0.2 
 tot_dataframes = 13
-grid_yrs <- grid_yrs_ebs
 replicate_num <- 3
 catch <- catch_ak
+grid_yrs <- grid_yrs_ebs
 
 ### Run ------------------------------------------------------------------------
 
-# for (ii in 1:nrow(test_species)){
-#   print(paste0(test_species$srvy[ii], " ", test_species$common_name[ii]))
-#   spp_dfs <- cleanup_by_species(
-#     catch = catch, 
-#     test_species = test_species[ii,], 
-#     seq_from = seq_from, 
-#     seq_to = seq_to, 
-#     seq_by = seq_by, 
-#     tot_dataframes = tot_dataframes, 
-#     replicate_num = replicate_num)
-#   
-#   try({
-#     resample_tests(
-#       spp_dfs = spp_dfs, 
-#       test_species = test_species[ii,], 
-#       grid_yrs = grid_yrs, 
-#       dir_out = dir_out) 
-#   }, silent = FALSE)      # end of try function
-# }
+map(
+  1:nrow(test_species), 
+  ~ clean_and_resample(test_species[.x,], 
+                       catch, seq_from, seq_to, seq_by, 
+                       tot_dataframes, replicate_num, grid_yrs, dir_out))
 
-map(1:nrow(test_species), ~ clean_and_resample(test_species[.x,], catch, seq_from, seq_to, seq_by, tot_dataframes, replicate_num, grid_yrs, dir_out))
 ### Plot indices --------------------------------------------------------------
 
 plot_results(srvy = "EBS", dir_out = dir_out) 
 
-# Scrap ------------------------------------------------------------------------
-
-# result <- 0
-# for(i in 1:10){
-#   try({                # start code block
-#     result = result + i
-#     log("a")             # I do not care about this error
-#     result = result + i
-#   }, silent=TRUE)      # end of try function
-# }

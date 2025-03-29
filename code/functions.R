@@ -175,7 +175,7 @@ resample_tests <- function (spp_dfs, test_species, grid_yrs, dir_out) {
   
   fit_df <- fit_pars <- fit_check <- index <- data.frame()
   
-  spp_dfs <- spp_dfs[names(spp_dfs)[(length(names(spp_dfs))-1):length(names(spp_dfs))]] # reduce DFs for testing
+  # spp_dfs <- spp_dfs[names(spp_dfs)[(length(names(spp_dfs))-1):length(names(spp_dfs))]] # reduce DFs for testing
   spp_files <- as.list(names(spp_dfs)) # make the names file
   for (i in seq_along(spp_dfs)) { # Save each dataframe separately
     write_parquet(spp_dfs[[i]], paste0(dir_spp, paste0("df_", i, ".parquet")))
@@ -203,28 +203,28 @@ resample_tests <- function (spp_dfs, test_species, grid_yrs, dir_out) {
     fit0 <- model_function(x = spp_df, y = spp_files[[i]], z = grid_yrs, dir_spp = dir_spp)
     # fit <- readRDS(file = paste0(dir_spp, "fit_", spp_files[[i]], ".rds")) # oor testing
     # Ensure extracted objects are dataframes, Store results in lists
-    fit_df <- fit_df %>% 
+    fit_df <- read.csv(file = paste0(dir_spp, "fit_df.csv")) %>%  
       dplyr::bind_rows(
         data.frame(
           species = test_species$file_name,
           effort = spp_files[[i]],
           data.frame(fit_df_fn(fit0$fit))))
     fwrite(fit_df, file = paste0(dir_spp, "fit_df.csv"))
-    fit_pars <- fit_pars %>% 
+    fit_pars <- read.csv(file = paste0(dir_spp, "fit_pars.csv")) %>%  
       dplyr::bind_rows(
         data.frame(
           species = test_species$file_name,
           effort = spp_files[[i]],
           data.frame(fit_pars_fn(fit0$fit))))
     fwrite(fit_pars, file = paste0(dir_spp, "fit_pars.csv"))
-    fit_check <- fit_check %>% 
+    fit_check <- read.csv(file = paste0(dir_spp, "fit_check.csv")) %>%  
       dplyr::bind_rows(
         data.frame(
           species = test_species$file_name,
           effort = spp_files[[i]],
           data.frame(fit_check_fn(fit0$fit))))
     fwrite(fit_check, file = paste0(dir_spp, "fit_check.csv"))
-    index <- index %>% 
+    index <- read.csv(file = paste0(dir_spp, "index.csv")) %>%  
       dplyr::bind_rows(
         data.frame(
           species = test_species$file_name,
