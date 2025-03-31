@@ -31,7 +31,7 @@ PKG <- c(
   
   "devtools", 
   # "require", 
-  
+
   # other tidyverse
   "plyr",
   "dplyr",
@@ -163,18 +163,21 @@ tot_dataframes = 91
 replicate_num <- 10
 catch <- catch_ca
 grid_yrs <- grid_yrs_ca
+srvy <- "CA"
 
 ### Run ------------------------------------------------------------------------
 
+sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
 map(
   1:nrow(test_species), 
   ~ clean_and_resample(test_species[.x,], 
                        catch, seq_from, seq_to, seq_by, 
                        tot_dataframes, replicate_num, grid_yrs, dir_out))
+sink()
 
 ### Plot indices --------------------------------------------------------------
 
-plot_results(srvy = "CA", dir_out = dir_out) 
+plot_results(srvy = srvy, dir_out = dir_out) 
 
 ## Alaska ----------------------------------------------------------------------
 
@@ -222,16 +225,19 @@ tot_dataframes = 13
 replicate_num <- 3
 catch <- catch_ak
 grid_yrs <- grid_yrs_ebs
+srvy <- "EBS"
 
 ### Run ------------------------------------------------------------------------
 
+sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
 map(
   1:nrow(test_species), 
   ~ clean_and_resample(test_species[.x,], 
                        catch, seq_from, seq_to, seq_by, 
                        tot_dataframes, replicate_num, grid_yrs, dir_out))
+sink()
 
 ### Plot indices --------------------------------------------------------------
 
-plot_results(srvy = "EBS", dir_out = dir_out) 
+plot_results(srvy = srvy, dir_out = dir_out) 
 

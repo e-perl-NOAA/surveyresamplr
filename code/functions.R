@@ -77,13 +77,17 @@ include_or_exclude <- function(df, proportions, replicate_num) {
 #' Filter catch by species, create a vector of tows and give tows a random
 #' assignment to be resampled,
 #'
-#' @param df full catch df
-#' @param species The species which you want to do data cleanup for.
+#' @param catch full catch df
+#' @param species_row A data frame containing information about the test species.
+#' @param seq_from
+#' @param seq_to
+#' @param seq_by
 #' @param tot_dataframes the number of data frames you want to output. effort x replicates - (replicates - 1). 5x3-2
+#' @param replicate_num
 #' @return List of resampled catch data frames
 #'
 cleanup_by_species <- function(catch, 
-                               test_species, 
+                               species_row, 
                                seq_from = 0.1, 
                                seq_to = 1.0, 
                                seq_by = 0.1, 
@@ -92,16 +96,16 @@ cleanup_by_species <- function(catch,
   
   df <- catch %>% 
     dplyr::filter(
-      Common_name == test_species$common_name)
+      Common_name == species_row$common_name)
   
-  if (!is.na(test_species$filter_lat_lt) | is.null(test_species$filter_lat_lt)) {
-    df <- df %>% dplyr::filter(Latitude_dd < test_species$filter_lat_lt)
+  if (!is.na(species_row$filter_lat_lt) | is.null(species_row$filter_lat_lt)) {
+    df <- df %>% dplyr::filter(Latitude_dd < species_row$filter_lat_lt)
   }
-  if (!is.na(test_species$filter_lat_gt) | is.null(test_species$filter_lat_gt)) {
-    df <- df %>% dplyr::filter(Latitude_dd > test_species$filter_lat_gt)
+  if (!is.na(species_row$filter_lat_gt) | is.null(species_row$filter_lat_gt)) {
+    df <- df %>% dplyr::filter(Latitude_dd > species_row$filter_lat_gt)
   }
-  if (!is.na(test_species$filter_depth) | is.null(test_species$filter_depth)) {
-    df <- df %>% dplyr::filter(Depth_m < test_species$filter_depth)
+  if (!is.na(species_row$filter_depth) | is.null(species_row$filter_depth)) {
+    df <- df %>% dplyr::filter(Depth_m < species_row$filter_depth)
   }
   
   catch_split <- split(df, df$Year)
@@ -153,7 +157,7 @@ cleanup_by_species <- function(catch,
 #' This function resamples species data frames, runs species distribution models (SDMs) in parallel, and saves the results.
 #'
 #' @param spp_dfs A list of species data frames.
-#' @param test_species A data frame containing information about the test species.
+#' @param species_row A data frame containing information about the test species.
 #' @param grid_yrs A data frame or list containing grid years information.
 #' @param dir_out A character string specifying the directory for output files.
 #' 
@@ -168,14 +172,12 @@ cleanup_by_species <- function(catch,
 #'   \item Saves the results of the SDM processing into CSV files.
 #' }
 #' 
-resample_tests <- function (spp_dfs, test_species, grid_yrs, dir_out) {
+resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
   # set directories for outputs
-  dir_spp <- paste0(dir_out, paste0(test_species$srvy, "_", test_species$file_name, "/"))
+  dir_spp <- paste0(dir_out, paste0(species_row$srvy, "_", species_row$file_name, "/"))
   dir.create(dir_spp, showWarnings = FALSE)
   
-  fit_df <- fit_pars <- fit_check <- index <- data.frame()
-  
-  # spp_dfs <- spp_dfs[names(spp_dfs)[(length(names(spp_dfs))-1):length(names(spp_dfs))]] # reduce DFs for testing
+  spp_dfs <- spp_dfs[names(spp_dfs)[(length(names(spp_dfs))-1):length(names(spp_dfs))]] # reduce DFs for testing
   spp_files <- as.list(names(spp_dfs)) # make the names file
   for (i in seq_along(spp_dfs)) { # Save each dataframe separately
     write_parquet(spp_dfs[[i]], paste0(dir_spp, paste0("df_", i, ".parquet")))
@@ -189,45 +191,53 @@ resample_tests <- function (spp_dfs, test_species, grid_yrs, dir_out) {
   # Remove large objects before parallel execution
   gc()
   
-  print("...Starting parallel SDM processing")
+  message("...Starting parallel SDM processing")
   
-  assign(value = get(test_species$model_fn), x = "model_function")
+  assign(value = get(species_row$model_fn), x = "model_function")
   
   # Run SDMs in parallel
   future_map(seq_along(spp_files), function(i) {
-    message(spp_files[[i]])
+    message(paste0("\n...", spp_files[[i]]))
     gc()  # Free memory
     # Load only the required dataframe
     spp_df <- read_parquet(paste0(dir_spp, paste0("df_", i, ".parquet")))
     # Run species SDM function
     fit0 <- model_function(x = spp_df, y = spp_files[[i]], z = grid_yrs, dir_spp = dir_spp)
-    # fit <- readRDS(file = paste0(dir_spp, "fit_", spp_files[[i]], ".rds")) # oor testing
+    # fit <- readRDS(file = paste0(dir_spp, "fit_", spp_files[[i]], ".rds")) # for testing
     # Ensure extracted objects are dataframes, Store results in lists
-    fit_df <- read.csv(file = paste0(dir_spp, "fit_df.csv")) %>%  
+    # fit 
+    if (i == 1) {fit_df <- c()} else {fit_df <- read.csv(file = paste0(dir_spp, "fit_df.csv"))}
+    fit_df <- fit_df %>%  
       dplyr::bind_rows(
         data.frame(
-          species = test_species$file_name,
+          species = species_row$file_name,
           effort = spp_files[[i]],
           data.frame(fit_df_fn(fit0$fit))))
     fwrite(fit_df, file = paste0(dir_spp, "fit_df.csv"))
-    fit_pars <- read.csv(file = paste0(dir_spp, "fit_pars.csv")) %>%  
+    # fit pars
+    if (i == 1) {fit_pars <- c()} else {fit_pars <- read.csv(file = paste0(dir_spp, "fit_pars.csv"))}
+    fit_pars <- fit_pars %>%  
       dplyr::bind_rows(
         data.frame(
-          species = test_species$file_name,
+          species = species_row$file_name,
           effort = spp_files[[i]],
           data.frame(fit_pars_fn(fit0$fit))))
     fwrite(fit_pars, file = paste0(dir_spp, "fit_pars.csv"))
-    fit_check <- read.csv(file = paste0(dir_spp, "fit_check.csv")) %>%  
+    # fit check
+    if (i == 1) {fit_check <- c()} else {fit_check <- read.csv(file = paste0(dir_spp, "fit_check.csv"))}
+    fit_check <- fit_check %>%  
       dplyr::bind_rows(
         data.frame(
-          species = test_species$file_name,
+          species = species_row$file_name,
           effort = spp_files[[i]],
           data.frame(fit_check_fn(fit0$fit))))
     fwrite(fit_check, file = paste0(dir_spp, "fit_check.csv"))
-    index <- read.csv(file = paste0(dir_spp, "index.csv")) %>%  
+    # index
+    if (i == 1) {index <- c()} else {index <- read.csv(file = paste0(dir_spp, "index.csv"))}
+    index <- index %>%  
       dplyr::bind_rows(
         data.frame(
-          species = test_species$file_name,
+          species = species_row$file_name,
           effort = spp_files[[i]],
           data.frame(fit0$index)))
     fwrite(index, file = paste0(dir_spp, "index.csv"))
@@ -237,7 +247,7 @@ resample_tests <- function (spp_dfs, test_species, grid_yrs, dir_out) {
     # NULL
   }, .progress = TRUE, .options = furrr_options(seed = TRUE))
   
-  print("...Parallel SDM processing complete")
+  message("...Parallel SDM processing complete")
 }
 
 #' Clean and Resample Species Data
@@ -262,11 +272,11 @@ resample_tests <- function (spp_dfs, test_species, grid_yrs, dir_out) {
 #' }
 #' 
 clean_and_resample <- function(species_row, catch, seq_from, seq_to, seq_by, tot_dataframes, replicate_num, grid_yrs, dir_out) {
-  print(paste0(species_row$srvy, " ", species_row$common_name))
+  message(paste0(species_row$srvy, " ", species_row$common_name))
   
   spp_dfs <- cleanup_by_species(
     catch = catch, 
-    test_species = species_row, 
+    species_row = species_row, 
     seq_from = seq_from, 
     seq_to = seq_to, 
     seq_by = seq_by, 
@@ -277,7 +287,7 @@ clean_and_resample <- function(species_row, catch, seq_from, seq_to, seq_by, tot
   try({
     resample_tests(
       spp_dfs = spp_dfs, 
-      test_species = species_row, 
+      species_row = species_row, 
       grid_yrs = grid_yrs, 
       dir_out = dir_out
     ) 
