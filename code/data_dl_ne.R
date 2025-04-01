@@ -86,7 +86,7 @@ noaa_nefsc_catch <- dat %>%
     depth_m
   ) %>%
   dplyr::left_join(y = test_species %>%
-                     dplyr::select(file_name, common_name))
+                     dplyr::select(file_name, Common_name = common_name))
 
 save(noaa_nefsc_catch, file = here::here("data","noaa_nefsc_catch.rda"))
 

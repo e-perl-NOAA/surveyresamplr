@@ -429,11 +429,11 @@ test_species <-
 # source(paste0(wd, "code/data_dl_ne.r"))
 
 load(file = paste0(wd, "/data/noaa_nefsc_catch.rda"))
-catch <- noaa_afsc_catch %>% dplyr::filter(srvy == "SPRING")
+catch <- noaa_nefsc_catch %>% dplyr::filter(srvy == "SPRING")
 
 ### Load grid data -------------------------------------------------------------
 
-load(paste0(wd, "grids/noaa_afsc_nwa_pred_grid_depth.rdata"))
+load(paste0(wd, "grids/noaa_nefsc_nwa_pred_grid_depth.rdata"))
 grid_yrs <- replicate_df(pred_grid_depth, "Year", unique(catch$Year))
 
 ### Variables ------------------------------------------------------------------
@@ -490,11 +490,11 @@ test_species <-
 # source(paste0(wd, "code/data_dl_ne.r"))
 
 load(file = paste0(wd, "/data/noaa_nefsc_catch.rda"))
-catch <- noaa_afsc_catch %>% dplyr::filter(srvy == "FALL")
+catch <- noaa_nefsc_catch %>% dplyr::filter(srvy == "FALL")
 
 ### Load grid data -------------------------------------------------------------
 
-load(paste0(wd, "grids/noaa_afsc_nwa_pred_grid_depth.rdata"))
+load(paste0(wd, "grids/noaa_nefsc_nwa_pred_grid_depth.rdata"))
 grid_yrs <- replicate_df(pred_grid_depth, "Year", unique(catch$Year))
 
 ### Variables ------------------------------------------------------------------
