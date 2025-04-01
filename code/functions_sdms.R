@@ -40,6 +40,91 @@ species_sdm_fn <- function(x, y, z, dir_spp) {
   return(list("fit" = fit, "predictions" = predictions, "index" = index))
 }
 
+
+#' Species distribution model function
+#'
+#' Function to create a mesh, fit the sdmTMB model, and get the index.
+#' Exports fit.rds and index.rds files to the designated species folder.
+#' Used for arrowtooth flounder, bocaccio, dover sole, lingcod north, lingcod
+#' south, longnose skate, pacific ocean perch (pop), pacific spiny dogfish, rex
+#' sole, yellowtail.
+#'
+#' @param x speciesname_df[[i]] which is a data frame from a list of data frames
+#' created from the cleanup_by_species() function and any further post-processing
+#' of depth filters (see the smaller_function.R file for those).
+#' @param y speciesname_files[[i]] which is an item in a list created from
+#' names(speciesname_df)
+#' @import sdmTMB
+#'
+species_sdm_fn_ak <- function(x, y, z, dir_spp) {
+  # make mesh
+  mesh <- sdmTMB::make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
+  
+  # fit model
+  fit <- sdmTMB::sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year) + temperature_bottom,
+    data = x,
+    mesh = mesh,
+    family = delta_gamma(),
+    time = "Year",
+    anisotropy = TRUE,
+    spatiotemporal = as.list(c("iid", "iid"))
+  )
+  
+  # get the index
+  predictions <- predict(fit, newdata = z, return_tmb_object = TRUE) # 
+  index <- sdmTMB::get_index(predictions, area = z$area_km2, bias_correct = TRUE)
+  
+  # save file
+  saveRDS(fit, paste0(dir_spp, "fit_", y, ".rds"))
+  saveRDS(index, paste0(dir_spp, "index_", y, ".rds"))
+  
+  return(list("fit" = fit, "predictions" = predictions, "index" = index))
+}
+
+
+
+#' Species distribution model function
+#'
+#' Function to create a mesh, fit the sdmTMB model, and get the index.
+#' Exports fit.rds and index.rds files to the designated species folder.
+#' Used for arrowtooth flounder, bocaccio, dover sole, lingcod north, lingcod
+#' south, longnose skate, pacific ocean perch (pop), pacific spiny dogfish, rex
+#' sole, yellowtail.
+#'
+#' @param x speciesname_df[[i]] which is a data frame from a list of data frames
+#' created from the cleanup_by_species() function and any further post-processing
+#' of depth filters (see the smaller_function.R file for those).
+#' @param y speciesname_files[[i]] which is an item in a list created from
+#' names(speciesname_df)
+#' @import sdmTMB
+#'
+species_sdm_fn_nwa <- function(x, y, z, dir_spp) {
+  # make mesh
+  mesh <- sdmTMB::make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
+  
+  # fit model
+  fit <- sdmTMB::sdmTMB(
+    total_catch_wt_kg ~ 0 + factor(Year),
+    data = x,
+    mesh = mesh,
+    family = delta_gamma(),
+    time = "Year",
+    anisotropy = TRUE,
+    spatiotemporal = as.list(c("iid", "iid"))
+  )
+  
+  # get the index
+  predictions <- predict(fit, newdata = z, return_tmb_object = TRUE) # 
+  index <- sdmTMB::get_index(predictions, area = z$area_km2, bias_correct = TRUE)
+  
+  # save file
+  saveRDS(fit, paste0(dir_spp, "fit_", y, ".rds"))
+  saveRDS(index, paste0(dir_spp, "index_", y, ".rds"))
+  
+  return(list("fit" = fit, "predictions" = predictions, "index" = index))
+}
+
 #' Species distribution model function using delta_lognormal family
 #'
 #' Function to create a mesh, fit the sdmTMB model, and get the index.

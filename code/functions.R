@@ -23,13 +23,13 @@ pkg_install <- function(p){
   }
   if(!require(p, character.only = TRUE)) {
     if (p == 'coldpool') {
-        devtools::install_github("afsc-gap-products/coldpool")
-      } else if (p == "akgfmapas") {
-        devtools::install_github("afsc-gap-products/akgfmaps", build_vignettes = TRUE)
-      } else if (p == 'nwfscSurvey') {
-        remotes::install_github("pfmc-assessments/nwfscSurvey")
-      } else {
-        install.packages(p)
+      devtools::install_github("afsc-gap-products/coldpool")
+    } else if (p == "akgfmapas") {
+      devtools::install_github("afsc-gap-products/akgfmaps", build_vignettes = TRUE)
+    } else if (p == 'nwfscSurvey') {
+      remotes::install_github("pfmc-assessments/nwfscSurvey")
+    } else {
+      install.packages(p)
     }
     require(p, character.only = TRUE)}
 }
@@ -141,7 +141,7 @@ cleanup_by_species <- function(catch,
   names(alldata_resampled) <- substr(names(alldata_resampled), 6, 50) # it would be good to replace 50 with a logical indicating the end
   
   species_all_yrs <- alldata_resampled %>%
-    bind_rows(.id = "source")
+    dplyr::bind_rows(.id = "source")
   
   species_all_yrs <- split(species_all_yrs, species_all_yrs$source)
   names(species_all_yrs) <- gsub(x = names(species_all_yrs), pattern = ".", replacement = "", fixed = TRUE)
@@ -177,7 +177,7 @@ resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
   dir_spp <- paste0(dir_out, paste0(species_row$srvy, "_", species_row$file_name, "/"))
   dir.create(dir_spp, showWarnings = FALSE)
   
-  spp_dfs <- spp_dfs[names(spp_dfs)[(length(names(spp_dfs))-1):length(names(spp_dfs))]] # reduce DFs for testing
+  # spp_dfs <- spp_dfs[names(spp_dfs)[(length(names(spp_dfs))-1):length(names(spp_dfs))]] # reduce DFs for testing
   spp_files <- as.list(names(spp_dfs)) # make the names file
   for (i in seq_along(spp_dfs)) { # Save each dataframe separately
     write_parquet(spp_dfs[[i]], paste0(dir_spp, paste0("df_", i, ".parquet")))
@@ -197,7 +197,7 @@ resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
   
   # Run SDMs in parallel
   future_map(seq_along(spp_files), function(i) {
-    message(paste0("\n...", spp_files[[i]]))
+    message(paste0("\n...", spp_files[[i]], "\n"))
     gc()  # Free memory
     # Load only the required dataframe
     spp_df <- read_parquet(paste0(dir_spp, paste0("df_", i, ".parquet")))
@@ -209,37 +209,41 @@ resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
     if (i == 1) {fit_df <- c()} else {fit_df <- read.csv(file = paste0(dir_spp, "fit_df.csv"))}
     fit_df <- fit_df %>%  
       dplyr::bind_rows(
-        data.frame(
-          species = species_row$file_name,
-          effort = spp_files[[i]],
-          data.frame(fit_df_fn(fit0$fit))))
+        dplyr::bind_cols(
+          species_row, 
+          data.frame(
+            effort = spp_files[[i]],
+            data.frame(fit_df_fn(fit0$fit)))))
     fwrite(fit_df, file = paste0(dir_spp, "fit_df.csv"))
     # fit pars
     if (i == 1) {fit_pars <- c()} else {fit_pars <- read.csv(file = paste0(dir_spp, "fit_pars.csv"))}
     fit_pars <- fit_pars %>%  
       dplyr::bind_rows(
-        data.frame(
-          species = species_row$file_name,
-          effort = spp_files[[i]],
-          data.frame(fit_pars_fn(fit0$fit))))
+        dplyr::bind_cols(
+          species_row, 
+          data.frame(
+            effort = spp_files[[i]],
+            data.frame(fit_pars_fn(fit0$fit)))))
     fwrite(fit_pars, file = paste0(dir_spp, "fit_pars.csv"))
     # fit check
     if (i == 1) {fit_check <- c()} else {fit_check <- read.csv(file = paste0(dir_spp, "fit_check.csv"))}
     fit_check <- fit_check %>%  
       dplyr::bind_rows(
-        data.frame(
-          species = species_row$file_name,
-          effort = spp_files[[i]],
-          data.frame(fit_check_fn(fit0$fit))))
+        dplyr::bind_cols(
+          species_row, 
+          data.frame(
+            effort = spp_files[[i]],
+            data.frame(fit_check_fn(fit0$fit)))))
     fwrite(fit_check, file = paste0(dir_spp, "fit_check.csv"))
     # index
     if (i == 1) {index <- c()} else {index <- read.csv(file = paste0(dir_spp, "index.csv"))}
     index <- index %>%  
       dplyr::bind_rows(
-        data.frame(
-          species = species_row$file_name,
-          effort = spp_files[[i]],
-          data.frame(fit0$index)))
+        dplyr::bind_cols(
+          species_row, 
+          data.frame(
+            effort = spp_files[[i]],
+            data.frame(fit0$index))))
     fwrite(index, file = paste0(dir_spp, "index.csv"))
     # Explicitly remove objects after processing
     rm("fit0", "spp_df")
@@ -323,7 +327,7 @@ plot_results <- function(srvy, dir_out) {
   # find files
   aaa <- list.files(path = dir_out, pattern = srvy, full.names = TRUE)
   aaa <- aaa[!grepl(pattern = "figures", x = aaa)]
-    
+  
   # compile files for each org
   fit_df <- fit_pars <- fit_check <- index <- data.frame()
   for (i in 1:length(aaa)) {
@@ -356,71 +360,96 @@ plot_results <- function(srvy, dir_out) {
   i <- 0
   theme_custom <- theme_bw() + 
     theme(
-    strip.text = element_text(size = 12, face = "bold"),
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    legend.position = "none"
-  )
+      strip.text = element_text(size = 12, face = "bold"),
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      legend.position = "none"
+    )
   
   ## log biomass estimates boxplot ---------------------------------------------
-  p1 <- ggplot(index, aes(x = as.factor(effort), y = log_est)) +
-    geom_boxplot() +
-    facet_wrap(~ species) +
-    labs(x = "Proprotion of effort",
-         y = "Log biomass estimate") +
-    theme_minimal() +
+  p1 <- ggplot2::ggplot(
+    data = index, 
+    mapping = aes(
+      x = as.factor(effort), 
+      y = log_est, 
+      color = effort)) +
+    ggplot2::geom_boxplot() +
+    ggplot2::facet_wrap(~ common_name) +
+    ggplot2::labs(x = "Proprotion of effort",
+         y = "Log biomass estimate")  + 
+    ggplot2::scale_color_viridis_d(
+      name = "Effort", 
+      option = "D") +
     theme_custom
   
-  i <- i + 1
-  plot_list[[i]] <- p1
+  i <- i + 1; plot_list[[i]] <- p1
   names(plot_list)[i] <- 'index_boxplot_log_biomass.png'
   
   # log(?) SE boxplot ----------------------------------------------------------
-  p1 <- ggplot(index, aes(x = as.factor(effort), y = se)) +
-    geom_boxplot() +
-    facet_wrap(~ species) +
-    labs(x = "Proprotion of effort",
-         y = "Standard error of log biomass estimate") +
-    theme_minimal() +
+  p1 <- ggplot2::ggplot(
+    data = index, 
+    mapping = aes(
+      x = as.factor(effort), 
+      y = se, 
+      color = effort)) +
+    ggplot2::geom_boxplot() +
+    ggplot2::facet_wrap(~ common_name) +
+    ggplot2::labs(x = "Proprotion of effort",
+         y = "Standard error of log biomass estimate")  + 
+    ggplot2::scale_color_viridis_d(
+      name = "Effort", 
+      option = "D") +
     theme_custom
   
-  i <- i + 1
-  plot_list[[i]] <- p1
+  i <- i + 1; plot_list[[i]] <- p1
   names(plot_list)[i] <- 'index_boxplot_log_biomass_SE.png'
   
   # biomass estimates boxplot --------------------------------------------------
-  p1 <- ggplot(index, aes(x = as.factor(effort), y = est)) +
+  p1 <- ggplot2::ggplot(
+    data = index, 
+    mapping = aes(
+      x = as.factor(effort), 
+      y = est, 
+      color = effort)) +
     geom_boxplot() +
-    facet_wrap(~ species) +
-    labs(x = "Proprotion of effort",
-         y = "Biomass estimate") +
-    theme_minimal() +
-    theme_custom
+    ggplot2::facet_wrap(~ common_name) +
+    ggplot2::labs(x = "Proprotion of effort",
+         y = "Biomass estimate")  + 
+    ggplot2::scale_color_viridis_d(
+      name = "Effort", 
+      option = "D") +
+   theme_custom
   
-  i <- i + 1
-  plot_list[[i]] <- p1
+  i <- i + 1; plot_list[[i]] <- p1
   names(plot_list)[i] <- 'index_boxplot_biomass.png'
   
   # biomass estimates over time ---------------------------------------------------
-  p1 <- ggplot(index, aes(x = Year, y = est, color = effort)) +
-    geom_line() +
-    facet_wrap(~ species) +
-    labs(x = "Proprotion of effort",
-         y = "Biomass estimate") +
-    theme_minimal() +
-    theme_custom
+  p1 <- ggplot2::ggplot(
+    data = index, 
+               mapping = aes(
+                 x = Year, 
+                 y = est, 
+                 color = effort)) +
+    ggplot2::geom_line() +
+    ggplot2::facet_wrap(~ common_name) +
+    ggplot2::labs(x = "Years",
+         y = "Biomass estimate")  + 
+    ggplot2::scale_color_viridis_d(
+      name = "Effort", 
+      option = "D") +
+    theme_custom + 
+    ggplot2::theme(legend.position = "right")
   
-  i <- i + 1
-  plot_list[[i]] <- p1
+  i <- i + 1; plot_list[[i]] <- p1
   names(plot_list)[i] <- 'index_timeseries_biomass.png'
   
   for (ii in 1:length(plot_list)) {
-  ggsave(filename = names(plot_list)[ii],
-         plot = plot_list[[ii]], 
-         path = dir_fig, 
-         width = 8, 
-         height = 8, 
-         device = 'png', 
-         dpi = 300)
+    ggsave(filename = names(plot_list)[ii],
+           plot = plot_list[[ii]], 
+           path = dir_fig, 
+           width = 8, 
+           height = 8, 
+           device = 'png', 
+           dpi = 300)
   }
   
   save(plot_list, file = paste0(dir_fig, "figures.rdata"))

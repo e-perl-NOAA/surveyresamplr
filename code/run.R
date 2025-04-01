@@ -136,34 +136,30 @@ test_species <- data.frame(
 # source(paste0(wd, "code/data_dl_nw.r"))
 
 catch_ca <- read.csv(paste0(wd,"data/nwfsc_bt_fmp_spp_updated.csv")) #pulled data again to get 2024
-catch_ca <- catch_ca %>% 
+catch <- catch_ca %>% 
   dplyr::select(Trawl_id, Common_name, Longitude_dd, Latitude_dd, Year, Pass, total_catch_wt_kg, Depth_m) %>% 
   dplyr::mutate(srvy = "CA")
 
-catch_ca <- catch_ca %>% dplyr::filter(Year > 2010) # Testing
-
 ### Load grid data -------------------------------------------------------------
 
-load(paste0(wd,"data/california_current_grid.rda"))
-california_current_grid <- california_current_grid %>% # rename x and y cols
+load(paste0(wd,"grids/noaa_nwfsc_ca_pred_grid_depth.rda"))
+pred_grid <- california_current_grid %>% # rename x and y cols
   dplyr::select(Longitude_dd = longitude, 
                 Latitude_dd = latitude, 
                 Pass = pass_scaled, 
                 Depth_m = depth, 
                 area_km2 = area_km2_WCGBTS) %>% 
   dplyr::mutate(srvy = "CA")
-grid_yrs_ca <- replicate_df(california_current_grid, "Year", unique(catch_ca$Year))
+grid_yrs <- replicate_df(pred_grid, "Year", unique(catch$Year))
 
 ### Variables ------------------------------------------------------------------
 
+srvy <- "CA"
 seq_from = 0.1
 seq_to = 1
 seq_by = 0.1
 tot_dataframes = 91
 replicate_num <- 10
-catch <- catch_ca
-grid_yrs <- grid_yrs_ca
-srvy <- "CA"
 
 ### Run ------------------------------------------------------------------------
 
@@ -175,11 +171,11 @@ map(
                        tot_dataframes, replicate_num, grid_yrs, dir_out))
 sink()
 
-### Plot indices --------------------------------------------------------------
+### Plot indices ---------------------------------------------------------------
 
 plot_results(srvy = srvy, dir_out = dir_out) 
 
-## Alaska ----------------------------------------------------------------------
+## Eastern Bering Sea ----------------------------------------------------------
 
 ### Define study species -------------------------------------------------------
 
@@ -188,15 +184,15 @@ test_species <- data.frame(
   common_name = c("walleye pollock", "snow crab", "Pacific cod", 
                   "red king crab", "blue king crab", 
                   "yellowfin sole", "Pacific halibut", 
-                  "Alaska plaice", "flathead sole", "northern rock sole"), 
+                  "Alaska plaice", "flathead sole", "northern rock sole", "arrowtooth flounder"), 
   species_code = as.character(c(21740, 68580, 21720, 
                                 69322, 69323, 
                                 10210, 10120, 
-                                10285, 10130, 10261)), 
+                                10285, 10130, 10261, 10110)), 
   filter_lat_lt = NA, 
   filter_lat_gt = NA, 
   filter_depth = NA, 
-  model_fn = "species_sdm_fn" # name of funcion for sdm. Will build in specificity for this later
+  model_fn = "species_sdm_fn_ak" # name of funcion for sdm. Will build in specificity for this later
 ) %>% 
   dplyr::mutate( 
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
@@ -205,27 +201,22 @@ test_species <- data.frame(
 
 # source(paste0(wd, "code/data_dl_ak.r"))
 
-load(file = paste0(wd, "/data/noaa_afsc_cpue.rda"))
-catch_ak <- noaa_afsc_cpue
-catch_ak <- catch_ak %>% dplyr::filter(Year > 2010) # Testing
+load(file = paste0(wd, "/data/noaa_afsc_catch.rda"))
+catch <- noaa_afsc_catch %>% dplyr::filter(srvy == "EBS")
 
 ### Load grid data -------------------------------------------------------------
 
-load(paste0(wd, "data/noaa_afsc_ebs_pred_grid_depth.rdata"))
-noaa_afsc_ebs_pred_grid_depth <- noaa_afsc_ebs_pred_grid_depth %>% 
-  dplyr::mutate(srvy = "EBS")
-grid_yrs_ebs <- replicate_df(noaa_afsc_ebs_pred_grid_depth, "Year", unique(catch_ak$Year))
+load(paste0(wd, "grids/noaa_afsc_ebs_pred_grid_depth.rdata"))
+grid_yrs <- replicate_df(pred_grid_depth, "Year", unique(catch$Year))
 
 ### Variables ------------------------------------------------------------------
 
+srvy <- "EBS"
 seq_from = 0.2
 seq_to = 1.0
 seq_by = 0.2 
 tot_dataframes = 13
 replicate_num <- 3
-catch <- catch_ak
-grid_yrs <- grid_yrs_ebs
-srvy <- "EBS"
 
 ### Run ------------------------------------------------------------------------
 
@@ -241,3 +232,290 @@ sink()
 
 plot_results(srvy = srvy, dir_out = dir_out) 
 
+## Eastern + Northern Bering Sea ----------------------------------------------------------
+
+### Define study species -------------------------------------------------------
+
+test_species <- data.frame(
+  srvy = "BS",
+  common_name = c("walleye pollock", "snow crab", "Pacific cod", 
+                  "red king crab", "blue king crab", 
+                  "yellowfin sole", "Pacific halibut", 
+                  "Alaska plaice", "flathead sole", "northern rock sole", "arrowtooth flounder"), 
+  species_code = as.character(c(21740, 68580, 21720, 
+                                69322, 69323, 
+                                10210, 10120, 
+                                10285, 10130, 10261, 10110)), 
+  filter_lat_lt = NA, 
+  filter_lat_gt = NA, 
+  filter_depth = NA, 
+  model_fn = "species_sdm_fn_ak" # name of funcion for sdm. Will build in specificity for this later
+) %>% 
+  dplyr::mutate( 
+    file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
+
+### Load survey data -----------------------------------------------------------
+
+# source(paste0(wd, "code/data_dl_ak.r"))
+
+load(file = paste0(wd, "/data/noaa_afsc_catch.rda"))
+catch <- noaa_afsc_catch %>% dplyr::filter(srvy %in% c("EBS", "NBS"))
+
+### Load grid data -------------------------------------------------------------
+
+load(paste0(wd, "grids/noaa_afsc_bs_pred_grid_depth.rdata"))
+grid_yrs <- replicate_df(pred_grid_depth, "Year", unique(catch$Year))
+
+### Variables ------------------------------------------------------------------
+
+srvy <- "BS"
+seq_from = 0.2
+seq_to = 1.0
+seq_by = 0.2 
+tot_dataframes = 13
+replicate_num <- 3
+
+### Run ------------------------------------------------------------------------
+
+sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
+map(
+  1:nrow(test_species), 
+  ~ clean_and_resample(test_species[.x,], 
+                       catch, seq_from, seq_to, seq_by, 
+                       tot_dataframes, replicate_num, grid_yrs, dir_out))
+sink()
+
+### Plot indices --------------------------------------------------------------
+
+plot_results(srvy = srvy, dir_out = dir_out) 
+
+## Gulf of Alaska ----------------------------------------------------------
+
+### Define study species -------------------------------------------------------
+
+test_species <- data.frame(
+  srvy = "GOA",
+  common_name = c("walleye pollock", "Pacific cod", 
+                  "Pacific ocean perch", "flathead sole", 
+                  "northern rockfish", "arrowtooth flounder"), 
+  species_code = as.character(c(21740, 21720, 
+                                30060, 10130, 
+                                30420, 10110)), 
+  filter_lat_lt = NA, 
+  filter_lat_gt = NA, 
+  filter_depth = NA, 
+  model_fn = "species_sdm_fn_ak" # name of funcion for sdm. Will build in specificity for this later
+) %>% 
+  dplyr::mutate( 
+    file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
+
+### Load survey data -----------------------------------------------------------
+
+# source(paste0(wd, "code/data_dl_ak.r"))
+
+load(file = paste0(wd, "/data/noaa_afsc_catch.rda"))
+catch <- noaa_afsc_catch %>% dplyr::filter(srvy == "GOA")
+
+### Load grid data -------------------------------------------------------------
+
+load(paste0(wd, "grids/noaa_afsc_goa_pred_grid_depth.rdata"))
+grid_yrs <- replicate_df(pred_grid_depth, "Year", unique(catch$Year))
+
+### Variables ------------------------------------------------------------------
+
+srvy <- "GOA"
+seq_from = 0.2
+seq_to = 1.0
+seq_by = 0.2 
+tot_dataframes = 13
+replicate_num <- 3
+
+### Run ------------------------------------------------------------------------
+
+sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
+map(
+  1:nrow(test_species), 
+  ~ clean_and_resample(test_species[.x,], 
+                       catch, seq_from, seq_to, seq_by, 
+                       tot_dataframes, replicate_num, grid_yrs, dir_out))
+sink()
+
+### Plot indices --------------------------------------------------------------
+
+plot_results(srvy = srvy, dir_out = dir_out) 
+
+## Aleutian Islands ------------------------------------------------------------
+
+### Define study species -------------------------------------------------------
+
+test_species <- data.frame(
+  srvy = "AI",
+  common_name = c("walleye pollock", "Pacific cod", 
+                  "Pacific ocean perch", "flathead sole", 
+                  "northern rockfish", "arrowtooth flounder"), 
+  species_code = as.character(c(21740, 21720, 
+                                30060, 10130, 
+                                30420, 10110)), 
+  filter_lat_lt = NA, 
+  filter_lat_gt = NA, 
+  filter_depth = NA, 
+  model_fn = "species_sdm_fn_ak" # name of funcion for sdm. Will build in specificity for this later
+) %>% 
+  dplyr::mutate( 
+    file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
+
+### Load survey data -----------------------------------------------------------
+
+# source(paste0(wd, "code/data_dl_ak.r"))
+
+load(file = paste0(wd, "/data/noaa_afsc_catch.rda"))
+catch <- noaa_afsc_catch %>% dplyr::filter(srvy == "AI")
+
+### Load grid data -------------------------------------------------------------
+
+load(paste0(wd, "grids/noaa_afsc_ai_pred_grid_depth.rdata"))
+grid_yrs <- replicate_df(pred_grid_depth, "Year", unique(catch$Year))
+
+### Variables ------------------------------------------------------------------
+
+srvy <- "AI"
+seq_from = 0.2
+seq_to = 1.0
+seq_by = 0.2 
+tot_dataframes = 13
+replicate_num <- 3
+
+### Run ------------------------------------------------------------------------
+
+sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
+map(
+  1:nrow(test_species), 
+  ~ clean_and_resample(test_species[.x,], 
+                       catch, seq_from, seq_to, seq_by, 
+                       tot_dataframes, replicate_num, grid_yrs, dir_out))
+sink()
+
+### Plot indices --------------------------------------------------------------
+
+plot_results(srvy = srvy, dir_out = dir_out) 
+
+## Spring Northwest Atlantic ---------------------------------------------------
+
+### Define study species -------------------------------------------------------
+
+test_species <- 
+  data.frame(
+    srvy = "NWA_SPRING",
+    common_name = c("Atlantic herring", "black sea bass", "Atlantic cod", 
+                    "American lobster", "longfin squid", "mackerel", 
+                    "monkfish", "red hake", "scup", 
+                    "sea scallop", "silver hake", "summer flounder", 
+                    "winter flounder"),
+    file_name0 = c("AtlanticHerring", "BlackSeaBass", "Cod", 
+                  "Lobster", "LongfinSquid", "Mackerel", 
+                  "Monkfish", "RedHake", "Scup", 
+                  "SeaScallop", "SilverHake", "SummerFlounder", 
+                  "WinterFlounder"), 
+  filter_lat_lt = NA, 
+  filter_lat_gt = NA, 
+  filter_depth = NA, 
+  model_fn = "species_sdm_fn_nwa" # name of funcion for sdm. Will build in specificity for this later
+) %>% 
+  dplyr::mutate( 
+    file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
+
+### Load survey data -----------------------------------------------------------
+
+# source(paste0(wd, "code/data_dl_ne.r"))
+
+load(file = paste0(wd, "/data/noaa_nefsc_catch.rda"))
+catch <- noaa_afsc_catch %>% dplyr::filter(srvy == "SPRING")
+
+### Load grid data -------------------------------------------------------------
+
+load(paste0(wd, "grids/noaa_afsc_nwa_pred_grid_depth.rdata"))
+grid_yrs <- replicate_df(pred_grid_depth, "Year", unique(catch$Year))
+
+### Variables ------------------------------------------------------------------
+
+srvy <- "NWA_SPRING"
+seq_from = 0.2
+seq_to = 1.0
+seq_by = 0.2 
+tot_dataframes = 13
+replicate_num <- 3
+
+### Run ------------------------------------------------------------------------
+
+sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
+map(
+  1:nrow(test_species), 
+  ~ clean_and_resample(test_species[.x,], 
+                       catch, seq_from, seq_to, seq_by, 
+                       tot_dataframes, replicate_num, grid_yrs, dir_out))
+sink()
+
+### Plot indices --------------------------------------------------------------
+
+plot_results(srvy = srvy, dir_out = dir_out) 
+
+
+## Fall Northwest Atlantic ---------------------------------------------------
+
+### Define study species -------------------------------------------------------
+
+test_species <- 
+  data.frame(
+    srvy = "NWA_FALL",
+    common_name = c("Atlantic herring", "black sea bass", "Atlantic cod", 
+                    "American lobster", "longfin squid", "mackerel", 
+                    "monkfish", "red hake", "scup", 
+                    "sea scallop", "silver hake", "summer flounder", 
+                    "winter flounder"),
+    file_name0 = c("AtlanticHerring", "BlackSeaBass", "Cod", 
+                   "Lobster", "LongfinSquid", "Mackerel", 
+                   "Monkfish", "RedHake", "Scup", 
+                   "SeaScallop", "SilverHake", "SummerFlounder", 
+                   "WinterFlounder"), 
+    filter_lat_lt = NA, 
+    filter_lat_gt = NA, 
+    filter_depth = NA, 
+    model_fn = "species_sdm_fn_nwa" # name of funcion for sdm. Will build in specificity for this later
+  ) %>% 
+  dplyr::mutate( 
+    file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
+
+### Load survey data -----------------------------------------------------------
+
+# source(paste0(wd, "code/data_dl_ne.r"))
+
+load(file = paste0(wd, "/data/noaa_nefsc_catch.rda"))
+catch <- noaa_afsc_catch %>% dplyr::filter(srvy == "FALL")
+
+### Load grid data -------------------------------------------------------------
+
+load(paste0(wd, "grids/noaa_afsc_nwa_pred_grid_depth.rdata"))
+grid_yrs <- replicate_df(pred_grid_depth, "Year", unique(catch$Year))
+
+### Variables ------------------------------------------------------------------
+
+srvy <- "NWA_FALL"
+seq_from = 0.2
+seq_to = 1.0
+seq_by = 0.2 
+tot_dataframes = 13
+replicate_num <- 3
+
+### Run ------------------------------------------------------------------------
+
+sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
+map(
+  1:nrow(test_species), 
+  ~ clean_and_resample(test_species[.x,], 
+                       catch, seq_from, seq_to, seq_by, 
+                       tot_dataframes, replicate_num, grid_yrs, dir_out))
+sink()
+
+### Plot indices --------------------------------------------------------------
+
+plot_results(srvy = srvy, dir_out = dir_out) 
