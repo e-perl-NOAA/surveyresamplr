@@ -56,9 +56,9 @@ species_sdm_fn <- function(x, y, z, dir_spp) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-species_sdm_fn_ak <- function(x, y, z, dir_spp) {
+species_sdm_fn_ak <- function(x, y, z, dir_spp, n_knots = 250) {
   # make mesh
-  mesh <- sdmTMB::make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = 500)
+  mesh <- sdmTMB::make_mesh(x, xy_cols = c("Longitude_dd", "Latitude_dd"), n_knots = n_knots)
   
   # fit model
   fit <- sdmTMB::sdmTMB(

@@ -177,7 +177,7 @@ resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
   dir_spp <- paste0(dir_out, paste0(species_row$srvy, "_", species_row$file_name, "/"))
   dir.create(dir_spp, showWarnings = FALSE)
   
-  # spp_dfs <- spp_dfs[names(spp_dfs)[(length(names(spp_dfs))-1):length(names(spp_dfs))]] # reduce DFs for testing
+  spp_dfs <- spp_dfs[names(spp_dfs)[(length(names(spp_dfs))-1):length(names(spp_dfs))]] # reduce DFs for testing
   spp_files <- as.list(names(spp_dfs)) # make the names file
   for (i in seq_along(spp_dfs)) { # Save each dataframe separately
     write_parquet(spp_dfs[[i]], paste0(dir_spp, paste0("df_", i, ".parquet")))
@@ -206,7 +206,7 @@ resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
     # fit <- readRDS(file = paste0(dir_spp, "fit_", spp_files[[i]], ".rds")) # for testing
     # Ensure extracted objects are dataframes, Store results in lists
     # fit 
-    if (i == 1) {fit_df <- c()} else {fit_df <- read.csv(file = paste0(dir_spp, "fit_df.csv"))}
+    if (!file.exists(paste0(dir_spp, "fit_df.csv"))) {fit_df <- c()} else {fit_df <- read.csv(file = paste0(dir_spp, "fit_df.csv"))}
     fit_df <- fit_df %>%  
       dplyr::bind_rows(
         dplyr::bind_cols(
@@ -216,7 +216,7 @@ resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
             data.frame(fit_df_fn(fit0$fit)))))
     fwrite(fit_df, file = paste0(dir_spp, "fit_df.csv"))
     # fit pars
-    if (i == 1) {fit_pars <- c()} else {fit_pars <- read.csv(file = paste0(dir_spp, "fit_pars.csv"))}
+    if (!file.exists(paste0(dir_spp, "fit_pars.csv"))) {fit_pars <- c()} else {fit_pars <- read.csv(file = paste0(dir_spp, "fit_pars.csv"))}
     fit_pars <- fit_pars %>%  
       dplyr::bind_rows(
         dplyr::bind_cols(
@@ -226,7 +226,7 @@ resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
             data.frame(fit_pars_fn(fit0$fit)))))
     fwrite(fit_pars, file = paste0(dir_spp, "fit_pars.csv"))
     # fit check
-    if (i == 1) {fit_check <- c()} else {fit_check <- read.csv(file = paste0(dir_spp, "fit_check.csv"))}
+    if (!file.exists(paste0(dir_spp, "fit_check.csv"))) {fit_check <- c()} else {fit_check <- read.csv(file = paste0(dir_spp, "fit_check.csv"))}
     fit_check <- fit_check %>%  
       dplyr::bind_rows(
         dplyr::bind_cols(
@@ -236,7 +236,7 @@ resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
             data.frame(fit_check_fn(fit0$fit)))))
     fwrite(fit_check, file = paste0(dir_spp, "fit_check.csv"))
     # index
-    if (i == 1) {index <- c()} else {index <- read.csv(file = paste0(dir_spp, "index.csv"))}
+    if (!file.exists(paste0(dir_spp, "index.csv"))) {index <- c()} else {index <- read.csv(file = paste0(dir_spp, "index.csv"))}
     index <- index %>%  
       dplyr::bind_rows(
         dplyr::bind_cols(

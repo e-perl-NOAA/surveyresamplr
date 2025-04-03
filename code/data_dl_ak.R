@@ -304,8 +304,9 @@ a <- extrap_grid(pred_grid = pred_grid, srvy = "NBS", noaa_afsc_catch = noaa_afs
 # BS (NBS+EBS) Extrapolation grid -------------------------------------------------------
 
 pred_grid <- read.csv(here::here("grids", "orig", "bering_coarse_grid.csv")) %>% 
-  dplyr::rename(Longitude_dd = X, 
-                Latitude_dd = Y) 
+  dplyr::mutate(Longitude_dd = ((X/10)-360), 
+                Latitude_dd = Y/100) %>% 
+  dplyr::select(area_km2, Longitude_dd, Latitude_dd)
 
 a <- extrap_grid(pred_grid = pred_grid, 
             srvy = c("NBS", "EBS"), 

@@ -249,7 +249,7 @@ test_species <- data.frame(
   filter_lat_lt = NA, 
   filter_lat_gt = NA, 
   filter_depth = NA, 
-  model_fn = "species_sdm_fn_ak" # name of funcion for sdm. Will build in specificity for this later
+  model_fn = "species_sdm_fn" # name of funcion for sdm. Will build in specificity for this later
 ) %>% 
   dplyr::mutate( 
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
@@ -263,7 +263,7 @@ catch <- noaa_afsc_catch %>% dplyr::filter(srvy %in% c("EBS", "NBS"))
 
 ### Load grid data -------------------------------------------------------------
 
-load(paste0(wd, "grids/noaa_afsc_bs_pred_grid_depth.rdata"))
+load(paste0(wd, "grids/noaa_afsc_bs_pred_grid_depth.rdata"), verbose = TRUE)
 grid_yrs <- replicate_df(pred_grid_depth, "Year", unique(catch$Year))
 
 ### Variables ------------------------------------------------------------------
