@@ -59,7 +59,7 @@ catch<-nwfscSurvey::pull_catch(SurveyName = "NWFSC.Combo",
                                                "lingcod")) 
 #bio<-nwfscSurvey::pull_bio(SurveyName = "NWFSC.Combo")
 
-table(catch$Common_name)
+table(catch$common_name)
 catch<-unique(catch)
 
 #write csv

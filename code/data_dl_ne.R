@@ -5,6 +5,9 @@
 ## Date:          March 2025
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+library(here)
+source(here::here("code","functions.R"))
+
 # Install Libraries ------------------------------------------------------------
 
 # Here we list all the packages we will need for this whole process
@@ -24,16 +27,10 @@ PKG <- c(
   "FishStatsUtils"
 )
 
-PKG <- unique(PKG)
-for (p in PKG) {
-  if(!require(p, character.only = TRUE)) {
-    if (p == 'FishStatsUtils') {
-      devtools::install_github("James-Thorson-NOAA/FishStatsUtils")
-    } else {
-      install.packages(p)
-    }
-    require(p,character.only = TRUE)}
-}
+# Use pkg_install() function found in functions.R file to load packages
+lapply(unique(PKG), pkg_install)
+
+# Test species to pull ---------------------------------------------------------
 
 test_species <- 
   data.frame(
@@ -64,29 +61,29 @@ for (i in 1:length(aaa)) {
 
 noaa_nefsc_catch <- dat %>% 
   janitor::clean_names() %>% 
-  dplyr::mutate(Pass = vessel, # is this data set calibrated? who knows lol
+  dplyr::mutate(pass = vessel, # is this data set calibrated? who knows lol
                 file_name = gsub(x = file, pattern = ".csv", replacement = ""), 
                 file_name = gsub(x = file_name, pattern = "NEFSCBottomTrawl", replacement = ""), 
                 srvy = season, 
-                Latitude_dd = latitude/100,
-                Longitude_dd = longitude/100*-1,
-                Trawl_id = paste0(cruise, "_", stratum, "_", station)) %>% 
+                latitude_dd = latitude/100,
+                longitude_dd = longitude/100*-1,
+                trawlid = paste0(cruise, "_", stratum, "_", station)) %>% 
   dplyr::select(
     srvy,
-    Trawl_id, 
+    trawlid, 
     file_name,
     total_catch_numbers = tot_n, 
     total_catch_wt_kg = tot_kg,
-    Latitude_dd,
-    Longitude_dd,
-    Year = year, 
-    temperature_bottom = temp_bottom, 
+    latitude_dd,
+    longitude_dd,
+    year, 
+    bottom_temperature_c = temp_bottom, 
     salinity_bottom, 
-    Pass, 
+    pass, 
     depth_m
   ) %>%
   dplyr::left_join(y = test_species %>%
-                     dplyr::select(file_name, Common_name = common_name))
+                     dplyr::select(file_name, common_name = common_name))
 
 save(noaa_nefsc_catch, file = here::here("data","noaa_nefsc_catch.rda"))
 
@@ -94,7 +91,12 @@ save(noaa_nefsc_catch, file = here::here("data","noaa_nefsc_catch.rda"))
 
 # this is a bit made up, it would be nice to get a real extrapolation grid from the center, but no avail
 
-extrap_grid <- function(pred_grid, srvy, srvy_out = NULL, noaa_nefsc_catch, crs_proj = NULL) {
+extrap_grid <- function(
+    pred_grid, 
+    srvy, 
+    srvy_out = NULL, 
+    noaa_nefsc_catch, 
+    crs_proj = NULL) {
   
   crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
   
@@ -103,28 +105,28 @@ extrap_grid <- function(pred_grid, srvy, srvy_out = NULL, noaa_nefsc_catch, crs_
   }
   
   pred_grid <- pred_grid %>% 
-    dplyr::mutate(Pass = 1, 
+    dplyr::mutate(pass = 1, 
                   srvy = srvy_out)
   
   if(!is.null(crs_proj)) {
     sp_extrap_raster <- sp::SpatialPoints(
-      coords = coordinates(as.matrix(pred_grid[,c("Longitude_dd", "Latitude_dd")])), 
+      coords = coordinates(as.matrix(pred_grid[,c("longitude_dd", "latitude_dd")])), 
       proj4string = CRS(crs_proj) ) %>% 
       sp::spTransform(CRSobj = crs_latlon)
   } else {
     sp_extrap_raster <- SpatialPoints(
-      coords = coordinates(as.matrix(pred_grid[,c("Longitude_dd", "Latitude_dd")])), 
+      coords = coordinates(as.matrix(pred_grid[,c("longitude_dd", "latitude_dd")])), 
       proj4string = CRS(crs_latlon) )    
   }
   
   ## Add depth -------------------------------------------------------------------
   
   x <- noaa_nefsc_catch %>%
-    dplyr::filter(Year > 2010 & srvy %in% c(srvy)) %>% # lets assume our ability to assess depth has improved, technologically since before 2000. Year negotiable if anyone has strong opinions
-    dplyr::select(Longitude_dd, Latitude_dd, depth_m) %>%
+    dplyr::filter(year > 2010 & srvy %in% c(srvy)) %>% # lets assume our ability to assess depth has improved, technologically since before 2000. year negotiable if anyone has strong opinions
+    dplyr::select(longitude_dd, latitude_dd, depth_m) %>%
     stats::na.omit()  %>% 
     sf::st_as_sf(x = ., 
-                 coords = c(x = "Longitude_dd", y = "Latitude_dd"), 
+                 coords = c(x = "longitude_dd", y = "latitude_dd"), 
                  crs = sf::st_crs(crs_latlon))
   
   idw_fit <- gstat::gstat(formula = depth_m ~ 1,
@@ -141,14 +143,14 @@ extrap_grid <- function(pred_grid, srvy, srvy_out = NULL, noaa_nefsc_catch, crs_
   
   pred_grid_depth <- stars::st_extract(
     x = depth_raster,
-    at = as.matrix(pred_grid[,c("Longitude_dd", "Latitude_dd")])) %>% 
+    at = as.matrix(pred_grid[,c("longitude_dd", "latitude_dd")])) %>% 
     dplyr::bind_cols(pred_grid) %>% 
-    dplyr::rename(Depth_m = var1.pred) %>% 
+    dplyr::rename(depth_m = var1.pred) %>% 
     dplyr::select(-var1.var) %>%
     stats::na.omit()
   
   save(pred_grid_depth, file = here::here("grids",paste0("noaa_nefsc_",tolower(srvy_out),"_pred_grid_depth.rdata")))
-  save(depth_raster, file = here::here("grids","depth_rasters",paste0("noaa_nefsc_", tolower(srvy_out),"_depth_raster.rdata")))
+  save(depth_raster, file = here::here("grids","grid_depth",paste0("noaa_nefsc_", tolower(srvy_out),"_depth_raster.rdata")))
   
   return(list("pred_grid_depth" = pred_grid_depth, 
               "depth_raster" = depth_raster))
@@ -157,11 +159,13 @@ extrap_grid <- function(pred_grid, srvy, srvy_out = NULL, noaa_nefsc_catch, crs_
 # from https://github.com/NOAA-EDAB/survdat/tree/master/inst/extdata
 # nwa_shp <- sf::st_read(dsn = here::here("grids","strata.shp"))
 
-pred_grid <- FishStatsUtils::convert_shapefile(file_path = here::here("grids", "orig", "strata.shp"), quiet = FALSE)
+pred_grid <- FishStatsUtils::convert_shapefile(
+  file_path = here::here("grids", "orig", "strata.shp"), 
+  quiet = FALSE)
 pred_grid <- pred_grid$extrapolation_grid %>% 
-  dplyr::rename(Longitude_dd = Lon, 
-                Latitude_dd = Lat, 
-                area_km = Area_km2) 
+  dplyr::rename(longitude_dd = Lon, 
+                latitude_dd = Lat, 
+                area_km2 = Area_km2) 
 
 a <- extrap_grid(pred_grid = pred_grid, srvy = c("SPRING", "FALL"), 
                  srvy_out = "NWA", 

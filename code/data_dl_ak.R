@@ -5,6 +5,9 @@
 ## Date:          March 2025
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+library(here)
+source(here::here("code","functions.R"))
+
 # Install Libraries ------------------------------------------------------------
 
 # Here we list all the packages we will need for this whole process
@@ -24,43 +27,37 @@ PKG <- c(
   "jsonlite", 
   "httr", 
   "sp", 
-  "RODBC"
+  "RODBC", 
+  "FishStatsUtils", 
+  "akgfmaps"
 )
 
-PKG <- unique(PKG)
-for (p in PKG) {
-  if(!require(p, character.only = TRUE)) {
-    if (p == 'coldpool') {
-      devtools::install_github("afsc-gap-products/coldpool")
-    } else if (p == "akgfmapas") {
-      devtools::install_github("afsc-gap-products/akgfmaps", build_vignettes = TRUE)
-    } else {
-      install.packages(p)
-    }
-    require(p,character.only = TRUE)}
-}
+# Use pkg_install() function found in functions.R file to load packages
+lapply(unique(PKG), pkg_install)
+
+# Test species to pull ---------------------------------------------------------
 
 test_species <- dplyr::bind_rows(
   data.frame(
-  srvy = "GOA",
-  common_name = c("walleye pollock", "Pacific cod", 
-                  "Pacific ocean perch", "flathead sole", 
-                  "northern rockfish", "arrowtooth flounder"), 
-  species_code = as.character(c(21740, 21720, 
-                                30060, 10130, 
-                                30420, 10110))), 
+    srvy = "GOA",
+    common_name = c("walleye pollock", "Pacific cod", 
+                    "Pacific ocean perch", "flathead sole", 
+                    "northern rockfish", "arrowtooth flounder"), 
+    species_code = as.character(c(21740, 21720, 
+                                  30060, 10130, 
+                                  30420, 10110))), 
   data.frame(
-  srvy = "EBS",
-  common_name = c("walleye pollock", "snow crab", "Pacific cod", 
-                  "red king crab", "blue king crab", 
-                  "yellowfin sole", "Pacific halibut", 
-                  "Alaska plaice", "flathead sole", "northern rock sole", "arrowtooth flounder"), 
-  species_code = as.character(c(21740, 68580, 21720, 
-                                69322, 69323, 
-                                10210, 10120, 
-                                10285, 10130, 10261, 10110)))) 
+    srvy = "EBS",
+    common_name = c("walleye pollock", "snow crab", "Pacific cod", 
+                    "red king crab", "blue king crab", 
+                    "yellowfin sole", "Pacific halibut", 
+                    "Alaska plaice", "flathead sole", "northern rock sole", "arrowtooth flounder"), 
+    species_code = as.character(c(21740, 68580, 21720, 
+                                  69322, 69323, 
+                                  10210, 10120, 
+                                  10285, 10130, 10261, 10110)))) 
 test_species <- unique(test_species[, c("common_name", "species_code")])
-  
+
 # CPUE/Catch Load data ---------------------------------------------------------
 
 ## Load haul data --------------------------------------------------------------
@@ -154,58 +151,59 @@ noaa_afsc_catch <- dplyr::full_join(
                      dplyr::mutate(species_code = as.numeric(species_code))) %>% 
   # dplyr::filter(srvy == "EBS") %>% 
   dplyr::mutate(
-    Pass = 1, 
-                Area_swept_ha = area_swept_km2/100) %>%
+    pass = 1, 
+    Area_swept_ha = area_swept_km2/100) %>%
   dplyr::select(
     srvy, 
-    Trawl_id = hauljoin, 
-    Common_name = common_name, 
+    trawlid = hauljoin, 
+    common_name = common_name, 
     species_code, 
     total_catch_numbers = count, 
     total_catch_wt_kg = weight_kg, 
-    Latitude_dd = latitude_dd_start, 
-    Longitude_dd = longitude_dd_start, 
-    Year = year, 
+    latitude_dd = latitude_dd_start, 
+    longitude_dd = longitude_dd_start, 
+    year, 
     Area_swept_ha, 
-    Pass, 
-    temperature_bottom = bottom_temperature_c, 
+    pass, 
+    bottom_temperature_c = bottom_temperature_c, 
     depth_m)
 
 save(noaa_afsc_catch, file = here::here("data","noaa_afsc_catch.rda"))
 
 # Make extrapolation grids -----------------------------------------------------
 
-extrap_grid <- function(pred_grid, srvy, srvy_out = NULL, noaa_afsc_catch, crs_proj = NULL) {
+extrap_grid <- function(pred_grid, srvy_in, srvy_out = NULL, noaa_afsc_catch, crs_proj = NULL) {
   
   crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
   
   if(is.null(srvy_out)) {
-    srvy_out <- srvy
+    srvy_out <- srvy_in
   }
   
   pred_grid <- pred_grid %>% 
-    dplyr::mutate(Pass = 1, 
+    dplyr::mutate(pass = 1, 
                   srvy = srvy_out)
   
-  if(!is.null(crs_proj)) {
+  if (!is.null(crs_proj)) {
     sp_extrap_raster <- sp::SpatialPoints(
-      coords = coordinates(as.matrix(pred_grid[,c("Longitude_dd", "Latitude_dd")])), 
+      coords = coordinates(as.matrix(pred_grid[,c("longitude_dd", "latitude_dd")])), 
       proj4string = CRS(crs_proj) ) %>% 
       sp::spTransform(CRSobj = crs_latlon)
   } else {
-  sp_extrap_raster <- SpatialPoints(
-    coords = coordinates(as.matrix(pred_grid[,c("Longitude_dd", "Latitude_dd")])), 
-    proj4string = CRS(crs_latlon) )    
+    sp_extrap_raster <- SpatialPoints(
+      coords = coordinates(as.matrix(pred_grid[,c("longitude_dd", "latitude_dd")])), 
+      proj4string = CRS(crs_latlon) )    
   }
   
   ## Add depth -------------------------------------------------------------------
   
   x <- noaa_afsc_catch %>%
-    dplyr::filter(Year > 2000 & srvy %in% c(srvy)) %>% # lets assume our ability to assess depth has improved, technologically since before 2000. Year negotiable if anyone has strong opinions
-    dplyr::select(Longitude_dd, Latitude_dd, depth_m) %>%
+    dplyr::filter(year > 2000 & 
+                    srvy %in% srvy_in) %>% # lets assume our ability to assess depth has improved, technologically since before 2000. year negotiable if anyone has strong opinions
+    dplyr::select(longitude_dd, latitude_dd, depth_m) %>%
     stats::na.omit()  %>% 
     sf::st_as_sf(x = ., 
-                 coords = c(x = "Longitude_dd", y = "Latitude_dd"), 
+                 coords = c(x = "longitude_dd", y = "latitude_dd"), 
                  crs = sf::st_crs(crs_latlon))
   
   idw_fit <- gstat::gstat(formula = depth_m ~ 1,
@@ -222,97 +220,94 @@ extrap_grid <- function(pred_grid, srvy, srvy_out = NULL, noaa_afsc_catch, crs_p
   
   pred_grid_depth <- stars::st_extract(
     x = depth_raster,
-    at = as.matrix(pred_grid[,c("Longitude_dd", "Latitude_dd")])) %>% 
+    at = as.matrix(pred_grid[,c("longitude_dd", "latitude_dd")])) %>% 
     dplyr::bind_cols(pred_grid) %>% 
-    dplyr::rename(Depth_m = var1.pred) %>% 
+    dplyr::rename(depth_m = var1.pred) %>% 
     dplyr::select(-var1.var) %>%
     stats::na.omit()
   
   save(pred_grid_depth, file = here::here("grids",paste0("noaa_afsc_",tolower(srvy_out),"_pred_grid_depth.rdata")))
-  save(depth_raster, file = here::here("grids","depth_rasters",paste0("noaa_afsc_", tolower(srvy_out),"_depth_raster.rdata")))
+  save(depth_raster, file = here::here("grids","grid_depth",paste0("noaa_afsc_", tolower(srvy_out),"_depth_raster.rdata")))
   
   return(list("pred_grid_depth" = pred_grid_depth, 
               "depth_raster" = depth_raster))
 }
-
-# EBS Extrapolation grid -------------------------------------------------------
-
-load(here::here("grids", "orig", "eastern_bering_sea_grid.rda"), verbose = TRUE)
-
-pred_grid <- data.frame(eastern_bering_sea_grid) %>% 
-  dplyr::rename(Longitude_dd = Lon, 
-                Latitude_dd = Lat, 
-                area_km = Area_in_survey_km2) 
-
-a <- extrap_grid(pred_grid = pred_grid, srvy = "EBS", noaa_afsc_catch = noaa_afsc_catch)
-
-## Add temperature -------------------------------------------------------------
-
-# ### Coldpool temperature data --------------------------------------------------
-# 
-# ### Data that varies over space and time (bottom temperature)
-# 
-# # Here, bottom temperature, and thereby the cold pool extent, have been show to drive the distribution of many species. This is especially true for walleye pollock. 
-# # For this we are going to lean on our in-house prepared validated and pre-prepared [{coldpool} R package](https://github.com/afsc-gap-products/coldpool) (S. Rohan, L. Barnett, and N. Charriere). This data interpolates over the whole area of the survey so there are no missing data. 
-# 
-# noaa_afsc_ebs_pred_grid_temperature <-
-#   dplyr::bind_cols(terra::unwrap(coldpool::ebs_bottom_temperature) %>%
-#   terra::project(crs_latlon) %>%
-#   terra::extract(st_as_sf(sp_extrap_raster)))
-# 
-# names(noaa_afsc_ebs_pred_grid_temperature) <- paste0("GEAR_TEMPERATURE_", names(noaa_afsc_ebs_pred_grid_temperature))
-# 
-# noaa_afsc_ebs_pred_grid_depth_temperature <-
-#   dplyr::bind_cols(noaa_afsc_ebs_pred_grid_depth,
-#                    noaa_afsc_ebs_pred_grid_temperature)
-# 
-# save(noaa_afsc_ebs_pred_grid_depth_temperature, file = paste0("data/noaa_afsc_ebs_pred_grid_depth_temperature.rdata"))
-
 
 # GOA Extrapolation grid -------------------------------------------------------
 
 pred_grid <- read.csv(here::here("grids", "orig", "goa_2025_interpolation_grid.csv"))
 
 pred_grid <- pred_grid %>% 
-  dplyr::rename(Longitude_dd = lon, 
-                Latitude_dd = lat)
+  dplyr::rename(longitude_dd = lon, 
+                latitude_dd = lat)
 
-a <- extrap_grid(pred_grid = pred_grid, srvy = "GOA", noaa_afsc_catch = noaa_afsc_catch)
+a <- extrap_grid(pred_grid = pred_grid, 
+                 srvy_in = "GOA", 
+                 noaa_afsc_catch = noaa_afsc_catch)
 
 # AI Extrapolation grid -------------------------------------------------------
 
 load(here::here("grids", "orig", "aleutian_islands_grid.rda"), verbose = TRUE)
 
 pred_grid <- data.frame(aleutian_islands_grid) %>% 
-  dplyr::rename(Longitude_dd = Lon, 
-                Latitude_dd = Lat, 
-                area_km = Area_km2)
+  dplyr::rename(longitude_dd = Lon, 
+                latitude_dd = Lat, 
+                area_km2 = Area_km2)
 
-a <- extrap_grid(pred_grid = pred_grid, srvy = "AI", noaa_afsc_catch = noaa_afsc_catch)
+a <- extrap_grid(pred_grid = pred_grid, 
+                 srvy_in = "AI", 
+                 noaa_afsc_catch = noaa_afsc_catch)
 
+# EBS Extrapolation grid -------------------------------------------------------
+
+load(here::here("grids", "orig", "eastern_bering_sea_grid.rda"), verbose = TRUE)
+
+pred_grid_ebs <- pred_grid <- data.frame(eastern_bering_sea_grid) %>% 
+  dplyr::rename(longitude_dd = Lon, 
+                latitude_dd = Lat, 
+                stratum = Stratum,
+                area_km2 = Area_in_survey_km2) 
+
+a <- extrap_grid(pred_grid = pred_grid, 
+                 srvy_in = "EBS", 
+                 noaa_afsc_catch = noaa_afsc_catch)
 # NBS Extrapolation grid -------------------------------------------------------
 
 load(here::here("grids", "orig", "northern_bering_sea_grid.rda"), verbose = TRUE)
 
-pred_grid <- data.frame(northern_bering_sea_grid) %>% 
-  dplyr::rename(Longitude_dd = Lon, 
-                Latitude_dd = Lat, 
+pred_grid_nbs <- pred_grid <- data.frame(northern_bering_sea_grid) %>% 
+  dplyr::rename(longitude_dd = Lon, 
+                latitude_dd = Lat, 
+                stratum = Stratum,
                 area_km2 = Area_in_survey_km2) 
 
-a <- extrap_grid(pred_grid = pred_grid, srvy = "NBS", noaa_afsc_catch = noaa_afsc_catch)
+a <- extrap_grid(pred_grid = pred_grid, 
+                 srvy_in = "NBS", 
+                 noaa_afsc_catch = noaa_afsc_catch)
 
 # BS (NBS+EBS) Extrapolation grid -------------------------------------------------------
 
-pred_grid <- read.csv(here::here("grids", "orig", "bering_coarse_grid.csv")) %>% 
-  dplyr::mutate(Longitude_dd = ((X/10)-360), 
-                Latitude_dd = Y/100) %>% 
-  dplyr::select(area_km2, Longitude_dd, Latitude_dd)
+# pred_grid <- dplyr::bind_rows(
+#   pred_grid_nbs %>% dplyr::mutate(srvy_in  = "NBS"), 
+#   pred_grid_ebs %>% dplyr::mutate(srvy_in  = "EBS"))
+
+shp <- akgfmaps::get_base_layers(select.region = "bs.all", set.crs = crs_latlon)
+bs_all <- shp$survey.area
+names(bs_all) <- tolower(names(bs_all))
+sf::st_write(bs_all, here::here("grids", "orig", "bs_all.shp"))
+
+pred_grid <- FishStatsUtils::convert_shapefile(
+  file_path = here::here("grids", "orig", "bs_all.shp"), 
+  quiet = FALSE)
+pred_grid <- pred_grid$extrapolation_grid %>% 
+  dplyr::rename(longitude_dd = Lon, 
+                latitude_dd = Lat, 
+                area_km2 = Area_km2) 
 
 a <- extrap_grid(pred_grid = pred_grid, 
-            srvy = c("NBS", "EBS"), 
-            srvy_out = "BS", 
-            crs_proj = "EPSG:3338", 
-            noaa_afsc_catch = noaa_afsc_catch)
+                 srvy_in = c("NBS", "EBS"), 
+                 srvy_out = "BS", 
+                 noaa_afsc_catch = noaa_afsc_catch)
 
 # Load Design-based biomass data for comparison --------------------------------
 
@@ -330,7 +325,7 @@ noaa_afsc_biomass_estimates <- RODBC::sqlQuery(
 bb.SURVEY_DEFINITION_ID,
 bb.AREA_ID,
 bb.SPECIES_CODE,
-bb.YEAR,
+bb.year,
 bb.BIOMASS_MT,
 bb.BIOMASS_VAR,
 bb.POPULATION_COUNT,
@@ -343,7 +338,7 @@ AND bb.SPECIES_CODE IN (", paste0(test_species$species_code, collapse = ","),")
   #   -- WHERE bb.SURVEY_DEFINITION_ID = 98 
   # -- AND bb.SPECIES_CODE IN (21740, 10210, 69322) 
   # -- AND AREA_ID = 99901
-  # -- AND bb.YEAR >= 1982
+  # -- AND bb.year >= 1982
   janitor::clean_names()
 
 # Save table to local directory

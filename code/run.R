@@ -12,8 +12,7 @@ options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
 
 # Set directories --------------------------------------------------------------
 library(here)
-# wd <- "C:/Users/Derek.Bolser/Documents/Resample_survey_data/" #for local testing
-# wd <- "Z:/Projects/Resample-survey-data/"
+
 wd <- paste0(here::here(),"/")
 dir_out <- paste0(wd, "/output/")
 dir.create(dir_out, showWarnings = FALSE)
@@ -22,6 +21,7 @@ dir.create(dir_out, showWarnings = FALSE)
 
 source(paste0(wd, "code/functions.R"))
 source(paste0(wd, "code/functions_sdms.R"))
+crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
 
 # Install Libraries ------------------------------------------------------------
 
@@ -70,6 +70,9 @@ PKG <- c(
   
   # sampling
   "sampling",
+  
+  "coldpool",
+  "akgfmaps",
   
   # modeling
   "arrow", 
@@ -137,20 +140,27 @@ test_species <- data.frame(
 
 catch_ca <- read.csv(paste0(wd,"data/nwfsc_bt_fmp_spp_updated.csv")) #pulled data again to get 2024
 catch <- catch_ca %>% 
-  dplyr::select(Trawl_id, Common_name, Longitude_dd, Latitude_dd, Year, Pass, total_catch_wt_kg, Depth_m) %>% 
+  dplyr::select(trawlid = Trawl_id, 
+                common_name = Common_name, 
+                longitude_dd = Longitude_dd, 
+                latitude_dd = Latitude_dd, 
+                year = Year, 
+                pass = Pass, 
+                total_catch_wt_kg, 
+                depth_m = Depth_m) %>% 
   dplyr::mutate(srvy = "CA")
 
 ### Load grid data -------------------------------------------------------------
 
-load(paste0(wd,"grids/noaa_nwfsc_ca_pred_grid_depth.rda"))
+load(paste0(wd,"grids/noaa_nwfsc_ca_pred_grid_depth.rda"), verbose = TRUE)
 pred_grid <- california_current_grid %>% # rename x and y cols
-  dplyr::select(Longitude_dd = longitude, 
-                Latitude_dd = latitude, 
-                Pass = pass_scaled, 
-                Depth_m = depth, 
+  dplyr::select(longitude_dd = longitude, 
+                latitude_dd = latitude, 
+                pass = pass_scaled, 
+                depth_m = depth, 
                 area_km2 = area_km2_WCGBTS) %>% 
   dplyr::mutate(srvy = "CA")
-grid_yrs <- replicate_df(pred_grid, "Year", unique(catch$Year))
+grid_yrs <- replicate_df(pred_grid, "year", unique(catch$year))
 
 ### Variables ------------------------------------------------------------------
 
@@ -175,12 +185,93 @@ sink()
 
 plot_results(srvy = srvy, dir_out = dir_out) 
 
+
 ## Eastern Bering Sea ----------------------------------------------------------
 
 ### Define study species -------------------------------------------------------
 
 test_species <- data.frame(
   srvy = "EBS",
+  common_name = c("walleye pollock", "snow crab", "Pacific cod", 
+                  "red king crab", "blue king crab", 
+                  "yellowfin sole", "Pacific halibut", 
+                  "Alaska plaice", "flathead sole", "northern rock sole", "arrowtooth flounder"), 
+  species_code = as.character(c(21740, 68580, 21720, 
+                                69322, 69323, 
+                                10210, 10120, 
+                                10285, 10130, 10261, 10110)), 
+  filter_lat_lt = NA, 
+  filter_lat_gt = NA, 
+  filter_depth = NA, 
+  model_fn = "species_sdm_fn_ak_temperature" # name of funcion for sdm. Will build in specificity for this later
+) %>% 
+  dplyr::mutate( 
+    file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
+
+### Load survey data -----------------------------------------------------------
+
+# source(paste0(wd, "code/data_dl_ak.r"))
+
+load(file = paste0(wd, "/data/noaa_afsc_catch.rda"))
+catch <- noaa_afsc_catch %>% dplyr::filter(srvy == "EBS")
+
+### Load grid data -------------------------------------------------------------
+
+load(paste0(wd, "grids/noaa_afsc_ebs_pred_grid_depth.rdata"), verbose = TRUE)
+
+#### Add temperature: Coldpool temperature data
+# Data that varies over space and time (bottom temperature)
+# Here, bottom temperature, and thereby the cold pool extent, have been show to drive the distribution of many species. This is especially true for walleye pollock.
+# For this we are going to lean on our in-house prepared validated and pre-prepared [{coldpool} R package](https://github.com/afsc-gap-products/coldpool) (S. Rohan, L. Barnett, and N. Charriere). This data interpolates over the whole area of the survey so there are no missing data.
+grid_yrs <-
+  dplyr::bind_cols(
+    pred_grid_depth[,c("longitude_dd", "latitude_dd", "depth_m")], 
+    terra::unwrap(coldpool::ebs_bottom_temperature) %>%
+      terra::project(crs_latlon) %>%
+      terra::extract(pred_grid_depth[,c("longitude_dd", "latitude_dd")])) 
+grid_yrs <- grid_yrs %>% 
+  tidyr::pivot_longer(
+    names_to = "year",
+    values_to = "bottom_temperature_c", 
+    cols = names(grid_yrs_temperature)[4:ncol(grid_yrs_temperature)])
+save(grid_yrs_depth_temperature, file = paste0("grids/grid_yr_temperature/noaa_afsc_ebs_pred_grid_depth_temperature.rdata"))
+
+# # test you extracted correctkt
+# ggplot(data = grid_yrs %>% 
+#          dplyr::filter(year %in% c(2022:2024)), 
+#        mapping = aes(x = longitude_dd, y = latitude_dd, color = bottom_temperature_c)) +
+#   geom_point() +
+#   facet_wrap(facets = "year")
+
+### Variables ------------------------------------------------------------------
+
+srvy <- "EBS"
+seq_from = 0.2
+seq_to = 1.0
+seq_by = 0.2 
+tot_dataframes = 13
+replicate_num <- 3
+
+### Run ------------------------------------------------------------------------
+
+sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append = FALSE, split = TRUE)  # for screen and log
+map(
+  1:nrow(test_species), 
+  ~ clean_and_resample(test_species[.x,], 
+                       catch, seq_from, seq_to, seq_by, 
+                       tot_dataframes, replicate_num, grid_yrs, dir_out))
+sink()
+
+### Plot indices ---------------------------------------------------------------
+
+plot_results(srvy = srvy, dir_out = dir_out) 
+
+## Northern Bering Sea ----------------------------------------------------------
+
+### Define study species -------------------------------------------------------
+
+test_species <- data.frame(
+  srvy = "NBS",
   common_name = c("walleye pollock", "snow crab", "Pacific cod", 
                   "red king crab", "blue king crab", 
                   "yellowfin sole", "Pacific halibut", 
@@ -202,16 +293,16 @@ test_species <- data.frame(
 # source(paste0(wd, "code/data_dl_ak.r"))
 
 load(file = paste0(wd, "/data/noaa_afsc_catch.rda"))
-catch <- noaa_afsc_catch %>% dplyr::filter(srvy == "EBS")
+catch <- noaa_afsc_catch %>% dplyr::filter(srvy == "NBS")
 
 ### Load grid data -------------------------------------------------------------
 
-load(paste0(wd, "grids/noaa_afsc_ebs_pred_grid_depth.rdata"))
-grid_yrs <- replicate_df(pred_grid_depth, "Year", unique(catch$Year))
+load(paste0(wd, "grids/noaa_afsc_nbs_pred_grid_depth.rdata"), verbose = TRUE)
+grid_yrs <- replicate_df(pred_grid_depth, "year", unique(catch$year))
 
 ### Variables ------------------------------------------------------------------
 
-srvy <- "EBS"
+srvy <- "NBS"
 seq_from = 0.2
 seq_to = 1.0
 seq_by = 0.2 
@@ -220,7 +311,7 @@ replicate_num <- 3
 
 ### Run ------------------------------------------------------------------------
 
-sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
+sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append = FALSE, split = TRUE)  # for screen and log
 map(
   1:nrow(test_species), 
   ~ clean_and_resample(test_species[.x,], 
@@ -228,11 +319,11 @@ map(
                        tot_dataframes, replicate_num, grid_yrs, dir_out))
 sink()
 
-### Plot indices --------------------------------------------------------------
+### Plot indices ---------------------------------------------------------------
 
 plot_results(srvy = srvy, dir_out = dir_out) 
 
-## Eastern + Northern Bering Sea ----------------------------------------------------------
+## Eastern + Northern Bering Sea -----------------------------------------------
 
 ### Define study species -------------------------------------------------------
 
@@ -264,7 +355,29 @@ catch <- noaa_afsc_catch %>% dplyr::filter(srvy %in% c("EBS", "NBS"))
 ### Load grid data -------------------------------------------------------------
 
 load(paste0(wd, "grids/noaa_afsc_bs_pred_grid_depth.rdata"), verbose = TRUE)
-grid_yrs <- replicate_df(pred_grid_depth, "Year", unique(catch$Year))
+#### Add temperature: Coldpool temperature data
+# Data that varies over space and time (bottom temperature)
+# Here, bottom temperature, and thereby the cold pool extent, have been show to drive the distribution of many species. This is especially true for walleye pollock.
+# For this we are going to lean on our in-house prepared validated and pre-prepared [{coldpool} R package](https://github.com/afsc-gap-products/coldpool) (S. Rohan, L. Barnett, and N. Charriere). This data interpolates over the whole area of the survey so there are no missing data.
+grid_yrs <-
+  dplyr::bind_cols(
+    pred_grid_depth[,c("longitude_dd", "latitude_dd", "depth_m")], 
+    terra::unwrap(coldpool::nbs_ebs_bottom_temperature) %>%
+      terra::project(crs_latlon) %>%
+      terra::extract(pred_grid_depth[,c("longitude_dd", "latitude_dd")])) 
+grid_yrs_depth_temperature <- grid_yrs <- grid_yrs %>% 
+  tidyr::pivot_longer(
+    names_to = "year",
+    values_to = "bottom_temperature_c", 
+    cols = names(grid_yrs_temperature)[4:ncol(grid_yrs_temperature)])
+save(grid_yrs_depth_temperature, file = paste0("data/grid_yr_temperature/noaa_afsc_bs_pred_grid_depth_temperature.rdata"))
+
+# # test you extracted correct
+# ggplot(data = grid_yrs %>% 
+#          dplyr::filter(year %in% c(2022:2024)), 
+#        mapping = aes(x = longitude_dd, y = latitude_dd, color = bottom_temperature_c)) +
+#   geom_point() +
+#   facet_wrap(facets = "year")
 
 ### Variables ------------------------------------------------------------------
 
@@ -318,8 +431,8 @@ catch <- noaa_afsc_catch %>% dplyr::filter(srvy == "GOA")
 
 ### Load grid data -------------------------------------------------------------
 
-load(paste0(wd, "grids/noaa_afsc_goa_pred_grid_depth.rdata"))
-grid_yrs <- replicate_df(pred_grid_depth, "Year", unique(catch$Year))
+load(paste0(wd, "grids/noaa_afsc_goa_pred_grid_depth.rdata"), verbose = TRUE)
+grid_yrs <- replicate_df(pred_grid_depth, "year", unique(catch$year))
 
 ### Variables ------------------------------------------------------------------
 
@@ -373,8 +486,8 @@ catch <- noaa_afsc_catch %>% dplyr::filter(srvy == "AI")
 
 ### Load grid data -------------------------------------------------------------
 
-load(paste0(wd, "grids/noaa_afsc_ai_pred_grid_depth.rdata"))
-grid_yrs <- replicate_df(pred_grid_depth, "Year", unique(catch$Year))
+load(paste0(wd, "grids/noaa_afsc_ai_pred_grid_depth.rdata"), verbose = TRUE)
+grid_yrs <- replicate_df(pred_grid_depth, "year", unique(catch$year))
 
 ### Variables ------------------------------------------------------------------
 
@@ -433,8 +546,8 @@ catch <- noaa_nefsc_catch %>% dplyr::filter(srvy == "SPRING")
 
 ### Load grid data -------------------------------------------------------------
 
-load(paste0(wd, "grids/noaa_nefsc_nwa_pred_grid_depth.rdata"))
-grid_yrs <- replicate_df(pred_grid_depth, "Year", unique(catch$Year))
+load(paste0(wd, "grids/noaa_nefsc_nwa_pred_grid_depth.rdata"), verbose = TRUE)
+grid_yrs <- replicate_df(pred_grid_depth, "year", unique(catch$year))
 
 ### Variables ------------------------------------------------------------------
 
@@ -494,8 +607,8 @@ catch <- noaa_nefsc_catch %>% dplyr::filter(srvy == "FALL")
 
 ### Load grid data -------------------------------------------------------------
 
-load(paste0(wd, "grids/noaa_nefsc_nwa_pred_grid_depth.rdata"))
-grid_yrs <- replicate_df(pred_grid_depth, "Year", unique(catch$Year))
+load(paste0(wd, "grids/noaa_nefsc_nwa_pred_grid_depth.rdata"), verbose = TRUE)
+grid_yrs <- replicate_df(pred_grid_depth, "year", unique(catch$year))
 
 ### Variables ------------------------------------------------------------------
 

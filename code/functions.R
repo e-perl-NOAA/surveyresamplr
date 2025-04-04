@@ -42,7 +42,7 @@ pkg_install <- function(p){
 #' @param df tows data frame
 #' @param proportions proportions developed using: props <- as.data.frame(seq
 #' (0.1,1.0, by = 0.1)) replicated by the length of the tows dataframe. The name
-#' of the props is "Trawl_id".
+#' of the props is "trawlid".
 #' @param replicate_num going to be 10 for NWFSC and 3 for AK
 #'
 include_or_exclude <- function(df, proportions, replicate_num) {
@@ -96,25 +96,25 @@ cleanup_by_species <- function(catch,
   
   df <- catch %>% 
     dplyr::filter(
-      Common_name == species_row$common_name)
+      common_name == species_row$common_name)
   
   if (!is.na(species_row$filter_lat_lt) | is.null(species_row$filter_lat_lt)) {
-    df <- df %>% dplyr::filter(Latitude_dd < species_row$filter_lat_lt)
+    df <- df %>% dplyr::filter(latitude_dd < species_row$filter_lat_lt)
   }
   if (!is.na(species_row$filter_lat_gt) | is.null(species_row$filter_lat_gt)) {
-    df <- df %>% dplyr::filter(Latitude_dd > species_row$filter_lat_gt)
+    df <- df %>% dplyr::filter(latitude_dd > species_row$filter_lat_gt)
   }
   if (!is.na(species_row$filter_depth) | is.null(species_row$filter_depth)) {
-    df <- df %>% dplyr::filter(Depth_m < species_row$filter_depth)
+    df <- df %>% dplyr::filter(depth_m < species_row$filter_depth)
   }
   
-  catch_split <- split(df, df$Year)
+  catch_split <- split(df, df$year)
   
   tows <- lapply(catch_split, tow_fn)
   
   # Assign random 1s and 0s based on the specified proportions to a list of dataframes
   props <- as.data.frame(seq(from = seq_from, to = seq_to, by = seq_by))
-  names(props) <- "Trawl_id"
+  names(props) <- "trawlid"
   
   # match the structure of the catch data
   props <- rep(props, length(tows))
@@ -136,7 +136,7 @@ cleanup_by_species <- function(catch,
   
   tows_assigned_resampled <- unlist(tows_assigned_resampled, recursive = F)
   
-  alldata_resampled <- join_dfs(tows_assigned_resampled, df, "Trawl_id")
+  alldata_resampled <- join_dfs(tows_assigned_resampled, df, "trawlid")
   
   names(alldata_resampled) <- substr(names(alldata_resampled), 6, 50) # it would be good to replace 50 with a logical indicating the end
   
@@ -193,7 +193,7 @@ resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
   
   message("...Starting parallel SDM processing")
   
-  assign(value = get(species_row$model_fn), x = "model_function")
+  assign(value = get(species_row$model_fn), x = "model0")
   
   # Run SDMs in parallel
   future_map(seq_along(spp_files), function(i) {
@@ -202,8 +202,14 @@ resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
     # Load only the required dataframe
     spp_df <- read_parquet(paste0(dir_spp, paste0("df_", i, ".parquet")))
     # Run species SDM function
-    fit0 <- model_function(x = spp_df, y = spp_files[[i]], z = grid_yrs, dir_spp = dir_spp)
-    # fit <- readRDS(file = paste0(dir_spp, "fit_", spp_files[[i]], ".rds")) # for testing
+    fit0 <- species_sdm_wrapper(x = spp_df, 
+                           y = spp_files[[i]], 
+                           z = grid_yrs, 
+                           dir_spp = dir_spp, 
+                           model0 = model0)
+    fit <- readRDS(file = paste0(dir_spp, "fit_", spp_files[[i]], ".rds")) # for testing
+    index <- readRDS(file = paste0(dir_spp, "index_", spp_files[[i]], ".rds")) # for testing
+    fit0 <- list()
     # Ensure extracted objects are dataframes, Store results in lists
     # fit 
     if (!file.exists(paste0(dir_spp, "fit_df.csv"))) {fit_df <- c()} else {fit_df <- read.csv(file = paste0(dir_spp, "fit_df.csv"))}
@@ -212,8 +218,8 @@ resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
         dplyr::bind_cols(
           species_row, 
           data.frame(
-            effort = spp_files[[i]],
-            data.frame(fit_df_fn(fit0$fit)))))
+            effort = as.character(spp_files[[i]]),
+            data.frame(fit_df_fn(fit0$fit))) ))
     fwrite(fit_df, file = paste0(dir_spp, "fit_df.csv"))
     # fit pars
     if (!file.exists(paste0(dir_spp, "fit_pars.csv"))) {fit_pars <- c()} else {fit_pars <- read.csv(file = paste0(dir_spp, "fit_pars.csv"))}
@@ -426,12 +432,12 @@ plot_results <- function(srvy, dir_out) {
   p1 <- ggplot2::ggplot(
     data = index, 
                mapping = aes(
-                 x = Year, 
+                 x = year, 
                  y = est, 
                  color = effort)) +
     ggplot2::geom_line() +
     ggplot2::facet_wrap(~ common_name) +
-    ggplot2::labs(x = "Years",
+    ggplot2::labs(x = "years",
          y = "Biomass estimate")  + 
     ggplot2::scale_color_viridis_d(
       name = "Effort", 
@@ -463,10 +469,10 @@ plot_results <- function(srvy, dir_out) {
 #' @param x catch_split data frame
 #'
 tow_fn <- function(x) {
-  tows <- as.data.frame(x$Trawl_id)
+  tows <- as.data.frame(x$trawlid)
   tows <- unique(tows)
   tows <- as.data.frame(tows[!is.na(tows)])
-  names(tows) <- "Trawl_id"
+  names(tows) <- "trawlid"
   return(tows)
 }
 
