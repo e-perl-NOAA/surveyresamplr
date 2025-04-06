@@ -90,7 +90,7 @@ species_sdm_fn <- function(x, mesh) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-species_sdm_fn_ak <- function(x, y, z, dir_spp, n_knots = 250) {
+species_sdm_fn_ak <- function(x, mesh) {
   fit <- sdmTMB::sdmTMB(
     total_catch_wt_kg ~ 0 + factor(year),
     data = x,
@@ -118,7 +118,7 @@ species_sdm_fn_ak <- function(x, y, z, dir_spp, n_knots = 250) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-species_sdm_fn_ak_temperature <- function(x, y, z, dir_spp, n_knots = 250) {
+species_sdm_fn_ak_temperature <- function(x, mesh) {
   fit <- sdmTMB::sdmTMB(
     total_catch_wt_kg ~ 0 + factor(year) + bottom_temperature_c,
     data = x,
@@ -147,7 +147,7 @@ species_sdm_fn_ak_temperature <- function(x, y, z, dir_spp, n_knots = 250) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-species_sdm_fn_nwa <- function(x, y, z, dir_spp) {
+species_sdm_fn_nwa <- function(x, mesh) {
   fit <- sdmTMB::sdmTMB(
     total_catch_wt_kg ~ 0 + factor(year),
     data = x,
@@ -173,7 +173,7 @@ species_sdm_fn_nwa <- function(x, y, z, dir_spp) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-species_sdm_lognormal_fn <- function(x, y, z, dir_spp) {
+species_sdm_lognormal_fn <- function(x, mesh) {
   fit <- sdmTMB::sdmTMB(
     total_catch_wt_kg ~ 0 + factor(year) + pass,
     data = x,
@@ -200,7 +200,7 @@ species_sdm_lognormal_fn <- function(x, y, z, dir_spp) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-canary_sdm_fn <- function(x, y, z, dir_spp) {
+canary_sdm_fn <- function(x, mesh) {
   fit <- sdmTMB::sdmTMB(
     total_catch_wt_kg ~ 0 + factor(year) + pass,
     data = x,
@@ -227,7 +227,7 @@ canary_sdm_fn <- function(x, y, z, dir_spp) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-darkblotched_sdm_fn <- function(x, y, z, dir_spp) {
+darkblotched_sdm_fn <- function(x, mesh) {
   fit <- sdmTMB::sdmTMB(
     total_catch_wt_kg ~ 0 + factor(year) + pass,
     data = x,
@@ -254,7 +254,7 @@ darkblotched_sdm_fn <- function(x, y, z, dir_spp) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-shortspine_sdm_fn <- function(x, y, z, dir_spp) {
+shortspine_sdm_fn <- function(x, mesh) {
   fit <- sdmTMB::sdmTMB(
     total_catch_wt_kg ~ 0 + factor(year) + pass + depth_m + (depth_m^2),
     data = x,
@@ -282,7 +282,7 @@ shortspine_sdm_fn <- function(x, y, z, dir_spp) {
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-widow_sdm_fn <- function(x, y, z, dir_spp) {
+widow_sdm_fn <- function(x, mesh) {
   fit <- sdmTMB::sdmTMB(
     total_catch_wt_kg ~ 0 + factor(year) + pass, # fyear and pass_scaled were specified in the configs doc.
     data = x,

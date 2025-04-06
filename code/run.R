@@ -340,7 +340,7 @@ test_species <- data.frame(
   filter_lat_lt = NA, 
   filter_lat_gt = NA, 
   filter_depth = NA, 
-  model_fn = "species_sdm_fn" # name of funcion for sdm. Will build in specificity for this later
+  model_fn = "species_sdm_fn_ak_temperature" # name of funcion for sdm. Will build in specificity for this later
 ) %>% 
   dplyr::mutate( 
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
@@ -359,18 +359,26 @@ load(paste0(wd, "grids/noaa_afsc_bs_pred_grid_depth.rdata"), verbose = TRUE)
 # Data that varies over space and time (bottom temperature)
 # Here, bottom temperature, and thereby the cold pool extent, have been show to drive the distribution of many species. This is especially true for walleye pollock.
 # For this we are going to lean on our in-house prepared validated and pre-prepared [{coldpool} R package](https://github.com/afsc-gap-products/coldpool) (S. Rohan, L. Barnett, and N. Charriere). This data interpolates over the whole area of the survey so there are no missing data.
-grid_yrs <-
+ebs_only <- setdiff(names( terra::unwrap(coldpool::ebs_bottom_temperature)), names( terra::unwrap(coldpool::nbs_ebs_bottom_temperature)))
+grid_yrs_temperature <- dplyr::full_join(
+  dplyr::bind_cols(
+    pred_grid_depth[,c("longitude_dd", "latitude_dd", "depth_m")], 
+    terra::unwrap(coldpool::ebs_bottom_temperature) %>% #TOLEDO
+      subset(ebs_only) %>%
+      terra::project(crs_latlon) %>%
+      terra::extract(pred_grid_depth[,c("longitude_dd", "latitude_dd")])) , 
   dplyr::bind_cols(
     pred_grid_depth[,c("longitude_dd", "latitude_dd", "depth_m")], 
     terra::unwrap(coldpool::nbs_ebs_bottom_temperature) %>%
       terra::project(crs_latlon) %>%
-      terra::extract(pred_grid_depth[,c("longitude_dd", "latitude_dd")])) 
+      terra::extract(pred_grid_depth[,c("longitude_dd", "latitude_dd")])) )
+
 grid_yrs_depth_temperature <- grid_yrs <- grid_yrs %>% 
   tidyr::pivot_longer(
     names_to = "year",
     values_to = "bottom_temperature_c", 
     cols = names(grid_yrs_temperature)[4:ncol(grid_yrs_temperature)])
-save(grid_yrs_depth_temperature, file = paste0("data/grid_yr_temperature/noaa_afsc_bs_pred_grid_depth_temperature.rdata"))
+save(grid_yrs_depth_temperature, file = paste0("grids/grid_yr_temperature/noaa_afsc_bs_pred_grid_depth_temperature.rdata"))
 
 # # test you extracted correct
 # ggplot(data = grid_yrs %>% 

@@ -202,14 +202,15 @@ resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
     # Load only the required dataframe
     spp_df <- read_parquet(paste0(dir_spp, paste0("df_", i, ".parquet")))
     # Run species SDM function
-    fit0 <- species_sdm_wrapper(x = spp_df, 
+    fit0 <- species_sdm_wrapper(
+      x = spp_df, 
                            y = spp_files[[i]], 
                            z = grid_yrs, 
                            dir_spp = dir_spp, 
                            model0 = model0)
-    fit <- readRDS(file = paste0(dir_spp, "fit_", spp_files[[i]], ".rds")) # for testing
-    index <- readRDS(file = paste0(dir_spp, "index_", spp_files[[i]], ".rds")) # for testing
-    fit0 <- list()
+    # fit <- readRDS(file = paste0(dir_spp, "fit_", spp_files[[i]], ".rds")) # for testing
+    # index <- readRDS(file = paste0(dir_spp, "index_", spp_files[[i]], ".rds")) # for testing
+    # fit0 <- list("fit" = fit, "index" = index)
     # Ensure extracted objects are dataframes, Store results in lists
     # fit 
     if (!file.exists(paste0(dir_spp, "fit_df.csv"))) {fit_df <- c()} else {fit_df <- read.csv(file = paste0(dir_spp, "fit_df.csv"))}
