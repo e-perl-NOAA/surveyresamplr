@@ -362,7 +362,7 @@ load(paste0(wd, "grids/noaa_afsc_bs_pred_grid_depth.rdata"), verbose = TRUE)
 ebs_only <- setdiff(names( terra::unwrap(coldpool::ebs_bottom_temperature)), names( terra::unwrap(coldpool::nbs_ebs_bottom_temperature)))
 grid_yrs_temperature <- dplyr::full_join(
   dplyr::bind_cols(
-    pred_grid_depth[,c("longitude_dd", "latitude_dd", "depth_m")], 
+    pred_grid_depth[,c("longitude_dd", "latitude_dd", "depth_m", "area_km2")], 
     terra::unwrap(coldpool::ebs_bottom_temperature) %>% #TOLEDO
       subset(ebs_only) %>%
       terra::project(crs_latlon) %>%
@@ -373,11 +373,12 @@ grid_yrs_temperature <- dplyr::full_join(
       terra::project(crs_latlon) %>%
       terra::extract(pred_grid_depth[,c("longitude_dd", "latitude_dd")])) )
 
-grid_yrs_depth_temperature <- grid_yrs <- grid_yrs %>% 
+grid_yrs_depth_temperature <- grid_yrs <- grid_yrs_temperature %>% 
   tidyr::pivot_longer(
     names_to = "year",
     values_to = "bottom_temperature_c", 
-    cols = names(grid_yrs_temperature)[4:ncol(grid_yrs_temperature)])
+    cols = names(grid_yrs_temperature)[6:ncol(grid_yrs_temperature)]) %>% 
+  dplyr::mutate(year = as.numeric(year))
 save(grid_yrs_depth_temperature, file = paste0("grids/grid_yr_temperature/noaa_afsc_bs_pred_grid_depth_temperature.rdata"))
 
 # # test you extracted correct

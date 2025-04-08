@@ -152,6 +152,54 @@ cleanup_by_species <- function(catch,
 }
 
 
+#' Species distribution model function
+#'
+#' Function to create a mesh, fit the sdmTMB model, and get the index.
+#' Exports fit.rds and index.rds files to the designated species folder.
+#' Used for arrowtooth flounder, bocaccio, dover sole, lingcod north, lingcod
+#' south, longnose skate, pacific ocean perch (pop), pacific spiny dogfish, rex
+#' sole, yellowtail.
+#'
+#' @param x speciesname_df[[i]] which is a data frame from a list of data frames
+#' created from the cleanup_by_species() function and any further post-processing
+#' of depth filters (see the smaller_function.R file for those).
+#' @param y speciesname_files[[i]] which is an item in a list created from
+#' names(speciesname_df)
+#' @import sdmTMB
+#'
+species_sdm_wrapper <- function(x, y, z, dir_spp, model0, n_knots = 500) {
+  # make mesh
+  mesh <- sdmTMB::make_mesh(x, xy_cols = c("longitude_dd", "latitude_dd"), n_knots = n_knots)
+  
+  # fit model
+  fit <- model0(x, mesh)
+  # fit <- sdmTMB::sdmTMB(
+  #   total_catch_wt_kg ~ 0 + factor(year) + pass,
+  #   data = x,
+  #   mesh = mesh,
+  #   family = delta_gamma(),
+  #   time = "year",
+  #   anisotropy = TRUE,
+  #   spatiotemporal = as.list(c("iid", "iid"))
+  # )
+  
+  # get the index
+  predictions <- predict(fit, newdata = z, return_tmb_object = TRUE) # 
+  index <- sdmTMB::get_index(predictions, area = z$area_km2, bias_correct = TRUE)
+  
+  # save file
+  out <- list("fit" = fit, 
+              "predictions" = predictions, 
+              "index" = index)
+  saveRDS(out, 
+          paste0(dir_spp, "modelout_", y, ".rds"))
+  # saveRDS(index, paste0(dir_spp, "index_", y, ".rds"))
+  
+  return(out)
+}
+
+
+
 #' Resample Tests and Run SDM Processing
 #'
 #' This function resamples species data frames, runs species distribution models (SDMs) in parallel, and saves the results.
@@ -204,10 +252,10 @@ resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
     # Run species SDM function
     fit0 <- species_sdm_wrapper(
       x = spp_df, 
-                           y = spp_files[[i]], 
-                           z = grid_yrs, 
-                           dir_spp = dir_spp, 
-                           model0 = model0)
+      y = spp_files[[i]], 
+      z = grid_yrs, 
+      dir_spp = dir_spp, 
+      model0 = model0)
     # fit <- readRDS(file = paste0(dir_spp, "fit_", spp_files[[i]], ".rds")) # for testing
     # index <- readRDS(file = paste0(dir_spp, "index_", spp_files[[i]], ".rds")) # for testing
     # fit0 <- list("fit" = fit, "index" = index)
@@ -382,7 +430,7 @@ plot_results <- function(srvy, dir_out) {
     ggplot2::geom_boxplot() +
     ggplot2::facet_wrap(~ common_name) +
     ggplot2::labs(x = "Proprotion of effort",
-         y = "Log biomass estimate")  + 
+                  y = "Log biomass estimate")  + 
     ggplot2::scale_color_viridis_d(
       name = "Effort", 
       option = "D") +
@@ -401,7 +449,7 @@ plot_results <- function(srvy, dir_out) {
     ggplot2::geom_boxplot() +
     ggplot2::facet_wrap(~ common_name) +
     ggplot2::labs(x = "Proprotion of effort",
-         y = "Standard error of log biomass estimate")  + 
+                  y = "Standard error of log biomass estimate")  + 
     ggplot2::scale_color_viridis_d(
       name = "Effort", 
       option = "D") +
@@ -420,11 +468,11 @@ plot_results <- function(srvy, dir_out) {
     geom_boxplot() +
     ggplot2::facet_wrap(~ common_name) +
     ggplot2::labs(x = "Proprotion of effort",
-         y = "Biomass estimate")  + 
+                  y = "Biomass estimate")  + 
     ggplot2::scale_color_viridis_d(
       name = "Effort", 
       option = "D") +
-   theme_custom
+    theme_custom
   
   i <- i + 1; plot_list[[i]] <- p1
   names(plot_list)[i] <- 'index_boxplot_biomass.png'
@@ -432,14 +480,14 @@ plot_results <- function(srvy, dir_out) {
   # biomass estimates over time ---------------------------------------------------
   p1 <- ggplot2::ggplot(
     data = index, 
-               mapping = aes(
-                 x = year, 
-                 y = est, 
-                 color = effort)) +
+    mapping = aes(
+      x = year, 
+      y = est, 
+      color = effort)) +
     ggplot2::geom_line() +
     ggplot2::facet_wrap(~ common_name) +
     ggplot2::labs(x = "years",
-         y = "Biomass estimate")  + 
+                  y = "Biomass estimate")  + 
     ggplot2::scale_color_viridis_d(
       name = "Effort", 
       option = "D") +
