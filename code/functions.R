@@ -78,7 +78,7 @@ include_or_exclude <- function(df, proportions, replicate_num) {
 #' assignment to be resampled,
 #'
 #' @param catch full catch df
-#' @param species_row A data frame containing information about the test species.
+#' @param spp_info A data frame containing information about the test species.
 #' @param seq_from
 #' @param seq_to
 #' @param seq_by
@@ -87,7 +87,7 @@ include_or_exclude <- function(df, proportions, replicate_num) {
 #' @return List of resampled catch data frames
 #'
 cleanup_by_species <- function(catch, 
-                               species_row, 
+                               spp_info, 
                                seq_from = 0.1, 
                                seq_to = 1.0, 
                                seq_by = 0.1, 
@@ -96,16 +96,16 @@ cleanup_by_species <- function(catch,
   
   df <- catch %>% 
     dplyr::filter(
-      common_name == species_row$common_name)
+      common_name == spp_info$common_name)
   
-  if (!is.na(species_row$filter_lat_lt) | is.null(species_row$filter_lat_lt)) {
-    df <- df %>% dplyr::filter(latitude_dd < species_row$filter_lat_lt)
+  if (!is.na(spp_info$filter_lat_lt) | is.null(spp_info$filter_lat_lt)) {
+    df <- df %>% dplyr::filter(latitude_dd < spp_info$filter_lat_lt)
   }
-  if (!is.na(species_row$filter_lat_gt) | is.null(species_row$filter_lat_gt)) {
-    df <- df %>% dplyr::filter(latitude_dd > species_row$filter_lat_gt)
+  if (!is.na(spp_info$filter_lat_gt) | is.null(spp_info$filter_lat_gt)) {
+    df <- df %>% dplyr::filter(latitude_dd > spp_info$filter_lat_gt)
   }
-  if (!is.na(species_row$filter_depth) | is.null(species_row$filter_depth)) {
-    df <- df %>% dplyr::filter(depth_m < species_row$filter_depth)
+  if (!is.na(spp_info$filter_depth) | is.null(spp_info$filter_depth)) {
+    df <- df %>% dplyr::filter(depth_m < spp_info$filter_depth)
   }
   
   catch_split <- split(df, df$year)
@@ -167,21 +167,20 @@ cleanup_by_species <- function(catch,
 #' names(speciesname_df)
 #' @import sdmTMB
 #'
-species_sdm_wrapper <- function(x, y, z, dir_spp, model0, n_knots = 500) {
+species_sdm_wrapper <- function(x, y, z, dir_spp, spp_info, n_knots = 500) {
+  
   # make mesh
   mesh <- sdmTMB::make_mesh(x, xy_cols = c("longitude_dd", "latitude_dd"), n_knots = n_knots)
   
-  # fit model
-  fit <- model0(x, mesh)
-  # fit <- sdmTMB::sdmTMB(
-  #   total_catch_wt_kg ~ 0 + factor(year) + pass,
-  #   data = x,
-  #   mesh = mesh,
-  #   family = delta_gamma(),
-  #   time = "year",
-  #   anisotropy = TRUE,
-  #   spatiotemporal = as.list(c("iid", "iid"))
-  # )
+  eval(parse(text = paste0('fit <- sdmTMB::sdmTMB(
+    ',spp_info$model_fn,',
+    data = x,
+    mesh = mesh,
+    family = ', spp_info$model_family,'(),
+    time = "year",
+    anisotropy = ', spp_info$model_anisotropy,',
+    spatiotemporal = as.list(c("', gsub(pattern = ', ', replace = '", "', x = spp_info$model_spatiotemporal),'"))
+  )')))
   
   # get the index
   predictions <- predict(fit, newdata = z, return_tmb_object = TRUE) # 
@@ -205,7 +204,7 @@ species_sdm_wrapper <- function(x, y, z, dir_spp, model0, n_knots = 500) {
 #' This function resamples species data frames, runs species distribution models (SDMs) in parallel, and saves the results.
 #'
 #' @param spp_dfs A list of species data frames.
-#' @param species_row A data frame containing information about the test species.
+#' @param spp_info A data frame containing information about the test species.
 #' @param grid_yrs A data frame or list containing grid years information.
 #' @param dir_out A character string specifying the directory for output files.
 #' 
@@ -220,12 +219,14 @@ species_sdm_wrapper <- function(x, y, z, dir_spp, model0, n_knots = 500) {
 #'   \item Saves the results of the SDM processing into CSV files.
 #' }
 #' 
-resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
+resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE) {
   # set directories for outputs
-  dir_spp <- paste0(dir_out, paste0(species_row$srvy, "_", species_row$file_name, "/"))
+  dir_spp <- paste0(dir_out, paste0(spp_info$srvy, "_", spp_info$file_name, "/"))
   dir.create(dir_spp, showWarnings = FALSE)
   
+  if (test) {
   spp_dfs <- spp_dfs[names(spp_dfs)[(length(names(spp_dfs))-1):length(names(spp_dfs))]] # reduce DFs for testing
+  }
   spp_files <- as.list(names(spp_dfs)) # make the names file
   for (i in seq_along(spp_dfs)) { # Save each dataframe separately
     write_parquet(spp_dfs[[i]], paste0(dir_spp, paste0("df_", i, ".parquet")))
@@ -241,8 +242,6 @@ resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
   
   message("...Starting parallel SDM processing")
   
-  assign(value = get(species_row$model_fn), x = "model0")
-  
   # Run SDMs in parallel
   future_map(seq_along(spp_files), function(i) {
     message(paste0("\n...", spp_files[[i]], "\n"))
@@ -255,50 +254,78 @@ resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
       y = spp_files[[i]], 
       z = grid_yrs, 
       dir_spp = dir_spp, 
-      model0 = model0)
+      spp_info = spp_info)
     # fit <- readRDS(file = paste0(dir_spp, "fit_", spp_files[[i]], ".rds")) # for testing
     # index <- readRDS(file = paste0(dir_spp, "index_", spp_files[[i]], ".rds")) # for testing
     # fit0 <- list("fit" = fit, "index" = index)
     # Ensure extracted objects are dataframes, Store results in lists
     # fit 
-    if (!file.exists(paste0(dir_spp, "fit_df.csv"))) {fit_df <- c()} else {fit_df <- read.csv(file = paste0(dir_spp, "fit_df.csv"))}
-    fit_df <- fit_df %>%  
+    if (!file.exists(paste0(dir_spp, "fit_df.csv"))) {
+      fit_df <- c()
+    } else {
+      fit_df <- read.csv(file = paste0(dir_spp, "fit_df.csv")) %>%  
+        dplyr::mutate(across(everything(), as.character))
+    }
+    fit_df <- fit_df %>%
       dplyr::bind_rows(
         dplyr::bind_cols(
-          species_row, 
+          spp_info %>% 
+            dplyr::mutate(effort = as.character(spp_files[[i]])), 
           data.frame(
-            effort = as.character(spp_files[[i]]),
-            data.frame(fit_df_fn(fit0$fit))) ))
+            data.frame(fit_df_fn(fit0$fit))) ) %>%
+        dplyr::mutate(across(everything(), as.character)) 
+        )
     fwrite(fit_df, file = paste0(dir_spp, "fit_df.csv"))
     # fit pars
-    if (!file.exists(paste0(dir_spp, "fit_pars.csv"))) {fit_pars <- c()} else {fit_pars <- read.csv(file = paste0(dir_spp, "fit_pars.csv"))}
-    fit_pars <- fit_pars %>%  
+    if (!file.exists(paste0(dir_spp, "fit_pars.csv"))) {
+      fit_pars <- c()
+    } else {
+      fit_pars <- read.csv(file = paste0(dir_spp, "fit_pars.csv")) %>%  
+        dplyr::mutate(across(everything(), as.character))
+    }
+    fit_pars <- fit_pars %>%
       dplyr::bind_rows(
         dplyr::bind_cols(
-          species_row, 
+          spp_info %>% 
+            dplyr::mutate(effort = as.character(spp_files[[i]])), 
           data.frame(
-            effort = spp_files[[i]],
-            data.frame(fit_pars_fn(fit0$fit)))))
+            data.frame(fit_pars_fn(fit0$fit))) ) %>%
+          dplyr::mutate(across(everything(), as.character)) 
+      )
     fwrite(fit_pars, file = paste0(dir_spp, "fit_pars.csv"))
     # fit check
-    if (!file.exists(paste0(dir_spp, "fit_check.csv"))) {fit_check <- c()} else {fit_check <- read.csv(file = paste0(dir_spp, "fit_check.csv"))}
-    fit_check <- fit_check %>%  
+    if (!file.exists(paste0(dir_spp, "fit_check.csv"))) {
+      fit_check <- c()
+    } else {
+      fit_check <- read.csv(file = paste0(dir_spp, "fit_check.csv")) %>%  
+        dplyr::mutate(across(everything(), as.character))
+    }
+    fit_check <- fit_check %>%
       dplyr::bind_rows(
         dplyr::bind_cols(
-          species_row, 
+          spp_info %>% 
+            dplyr::mutate(effort = as.character(spp_files[[i]])), 
           data.frame(
-            effort = spp_files[[i]],
-            data.frame(fit_check_fn(fit0$fit)))))
+            data.frame(fit_check_fn(fit0$fit))) ) %>%
+          dplyr::mutate(across(everything(), as.character)) 
+      )
     fwrite(fit_check, file = paste0(dir_spp, "fit_check.csv"))
     # index
-    if (!file.exists(paste0(dir_spp, "index.csv"))) {index <- c()} else {index <- read.csv(file = paste0(dir_spp, "index.csv"))}
-    index <- index %>%  
+    if (!file.exists(paste0(dir_spp, "index.csv"))) {
+      index <- c()
+    } else {
+      index <- read.csv(file = paste0(dir_spp, "index.csv")) %>%  
+        dplyr::mutate(across(everything(), as.character))
+    }
+    index <- index %>%
       dplyr::bind_rows(
         dplyr::bind_cols(
-          species_row, 
+          spp_info %>% 
+            dplyr::mutate(effort = as.character(spp_files[[i]])), 
           data.frame(
-            effort = spp_files[[i]],
-            data.frame(fit0$index))))
+            data.frame(fit0$index)) ) %>%
+          dplyr::mutate(across(everything(), as.character)) 
+      )
     fwrite(index, file = paste0(dir_spp, "index.csv"))
     # Explicitly remove objects after processing
     rm("fit0", "spp_df")
@@ -313,7 +340,7 @@ resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
 #'
 #' This function cleans up the catch data for a specific species and then performs resampling tests.
 #'
-#' @param species_row A data frame row containing information about the species.
+#' @param spp_info A data frame row containing information about the species.
 #' @param catch A data frame containing the catch data.
 #' @param seq_from A numeric value specifying the start of the sequence for data frames.
 #' @param seq_to A numeric value specifying the end of the sequence for data frames.
@@ -330,12 +357,29 @@ resample_tests <- function (spp_dfs, species_row, grid_yrs, dir_out) {
 #'   \item Performs resampling tests on the cleaned data using `resample_tests`.
 #' }
 #' 
-clean_and_resample <- function(species_row, catch, seq_from, seq_to, seq_by, tot_dataframes, replicate_num, grid_yrs, dir_out) {
-  message(paste0(species_row$srvy, " ", species_row$common_name))
+clean_and_resample <- function(spp_info, catch, seq_from, seq_to, seq_by, tot_dataframes, replicate_num, grid_yrs, dir_out, test = FALSE) {
+  
+  message(paste0(spp_info$srvy, " ", spp_info$common_name))
+  
+  # check input variables
+  ## do all of the model function variables exist in grid_yrs and the catch data?
+  aa <- spp_info$model_fn
+  aa <- gsub(x = aa, pattern = "factor(", replacement = "", fixed = TRUE)
+  aa <- gsub(x = aa, pattern = ")", replacement = "", fixed = TRUE)  
+  aa <- strsplit(x = aa, split = " ")[[1]]
+  aa <- aa[which(!(aa %in% c("+", "0", "~", "total_catch_wt_kg")))]
+  
+  if (sum(aa %in% names(grid_yrs)) != length(aa)){
+    stop(paste0("ERROR: Not all variables called in funciton are available in the grid_yrs object: ", aa[!(aa %in% names(grid_yrs))]))
+  }
+  
+  if (sum(aa %in% names(catch)) != length(aa)){
+    stop(paste0("ERROR: Not all variables called in funciton are available in the catch data object: ", aa[!(aa %in% names(catch))]))
+  }
   
   spp_dfs <- cleanup_by_species(
     catch = catch, 
-    species_row = species_row, 
+    spp_info = spp_info, 
     seq_from = seq_from, 
     seq_to = seq_to, 
     seq_by = seq_by, 
@@ -346,9 +390,10 @@ clean_and_resample <- function(species_row, catch, seq_from, seq_to, seq_by, tot
   try({
     resample_tests(
       spp_dfs = spp_dfs, 
-      species_row = species_row, 
+      spp_info = spp_info, 
       grid_yrs = grid_yrs, 
-      dir_out = dir_out
+      dir_out = dir_out, 
+      test = test
     ) 
   }, silent = FALSE)
 }

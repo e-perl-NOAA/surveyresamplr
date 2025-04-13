@@ -37,7 +37,7 @@ lapply(unique(PKG), pkg_install)
 
 # Test species to pull ---------------------------------------------------------
 
-test_species <- dplyr::bind_rows(
+spp_list <- dplyr::bind_rows(
   data.frame(
     srvy = "GOA",
     common_name = c("walleye pollock", "Pacific cod", 
@@ -56,7 +56,7 @@ test_species <- dplyr::bind_rows(
                                   69322, 69323, 
                                   10210, 10120, 
                                   10285, 10130, 10261, 10110)))) 
-test_species <- unique(test_species[, c("common_name", "species_code")])
+spp_list <- unique(spp_list[, c("common_name", "species_code")])
 
 # CPUE/Catch Load data ---------------------------------------------------------
 
@@ -101,8 +101,8 @@ dat_species <- data$items %>%
 api_link_catch <- 'https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_catch/'
 
 dat <- data.frame()
-for (ii in 1:nrow(test_species)) {
-  print(test_species$common_name[ii])
+for (ii in 1:nrow(spp_list)) {
+  print(spp_list$common_name[ii])
   for (i in seq(0, 1000000, 10000)){
     ## find how many iterations it takes to cycle through the data
     print(i)
@@ -110,7 +110,7 @@ for (ii in 1:nrow(test_species)) {
     # res <- httr::GET(url = paste0(api_link_catch, "?offset=",i,"&limit=10000"))
     # res <- httr::GET(url = paste0(api_link_haul, '?limit=10000&q={"species_code":2023,"srvy":"EBS"}'))
     res <- httr::GET(url = paste0(api_link_catch, 
-                                  '?offset=',i,'&limit=10000&q={"species_code":',test_species$species_code[ii],'}'))
+                                  '?offset=',i,'&limit=10000&q={"species_code":',spp_list$species_code[ii],'}'))
     # res <- httr::GET(url = 'https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_catch/?offset=0&limit=10000&q={%22species_code%22:21740,%22species_code%22:21720}')
     ## convert from JSON format
     data <- jsonlite::fromJSON(base::rawToChar(res$content)) 
@@ -333,7 +333,7 @@ bb.POPULATION_VAR
 FROM GAP_PRODUCTS.AKFIN_BIOMASS bb
 
 WHERE bb.AREA_ID IN (99901, 99902, 99903, 99904)
-AND bb.SPECIES_CODE IN (", paste0(test_species$species_code, collapse = ","),") 
+AND bb.SPECIES_CODE IN (", paste0(spp_list$species_code, collapse = ","),") 
 ")) %>% 
   #   -- WHERE bb.SURVEY_DEFINITION_ID = 98 
   # -- AND bb.SPECIES_CODE IN (21740, 10210, 69322) 

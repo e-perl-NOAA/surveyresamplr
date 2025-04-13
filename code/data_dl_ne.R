@@ -32,7 +32,7 @@ lapply(unique(PKG), pkg_install)
 
 # Test species to pull ---------------------------------------------------------
 
-test_species <- 
+spp_list <- 
   data.frame(
     srvy = "NWA",
     common_name = c("Atlantic herring", "black sea bass", "Atlantic cod", 
@@ -82,7 +82,7 @@ noaa_nefsc_catch <- dat %>%
     pass, 
     depth_m
   ) %>%
-  dplyr::left_join(y = test_species %>%
+  dplyr::left_join(y = spp_list %>%
                      dplyr::select(file_name, common_name = common_name))
 
 save(noaa_nefsc_catch, file = here::here("data","noaa_nefsc_catch.rda"))

@@ -54,7 +54,7 @@ species_sdm_fn_ak <- function(x, mesh) {
     anisotropy = TRUE,
     spatiotemporal = as.list(c("iid", "iid"))
   )
-  return(fir)
+  return(fit)
 }
 
 #' Species distribution model function

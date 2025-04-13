@@ -20,7 +20,6 @@ dir.create(dir_out, showWarnings = FALSE)
 # Load support files -----------------------------------------------------------
 
 source(paste0(wd, "code/functions.R"))
-source(paste0(wd, "code/functions_sdms.R"))
 crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
 
 # Install Libraries ------------------------------------------------------------
@@ -112,27 +111,70 @@ lapply(unique(PKG), pkg_install)
 
 ### Define study species -------------------------------------------------------
 
-test_species <- data.frame(
-  srvy = "CA", 
-  common_name = c("arrowtooth flounder", "bocaccio", "canary rockfish", "darkblotched rockfish", 
-                  "Dover sole", "lingcod", "lingcod", "longnose skate", 
-                  "Pacific ocean perch", "Pacific spiny dogfish", 
-                  "petrale sole", "rex sole", "sablefish", 
-                  "shortspine thornyhead", "yellowtail rockfish", "widow rockfish"), 
-  file_name = c("arrowtooth_flounder", "bocaccio", "canary_rockfish", "darkblotched_rockfish", 
-                "dover_sole", "lingcod_N", "lingcod_S", "longnose_skate", 
-                "pacific_ocean_perch", "pacific_spiny_dogfish",  "petrale_sole", "rex_sole",           
+spp_list <- data.frame(
+  srvy = "CA",
+  common_name = c("arrowtooth flounder", "bocaccio", "canary rockfish", "darkblotched rockfish",
+                  "Dover sole", "lingcod", "lingcod", "longnose skate",
+                  "Pacific ocean perch", "Pacific spiny dogfish",
+                  "petrale sole", "rex sole", "sablefish",
+                  "shortspine thornyhead", "yellowtail rockfish", "widow rockfish"),
+  file_name = c("arrowtooth_flounder", "bocaccio", "canary_rockfish", "darkblotched_rockfish",
+                "dover_sole", "lingcod_N", "lingcod_S", "longnose_skate",
+                "pacific_ocean_perch", "pacific_spiny_dogfish",  "petrale_sole", "rex_sole",
                 "sabefish", "shortspine_thornyhead" ,"yellowtail_rockfish", "widow_rockfish"),
-  filter_lat_gt = c(34, NA, NA, 335, NA, 35, NA, NA, 35, NA, NA, NA, NA, NA, 35.5, 33.5), 
-  filter_lat_lt = c(NA, NA, NA, NA, NA, NA, 35, NA, NA, NA, NA, NA, NA, NA, NA, NA), 
-  filter_depth = c(NA, 500, 275, 675, NA, 450, 450, NA, 500, 700, 675, 700, NA, NA, 425, 675), 
-  model_fn = c( # name of funcion for sdm. Will build in specificity for this later
-    "species_sdm_fn", "species_sdm_fn", "canary_sdm_fn", "darkblotched_sdm_fn", 
-    "species_sdm_fn", "species_sdm_fn", "species_sdm_fn", "species_sdm_fn", 
-    "species_sdm_fn", "species_sdm_fn", 
-    "species_sdm_lognormal_fn", "species_sdm_fn", "species_sdm_lognormal_fn", 
-    "shortspine_sdm_fn", "species_sdm_fn", "species_sdm_fn")
-) 
+  filter_lat_gt = c(34, NA, NA, 335, NA, 35, NA, NA, 35, NA, NA, NA, NA, NA, 35.5, 33.5),
+  filter_lat_lt = c(NA, NA, NA, NA, NA, NA, 35, NA, NA, NA, NA, NA, NA, NA, NA, NA),
+  filter_depth = c(NA, 500, 275, 675, NA, 450, 450, NA, 500, 700, 675, 700, NA, NA, 425, 675),
+  model_fn = c(
+    "total_catch_wt_kg ~ 0 + factor(year) + pass",
+    "total_catch_wt_kg ~ 0 + factor(year) + pass",
+    "total_catch_wt_kg ~ 0 + factor(year) + pass",
+    "total_catch_wt_kg ~ 0 + factor(year) + pass",
+    "total_catch_wt_kg ~ 0 + factor(year) + pass",
+    "total_catch_wt_kg ~ 0 + factor(year) + pass",
+    "total_catch_wt_kg ~ 0 + factor(year) + pass",
+    "total_catch_wt_kg ~ 0 + factor(year) + pass",
+    "total_catch_wt_kg ~ 0 + factor(year) + pass",
+    "total_catch_wt_kg ~ 0 + factor(year) + pass",
+    "total_catch_wt_kg ~ 0 + factor(year) + pass",
+    "total_catch_wt_kg ~ 0 + factor(year) + pass",
+    "total_catch_wt_kg ~ 0 + factor(year) + pass",
+    "total_catch_wt_kg ~ 0 + factor(year) + pass + depth_m + (depth_m^2)",
+    "total_catch_wt_kg ~ 0 + factor(year) + pass",
+    "total_catch_wt_kg ~ 0 + factor(year) + pass"),
+  # model_fn = c( # name of funcion for sdm. Will build in specificity for this later
+    # "species_sdm_fn", "species_sdm_fn", "canary_sdm_fn", "darkblotched_sdm_fn",
+  # "species_sdm_fn", "species_sdm_fn", "species_sdm_fn", "species_sdm_fn",
+  # "species_sdm_fn", "species_sdm_fn",
+  # "species_sdm_lognormal_fn", "species_sdm_fn", "species_sdm_lognormal_fn"),
+  # "shortspine_sdm_fn", "species_sdm_fn", "widow_sdm_fn"
+  model_family = c("delta_gamma", "delta_gamma", "delta_lognormal", "delta_lognormal",
+                   "delta_gamma", "delta_gamma", "delta_gamma", "delta_gamma",
+                   "delta_gamma", "delta_gamma",
+                   "delta_lognormal", "delta_gamma", "delta_lognormal",
+                   "delta_gamma", "delta_gamma", "delta_gamma"),
+  model_anisotropy = c(TRUE, TRUE, FALSE, TRUE, 
+                      TRUE, TRUE, TRUE, TRUE, 
+                      TRUE, TRUE, 
+                      TRUE, TRUE, TRUE, 
+                      TRUE, TRUE, TRUE),
+  model_spatiotemporal = c(c("iid, iid"), 
+                           c("iid, iid"), 
+                           c("iid, off"), 
+                           c("off, iid"), 
+                           c("iid, iid"), 
+                           c("iid, iid"), 
+                           c("iid, iid"), 
+                           c("iid, iid"), 
+                           c("iid, iid"), 
+                           c("iid, iid"), 
+                           c("iid, iid"), 
+                           c("iid, iid"), 
+                           c("iid, iid"), 
+                           c("iid, iid"), 
+                           c("iid, iid"), 
+                           c("off, off") )
+  )
 
 ### Load survey data -----------------------------------------------------------
 
@@ -175,8 +217,8 @@ replicate_num <- 10
 
 sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
 map(
-  1:nrow(test_species), 
-  ~ clean_and_resample(test_species[.x,], 
+  1:nrow(spp_list), 
+  ~ clean_and_resample(spp_list[.x,], 
                        catch, seq_from, seq_to, seq_by, 
                        tot_dataframes, replicate_num, grid_yrs, dir_out))
 sink()
@@ -185,12 +227,11 @@ sink()
 
 plot_results(srvy = srvy, dir_out = dir_out) 
 
-
 ## Eastern Bering Sea ----------------------------------------------------------
 
 ### Define study species -------------------------------------------------------
 
-test_species <- data.frame(
+spp_list <- data.frame(
   srvy = "EBS",
   common_name = c("walleye pollock", "snow crab", "Pacific cod", 
                   "red king crab", "blue king crab", 
@@ -203,8 +244,11 @@ test_species <- data.frame(
   filter_lat_lt = NA, 
   filter_lat_gt = NA, 
   filter_depth = NA, 
-  model_fn = "species_sdm_fn_ak_temperature" # name of funcion for sdm. Will build in specificity for this later
-) %>% 
+  model_fn = "total_catch_wt_kg ~ 0 + factor(year) + bottom_temperature_c",
+  model_family = "delta_gamma",
+  model_anisotropy = TRUE,
+  model_spatiotemporal = c(c("iid, iid"))
+  ) %>% 
   dplyr::mutate( 
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
 
@@ -256,10 +300,10 @@ replicate_num <- 3
 
 sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append = FALSE, split = TRUE)  # for screen and log
 map(
-  1:nrow(test_species), 
-  ~ clean_and_resample(test_species[.x,], 
+  1:nrow(spp_list), 
+  ~ clean_and_resample(spp_list[.x,], 
                        catch, seq_from, seq_to, seq_by, 
-                       tot_dataframes, replicate_num, grid_yrs, dir_out))
+                       tot_dataframes, replicate_num, grid_yrs, dir_out, test = TRUE))
 sink()
 
 ### Plot indices ---------------------------------------------------------------
@@ -270,7 +314,7 @@ plot_results(srvy = srvy, dir_out = dir_out)
 
 ### Define study species -------------------------------------------------------
 
-test_species <- data.frame(
+spp_list <- data.frame(
   srvy = "NBS",
   common_name = c("walleye pollock", "snow crab", "Pacific cod", 
                   "red king crab", "blue king crab", 
@@ -283,8 +327,11 @@ test_species <- data.frame(
   filter_lat_lt = NA, 
   filter_lat_gt = NA, 
   filter_depth = NA, 
-  model_fn = "species_sdm_fn_ak" # name of funcion for sdm. Will build in specificity for this later
-) %>% 
+  model_fn = "total_catch_wt_kg ~ 0 + factor(year)",
+  model_family = "delta_gamma",
+  model_anisotropy = TRUE,
+  model_spatiotemporal = c(c("iid, iid"))
+  ) %>% 
   dplyr::mutate( 
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
 
@@ -313,10 +360,10 @@ replicate_num <- 3
 
 sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append = FALSE, split = TRUE)  # for screen and log
 map(
-  1:nrow(test_species), 
-  ~ clean_and_resample(test_species[.x,], 
+  1:nrow(spp_list), 
+  ~ clean_and_resample(spp_list[.x,], 
                        catch, seq_from, seq_to, seq_by, 
-                       tot_dataframes, replicate_num, grid_yrs, dir_out))
+                       tot_dataframes, replicate_num, grid_yrs, dir_out, test = TRUE))
 sink()
 
 ### Plot indices ---------------------------------------------------------------
@@ -327,7 +374,7 @@ plot_results(srvy = srvy, dir_out = dir_out)
 
 ### Define study species -------------------------------------------------------
 
-test_species <- data.frame(
+spp_list <- data.frame(
   srvy = "BS",
   common_name = c("walleye pollock", "snow crab", "Pacific cod", 
                   "red king crab", "blue king crab", 
@@ -340,7 +387,10 @@ test_species <- data.frame(
   filter_lat_lt = NA, 
   filter_lat_gt = NA, 
   filter_depth = NA, 
-  model_fn = "species_sdm_fn_ak_temperature" # name of funcion for sdm. Will build in specificity for this later
+  model_fn = "total_catch_wt_kg ~ 0 + factor(year) + bottom_temperature_c + depth_m",
+  model_family = "delta_gamma",
+  model_anisotropy = TRUE,
+  model_spatiotemporal = c(c("iid, iid"))
 ) %>% 
   dplyr::mutate( 
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
@@ -401,10 +451,10 @@ replicate_num <- 3
 
 sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
 map(
-  1:nrow(test_species), 
-  ~ clean_and_resample(test_species[.x,], 
+  1:nrow(spp_list), 
+  ~ clean_and_resample(spp_list[.x,], 
                        catch, seq_from, seq_to, seq_by, 
-                       tot_dataframes, replicate_num, grid_yrs, dir_out))
+                       tot_dataframes, replicate_num, grid_yrs, dir_out, test = TRUE))
 sink()
 
 ### Plot indices --------------------------------------------------------------
@@ -415,7 +465,7 @@ plot_results(srvy = srvy, dir_out = dir_out)
 
 ### Define study species -------------------------------------------------------
 
-test_species <- data.frame(
+spp_list <- data.frame(
   srvy = "GOA",
   common_name = c("walleye pollock", "Pacific cod", 
                   "Pacific ocean perch", "flathead sole", 
@@ -426,7 +476,10 @@ test_species <- data.frame(
   filter_lat_lt = NA, 
   filter_lat_gt = NA, 
   filter_depth = NA, 
-  model_fn = "species_sdm_fn_ak" # name of funcion for sdm. Will build in specificity for this later
+  model_fn = "total_catch_wt_kg ~ 0 + factor(year)",
+  model_family = "delta_gamma",
+  model_anisotropy = TRUE,
+  model_spatiotemporal = c(c("iid, iid"))
 ) %>% 
   dplyr::mutate( 
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
@@ -456,10 +509,10 @@ replicate_num <- 3
 
 sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
 map(
-  1:nrow(test_species), 
-  ~ clean_and_resample(test_species[.x,], 
+  1:nrow(spp_list), 
+  ~ clean_and_resample(spp_list[.x,], 
                        catch, seq_from, seq_to, seq_by, 
-                       tot_dataframes, replicate_num, grid_yrs, dir_out))
+                       tot_dataframes, replicate_num, grid_yrs, dir_out, test = TRUE))
 sink()
 
 ### Plot indices --------------------------------------------------------------
@@ -470,7 +523,7 @@ plot_results(srvy = srvy, dir_out = dir_out)
 
 ### Define study species -------------------------------------------------------
 
-test_species <- data.frame(
+spp_list <- data.frame(
   srvy = "AI",
   common_name = c("walleye pollock", "Pacific cod", 
                   "Pacific ocean perch", "flathead sole", 
@@ -481,7 +534,10 @@ test_species <- data.frame(
   filter_lat_lt = NA, 
   filter_lat_gt = NA, 
   filter_depth = NA, 
-  model_fn = "species_sdm_fn_ak" # name of funcion for sdm. Will build in specificity for this later
+  model_fn = "total_catch_wt_kg ~ 0 + factor(year)",
+  model_family = "delta_gamma",
+  model_anisotropy = TRUE,
+  model_spatiotemporal = c(c("iid, iid"))
 ) %>% 
   dplyr::mutate( 
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
@@ -511,10 +567,10 @@ replicate_num <- 3
 
 sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
 map(
-  1:nrow(test_species), 
-  ~ clean_and_resample(test_species[.x,], 
+  1:nrow(spp_list), 
+  ~ clean_and_resample(spp_list[.x,], 
                        catch, seq_from, seq_to, seq_by, 
-                       tot_dataframes, replicate_num, grid_yrs, dir_out))
+                       tot_dataframes, replicate_num, grid_yrs, dir_out, test = TRUE))
 sink()
 
 ### Plot indices --------------------------------------------------------------
@@ -525,7 +581,7 @@ plot_results(srvy = srvy, dir_out = dir_out)
 
 ### Define study species -------------------------------------------------------
 
-test_species <- 
+spp_list <- 
   data.frame(
     srvy = "NWA_SPRING",
     common_name = c("Atlantic herring", "black sea bass", "Atlantic cod", 
@@ -541,8 +597,11 @@ test_species <-
   filter_lat_lt = NA, 
   filter_lat_gt = NA, 
   filter_depth = NA, 
-  model_fn = "species_sdm_fn_nwa" # name of funcion for sdm. Will build in specificity for this later
-) %>% 
+  model_fn = "total_catch_wt_kg ~ 0 + factor(year)",
+  model_family = "delta_gamma",
+  model_anisotropy = TRUE,
+  model_spatiotemporal = c(c("iid, iid"))
+  ) %>% 
   dplyr::mutate( 
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
 
@@ -571,10 +630,10 @@ replicate_num <- 3
 
 sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
 map(
-  1:nrow(test_species), 
-  ~ clean_and_resample(test_species[.x,], 
+  1:nrow(spp_list), 
+  ~ clean_and_resample(spp_list[.x,], 
                        catch, seq_from, seq_to, seq_by, 
-                       tot_dataframes, replicate_num, grid_yrs, dir_out))
+                       tot_dataframes, replicate_num, grid_yrs, dir_out, test = TRUE))
 sink()
 
 ### Plot indices --------------------------------------------------------------
@@ -586,7 +645,7 @@ plot_results(srvy = srvy, dir_out = dir_out)
 
 ### Define study species -------------------------------------------------------
 
-test_species <- 
+spp_list <- 
   data.frame(
     srvy = "NWA_FALL",
     common_name = c("Atlantic herring", "black sea bass", "Atlantic cod", 
@@ -602,7 +661,10 @@ test_species <-
     filter_lat_lt = NA, 
     filter_lat_gt = NA, 
     filter_depth = NA, 
-    model_fn = "species_sdm_fn_nwa" # name of funcion for sdm. Will build in specificity for this later
+    model_fn = "total_catch_wt_kg ~ 0 + factor(year)",
+    model_family = "delta_gamma",
+    model_anisotropy = TRUE,
+    model_spatiotemporal = c(c("iid, iid"))
   ) %>% 
   dplyr::mutate( 
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
@@ -632,10 +694,10 @@ replicate_num <- 3
 
 sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
 map(
-  1:nrow(test_species), 
-  ~ clean_and_resample(test_species[.x,], 
+  1:nrow(spp_list), 
+  ~ clean_and_resample(spp_list[.x,], 
                        catch, seq_from, seq_to, seq_by, 
-                       tot_dataframes, replicate_num, grid_yrs, dir_out))
+                       tot_dataframes, replicate_num, grid_yrs, dir_out, test = TRUE))
 sink()
 
 ### Plot indices --------------------------------------------------------------
