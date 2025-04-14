@@ -10,7 +10,7 @@
 
 ## This code is primarally maintained by:
 
-**Derek Bolser** (Derek.Bolser AT noaa.gov;
+**Derek Bolser** (Derek.Bolser@noaa.gov;
 [@dgbolser](https://github.com/dgbolser))
 
 Office of Science and Technology,
@@ -21,7 +21,7 @@ National Oceanic and Atmospheric Administration,
 
 Silver Spring, MD 98195
 
-**Emily Markowitz** (Emily.Markowitz AT noaa.gov;
+**Emily Markowitz** (Emily.Markowitz@noaa.gov;
 [@EmilyMarkowitz-NOAA](https://github.com/EmilyMarkowitz-NOAA))
 
 Alaska Fisheries Science Center,
@@ -32,7 +32,7 @@ National Oceanic and Atmospheric Administration,
 
 Seattle, WA 98195
 
-**Ian Taylor** (Ian.Taylor AT noaa.gov;
+**Ian Taylor** (Ian.Taylor@noaa.gov;
 [@iantaylor-NOAA](https://github.com/iantaylor-NOAA))
 
 Northwest Fisheries Science Center,
@@ -43,13 +43,13 @@ National Oceanic and Atmospheric Administration,
 
 Seattle, WA 98195
 
-**Elizabeth Perl** (Elizabeth.Perl AT noaa.gov;
+**Elizabeth Perl** (Elizabeth.Gugliotti@noaa.gov;
 [@e-perl-NOAA](https://github.com/e-perl-NOAA))
 
-/Affiliate with ECS Federal in support of the Office of Science and
+Affiliate with ECS Federal in support of the Office of Science and
 Technology,
 
-National Marine Fisheries Service,
+National Marine Fisheries Service
 
 National Oceanic and Atmospheric Administration,
 
