@@ -19,7 +19,7 @@ library(surveyresamp)
 ```
 
 
-```{r}
+```{r eval = FALSE}
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ## Project:       Resample_survey_data: Multiple species, multiple years
 ## Authors:       Derek Bolser, Office of Science and Technology (derek.bolser@noaa.gov)

@@ -1,16 +1,16 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# [Resample survey data](https://github.com/dgbolser/Resample-survey-data) <img src="https://github.com/dgbolser/Resample-survey-data/blob/em/img/bigelow_nefsc_bts.JPG?raw=true" alt="Logo." align="right" width="139" height="139"/>
+# [surveyresample](https://github.com/emilymarkowitz-noaa/surveyresample) <img src="https://github.com/emilymarkowitz-noaa/surveyresample/blob/em/img/bigelow_nefsc_bts.JPG?raw=true" alt="Logo." align="right" width="139" height="139"/>
 
 > This repository is under active development and all code, results, and
 > other materials should be considered preliminary. Find code used for
 > various versions in the
-> \[releases\](<https://github.com/dgbolser/Resample-survey-data/releases>
+> \[releases\](<https://github.com/emilymarkowitz-noaa/surveyresample/releases>
 > section for finalized products and project milestones.
 
 ## This code is primarally maintained by:
 
-**Derek Bolser** (Derek.Bolser@noaa.gov;
+**Derek Bolser** (Derek.Bolser AT noaa.gov;
 [@dgbolser](https://github.com/dgbolser))
 
 Office of Science and Technology,
@@ -21,7 +21,7 @@ National Oceanic and Atmospheric Administration,
 
 Silver Spring, MD 98195
 
-**Emily Markowitz** (Emily.Markowitz@noaa.gov;
+**Emily Markowitz** (Emily.Markowitz AT noaa.gov;
 [@EmilyMarkowitz-NOAA](https://github.com/EmilyMarkowitz-NOAA))
 
 Alaska Fisheries Science Center,
@@ -32,7 +32,7 @@ National Oceanic and Atmospheric Administration,
 
 Seattle, WA 98195
 
-**Ian Taylor** (Ian.Taylor@noaa.gov;
+**Ian Taylor** (Ian.Taylor AT noaa.gov;
 [@iantaylor-NOAA](https://github.com/iantaylor-NOAA))
 
 Northwest Fisheries Science Center,
@@ -43,13 +43,13 @@ National Oceanic and Atmospheric Administration,
 
 Seattle, WA 98195
 
-**Elizabeth Perl** (Elizabeth.Gugliotti@noaa.gov;
+**Elizabeth Perl** (Elizabeth.Perl AT noaa.gov;
 [@e-perl-NOAA](https://github.com/e-perl-NOAA))
 
 Affiliate with ECS Federal in support of the Office of Science and
 Technology,
 
-National Marine Fisheries Service
+National Marine Fisheries Service,
 
 National Oceanic and Atmospheric Administration,
 
@@ -78,7 +78,8 @@ scenarios/replicates when testing.
 
 # User Resources
 
-- [GitHub repository](https://github.com/dgbolser/Resample-survey-data).
+- [GitHub
+  repository](https://github.com/emilymarkowitz-noaa/surveyresample).
 
 - [Access Tips and Documentation for All AFSC Groundfish Assessment
   Program Production
@@ -113,11 +114,11 @@ https://www.fisheries.noaa.gov/foss; U.S. Dep. Commer.
 
 If you see that the data, product, or metadata can be improved, you are
 invited to create a [pull
-request](https://github.com/dgbolser/Resample-survey-data/pulls),
+request](https://github.com/emilymarkowitz-noaa/surveyresample/pulls),
 [submit an issue to the GitHub
 organization](https://github.com/afsc-gap-products/data-requests/issues),
 or [submit an issue to the code’s
-repository](https://github.com/dgbolser/Resample-survey-data/issues).
+repository](https://github.com/emilymarkowitz-noaa/surveyresample/issues).
 
 # R Version Metadata
 
