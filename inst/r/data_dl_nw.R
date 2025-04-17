@@ -70,14 +70,14 @@ noaa_nwfsc_catch <- nwfscSurvey::pull_catch(survey = "NWFSC.Combo",
 # utils::write.csv(catch,here::here("data", "nwfsc_bt_fmp_spp_updated.csv"), row.names = F)
 
 dat <- noaa_nwfsc_catch
-title <- "Combined NWFSC catch, haul, and species data"
 obj_name <- "noaa_nwfsc_catch"
+title <- "Combined NWFSC catch, haul, and species data"
 author <- "Northwest Fisheries Science Center, compiled by Emily Markowitz (Emily.Markowitz AT noaa.gov) and Derek Bolser (Derek.Bolser AT noaa.gov)"
 source <- "Northwest Fisheries Science Center. "
-details <- "[ENTER]."
-description <- "[ENTER]."
+details <- "ENTER."
+description <- "ENTER."
 
-save(noaa_nwfsc_catch, file = here::here("data", paste0(obj_name, ".rda")))
+save(noaa_nwfsc_catch, file = here::here("data", paste0(obj_name, ".rdata")))
 data_documentation(dat, title, obj_name, author, source, details, description)
 
 # Get grid ---------------------------------------------------------------------
@@ -100,14 +100,17 @@ pred_grid_depth <- california_current_grid %>% # rename x and y cols
                 area_km2 = area_km2_WCGBTS) %>% 
   dplyr::mutate(srvy = "CA")
 
-obj_name <- paste0("noaa_nwfsc_pred_grid_depth.rdata")
+names(pred_grid_depth) <- tolower(names(pred_grid_depth))
+
+obj_name <- paste0("noaa_nwfsc_pred_grid_depth")
+assign(x = obj_name, value = pred_grid_depth)
+dat <- pred_grid_depth
 title <- paste0("Prediction grid for NWFSC survey")
-obj_name <- "noaa_nwfsc_catch"
 author <- "Northwest Fisheries Science Center, compiled by Emily Markowitz (Emily.Markowitz AT noaa.gov) and Derek Bolser (Derek.Bolser AT noaa.gov)"
 source <- paste0("Northwest Fisheries Science Center; ",url,". ")
-details <- "[ENTER]."
-description <- "[ENTER]."
+details <- "ENTER."
+description <- "ENTER."
 
-save(noaa_nwfsc_catch, file = here::here("data", paste0(obj_name, ".rda")))
+save(noaa_nwfsc_pred_grid_depth, file = here::here("data", paste0(obj_name, ".rdata")))
 data_documentation(dat, title, obj_name, author, source, details, description)
 

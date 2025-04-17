@@ -36,7 +36,6 @@ Imports:
     ggplot2, 
     dplyr, 
     arrow, 
-    callr, 
     future
 VignetteBuilder: knitr
 RoxygenNote: 7.3.2

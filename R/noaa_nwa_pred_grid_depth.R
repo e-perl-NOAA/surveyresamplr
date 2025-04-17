@@ -1,8 +1,8 @@
-#' @title Combined AFSC catch, haul, and species data from FOSS
-#' @description The final, validated survey data are publicly accessible soon after surveys are completed on the Fisheries One Stop Shop (FOSS) platform. This data includes catch, haul, and environmental data collected at each station. On the FOSS data platform, users can interactively select, view, and download data. Descriptive documentation and user-examples are available on the metadata page.
-#' @usage data('noaa_afsc_catch')
-#' @author Alaska Fisheries Science Center, compiled by Emily Markowitz (Emily.Markowitz AT noaa.gov)
-#' @format A data frame with 430167 observations on the following 12 variables.
+#' @title Prediction grid for NWA survey
+#' @description [ENTER].
+#' @usage data('noaa_nwa_pred_grid_depth')
+#' @author Northeast Fisheries Science Center, compiled by Emily Markowitz (Emily.Markowitz AT noaa.gov)
+#' @format A data frame with 80413 observations on the following 9 variables.
 #' \describe{
 #'   \item{\code{srvy}}{Abbreviated survey names. Abbreviated survey names. }
 #'   \item{\code{trawlid}}{Trawl ID. This is a unique numeric identifier assigned to each (vessel, cruise, and haul) combination.}
@@ -14,12 +14,16 @@
 #'   \item{\code{latitude_dd}}{Latitude (decimal degrees). Latitude (one hundred thousandth of a decimal degree).}
 #'   \item{\code{longitude_dd}}{Longitude (decimal degrees). Longitude (one hundred thousandth of a decimal degree).}
 #'   \item{\code{year}}{Survey year. Year the observation (survey) was collected.}
+#'   \item{\code{pass}}{Pass. Pass}
 #'   \item{\code{bottom_temperature_c}}{Bottom temperature (degrees Celsius). Bottom temperature (tenths of a degree Celsius); NA indicates removed or missing values.}
-#'   \item{\code{depth_m}}{Depth (m). Bottom depth (meters).}#'   }
-#' @source https://github.com/afsc-gap-products/gap_products and https://www.fisheries.noaa.gov/foss/f?p=215:28:14951401791129:::::
+#'   \item{\code{depth_m}}{Depth (m). Bottom depth (meters).}
+#'   \item{\code{geometry}}{Spatial geometry. Spatial geometry.}
+#'   \item{\code{stratum}}{Stratum. Statistical area for analyzing data. Strata are often designed using bathymetry and other geographic and habitat-related elements. The strata are unique to each survey region.}
+#'   \item{\code{area_km2}}{Area (km2). Area in square kilometers.}#'   }
+#' @source Data request to the NEFSC. 
 #' @keywords species code data
 #' @examples
-#' data(noaa_afsc_catch)
-#' @details The Resource Assessment and Conservation Engineering (RACE) Division Groundfish Assessment Program (GAP) of the Alaska Fisheries Science Center (AFSC) conducts fisheries-independent bottom trawl surveys to assess the populations of demersal fish and crab stocks of Alaska.
+#' data(noaa_nwa_pred_grid_depth)
+#' @details [ENTER].
 
-'noaa_afsc_catch'
+'noaa_nwa_pred_grid_depth'

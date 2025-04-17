@@ -20,6 +20,10 @@ pkg_install <- function(p){
       devtools::install_github("afsc-gap-products/akgfmaps", build_vignettes = TRUE)
     } else if (p == 'nwfscSurvey') {
       remotes::install_github("pfmc-assessments/nwfscSurvey")
+    } else if (p == "gapctd") {
+      devtools::install_github("afsc-gap-products/gapctd")
+    } else if (p == 'gapindex') {
+      remotes::install_github("afsc-gap-products/gapindex")
     } else {
       install.packages(p)
     }

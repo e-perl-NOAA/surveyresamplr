@@ -85,14 +85,14 @@ noaa_nefsc_catch <- dat %>%
 # Save data -------------------------------------------------------------------
 
 dat <- noaa_nefsc_catch
-title <- "Combined NEFSC catch, haul, and species data from FOSS"
 obj_name <- "noaa_nefsc_catch"
+title <- "Combined NEFSC catch, haul, and species data from FOSS"
 author <- "Northeast Fisheries Science Center, compiled by Emily Markowitz (Emily.Markowitz AT noaa.gov)"
 source <- "Data request to the NEFSC"
-details <- "[ENTER]."
-description <- "[ENTER]."
+details <- "ENTER."
+description <- "ENTER."
 
-save(noaa_nefsc_catch, file = here::here("data", paste0(obj_name, ".rda")))
+save(noaa_nefsc_catch, file = here::here("data", paste0(obj_name, ".rdata")))
 data_documentation(dat, title, obj_name, author, source, details, description)
 
 # Make extrapolation grids -----------------------------------------------------
@@ -157,18 +157,21 @@ extrap_grid <- function(
     dplyr::select(-var1.var) %>%
     stats::na.omit()
 
+  names(pred_grid_depth) <- tolower(names(pred_grid_depth))
+  
   # save(depth_raster, file = here::here("inst", "exdata", "grids","grid_depth",paste0("noaa_nefsc_", tolower(srvy_out),"_depth_raster.rdata")))
   
-  obj_name <- paste0("noaa_",tolower(srvy_out),"_pred_grid_depth")
+  obj_name <- paste0("noaa_nefsc_pred_grid_depth")
+  assign(x = obj_name, value = pred_grid_depth)
   dat <- pred_grid_depth
   title <- paste0("Prediction grid for ", srvy_out, " survey")
   author <- "Northeast Fisheries Science Center, compiled by Emily Markowitz (Emily.Markowitz AT noaa.gov)"
   source <- "Data request to the NEFSC. "
-  details <- "[ENTER]."
-  description <- "[ENTER]."
+  details <- "ENTER."
+  description <- "ENTER."
   
+  save(noaa_nefsc_pred_grid_depth, file = here::here("data",paste0(obj_name, ".rdata")))  
   data_documentation(dat, title, obj_name, author, source, details, description)
-  save(pred_grid_depth, file = here::here("data",paste0(obj_name, ".rdata")))  
   
   return(list("pred_grid_depth" = pred_grid_depth, 
               "depth_raster" = depth_raster))

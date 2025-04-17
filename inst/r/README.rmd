@@ -15,6 +15,7 @@ link_repo <- "https://github.com/emilymarkowitz-noaa/surveyresamplr"
 
 # [surveyresamplr](`r link_repo`) <img src="`r paste0(link_repo, "/blob/em/man/img/logo.png?raw=true")`" alt="Logo." align="right" width="139" height="139"/>
 
+> Last run: `r format(Sys.Date(), format = "%B %d, %Y")`
 
 # Purpose
 

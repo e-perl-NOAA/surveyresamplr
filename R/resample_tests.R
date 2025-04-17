@@ -37,7 +37,7 @@ resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE) 
   gc()
   
   #set up parallel processing
-  future::plan(callr::callr, workers = 6)  # Adjust the number of workers based on available memory
+  future::plan(callr, workers = 6)  # Adjust the number of workers based on available memory
   
   # Remove large objects before parallel execution
   gc()

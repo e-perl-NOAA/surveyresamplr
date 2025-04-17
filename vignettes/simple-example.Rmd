@@ -20,6 +20,7 @@ library(surveyresamplr)
 
 
 ```{r eval = FALSE}
+
 #get rid of memory limits
 options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
 
@@ -36,7 +37,7 @@ crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
 # We'll also use this in our works cited page. 
 PKG <- c(
   "surveyresamplr",
-
+  
   # tidyverse
   "dplyr",
   "magrittr",
@@ -68,24 +69,22 @@ PKG <- c(
   "INLA" 
 )
 
-# Use pkg_install() function found in functions.R file to load packages
-source("./inst/r/pkg_install.R")
+pkg_install <- function(p){
+  if(!require(p, character.only = TRUE)) {
+    install.packages(p)
+  }
+  require(p, character.only = TRUE)
+}
 base::lapply(unique(PKG), pkg_install)
 
 # Run scenarios ----------------------------------------------------------------
 
-## Aleutian Islands ------------------------------------------------------------
-
 ### Define study species -------------------------------------------------------
 
 spp_list <- data.frame(
-  srvy = "AI",
-  common_name = c("walleye pollock", "Pacific cod", 
-                  "Pacific ocean perch", "flathead sole", 
-                  "northern rockfish", "arrowtooth flounder"), 
-  species_code = as.character(c(21740, 21720, 
-                                30060, 10130, 
-                                30420, 10110)), 
+  srvy = "EBS",
+  common_name = c("walleye pollock"), 
+  species_code = as.character(c(21740)),
   filter_lat_lt = NA, 
   filter_lat_gt = NA, 
   filter_depth = NA, 
@@ -97,68 +96,34 @@ spp_list <- data.frame(
   dplyr::mutate( 
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
 
-### Define study species -------------------------------------------------------
-
-spp_list <- data.frame(
-  srvy = "CA",
-  common_name = c("arrowtooth flounder"),
-  file_name = c("arrowtooth_flounder"),
-  filter_lat_gt = c(34),
-  filter_lat_lt = c(NA),
-  filter_depth = c(NA),
-  model_fn = c(
-    "total_catch_wt_kg ~ 0 + factor(year) + pass"),
-  model_family = c("delta_gamma"),
-  model_anisotropy = c(TRUE),
-  model_spatiotemporal = c(c("iid, iid"))
-  )
-
 ### Load survey data -----------------------------------------------------------
 
-# source(paste0(wd, "code/data_dl_nw.r"))
-
-catch_ca <- utils::read.csv(paste0(wd,"data/nwfsc_bt_fmp_spp_updated.csv")) #pulled data again to get 2024
-catch <- catch_ca %>% 
-  dplyr::select(trawlid = Trawl_id, 
-                common_name = Common_name, 
-                longitude_dd = Longitude_dd, 
-                latitude_dd = Latitude_dd, 
-                year = Year, 
-                pass = Pass, 
-                total_catch_wt_kg, 
-                depth_m = Depth_m) %>% 
-  dplyr::mutate(srvy = "CA")
+catch <- surveyresamplr::noaa_afsc_catch %>% 
+  dplyr::filter(srvy == "EBS") %>% 
+  dplyr::filter(year > 2010)
 
 ### Load grid data -------------------------------------------------------------
 
-load(paste0(wd,"grids/noaa_nwfsc_ca_pred_grid_depth.rda"), verbose = TRUE)
-pred_grid <- california_current_grid %>% # rename x and y cols
-  dplyr::select(longitude_dd = longitude, 
-                latitude_dd = latitude, 
-                pass = pass_scaled, 
-                depth_m = depth, 
-                area_km2 = area_km2_WCGBTS) %>% 
-  dplyr::mutate(srvy = "CA")
-grid_yrs <- replicate_df(pred_grid, "year", unique(catch$year))
+grid_yrs <- replicate_df(surveyresamplr::noaa_afsc_ebs_pred_grid_depth, "year", unique(catch$year))
 
 ### Variables ------------------------------------------------------------------
 
-srvy <- "CA"
-seq_from = 0.1
-seq_to = 1
-seq_by = 0.1
-tot_dataframes = 91
-replicate_num <- 10
+srvy <- "EBS"
+seq_from = 0.2
+seq_to = 1.0
+seq_by = 0.2 
+tot_dataframes = 13
+replicate_num <- 3
 
 ### Run ------------------------------------------------------------------------
 
-sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
+# sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
 map(
   1:nrow(spp_list), 
   ~ clean_and_resample(spp_list[.x,], 
                        catch, seq_from, seq_to, seq_by, 
-                       tot_dataframes, replicate_num, grid_yrs, dir_out))
-sink()
+                       tot_dataframes, replicate_num, grid_yrs, dir_out, test = TRUE))
+# sink()
 
 ### Plot indices ---------------------------------------------------------------
 

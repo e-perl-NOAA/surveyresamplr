@@ -22,12 +22,13 @@ PKG <- c(
   "tibble",
   "janitor", 
   "here",
+  "readr",
   
   # Survey data pull Specific packages
   "akgfmaps", # devtools::install_github("afsc-gap-products/akgfmaps", build_vignettes = TRUE)
   "coldpool", # devtools::install_github("afsc-gap-products/coldpool")
-  "gapctd", # install_github("afsc-gap-products/gapctd")
-  "gapindex", # devtools::install_github("afsc-gap-products/gapindex")
+  # "gapctd", # install_github("afsc-gap-products/gapctd")
+  # "gapindex", # devtools::install_github("afsc-gap-products/gapindex")
   "nwfscSurvey", 
   
   "jsonlite", 
@@ -89,7 +90,7 @@ data_documentation <- function(dat, title, obj_name, author, source, details, de
     )
   )
   
-  column <- column[names(column) %in% names(dat),]
+  column <- column[column$metadata_colname %in% names(dat),]
   
   str0 <- paste0("#' @title ", title,"
 #' @description ",description, "

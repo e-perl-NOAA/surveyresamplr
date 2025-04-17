@@ -231,9 +231,13 @@ extrap_grid <- function(pred_grid, srvy_in, srvy_out = NULL, noaa_afsc_catch, cr
     dplyr::select(-var1.var) %>%
     stats::na.omit()
   
+  names(pred_grid_depth) <- tolower(names(pred_grid_depth))
+  
   # save(depth_raster, file = here::here("inst", "exdata", "grids","grid_depth",paste0("noaa_afsc_", tolower(srvy_out),"_depth_raster.rdata")))
 
+  
   obj_name <- paste0("noaa_afsc_",tolower(srvy_out),"_pred_grid_depth")
+  assign(x = obj_name, value = pred_grid_depth)
   dat <- pred_grid_depth
   title <- paste0("Prediction grid for ", srvy_out, " survey")
   author <- "Alaska Fisheries Science Center, compiled by Emily Markowitz (Emily.Markowitz AT noaa.gov)"
@@ -242,13 +246,14 @@ extrap_grid <- function(pred_grid, srvy_in, srvy_out = NULL, noaa_afsc_catch, cr
   description <- "Vector geometries ('shapefiles') that are commonly needed for mapping and spatial analysis in Alaska marine management areas, marine statistical areas, and fishery-independent survey regions in Alaska."
   
   data_documentation(dat, title, obj_name, author, source, details, description)
-  save(pred_grid_depth, file = here::here("data",paste0(obj_name, ".rdata")))
+  # save(pred_grid_depth, file = here::here("data", paste0(obj_name, ".rdata")))
   
   return(list("pred_grid_depth" = pred_grid_depth, 
-              "depth_raster" = depth_raster))
+              "depth_raster" = depth_raster, 
+              "obj_name" = obj_name))
 }
 
-# GOA Extrapolation grid -------------------------------------------------------
+## GOA Extrapolation grid -------------------------------------------------------
 
 pred_grid <- utils::read.csv(here::here("inst", "exdata", "grids", "orig", "goa_2025_interpolation_grid.csv"))
 
@@ -260,7 +265,11 @@ a <- extrap_grid(pred_grid = pred_grid,
                  srvy_in = "GOA", 
                  noaa_afsc_catch = noaa_afsc_catch)
 
-# AI Extrapolation grid -------------------------------------------------------
+obj_name <- paste0("noaa_afsc_GOA_pred_grid_depth")
+assign(x = obj_name, value = a$pred_grid_depth)
+save(noaa_afsc_GOA_pred_grid_depth, file = here::here("data", paste0(obj_name, ".rdata")))
+
+## AI Extrapolation grid -------------------------------------------------------
 
 load(here::here("inst", "exdata", "grids", "orig", "aleutian_islands_grid.rda"), verbose = TRUE)
 
@@ -273,7 +282,11 @@ a <- extrap_grid(pred_grid = pred_grid,
                  srvy_in = "AI", 
                  noaa_afsc_catch = noaa_afsc_catch)
 
-# EBS Extrapolation grid -------------------------------------------------------
+obj_name <- paste0("noaa_afsc_AI_pred_grid_depth")
+assign(x = obj_name, value = a$pred_grid_depth)
+save(noaa_afsc_AI_pred_grid_depth, file = here::here("data", paste0(obj_name, ".rdata")))
+
+## EBS Extrapolation grid -------------------------------------------------------
 
 load(here::here("inst", "exdata", "grids", "orig", "eastern_bering_sea_grid.rda"), verbose = TRUE)
 
@@ -286,7 +299,12 @@ pred_grid_ebs <- pred_grid <- data.frame(eastern_bering_sea_grid) %>%
 a <- extrap_grid(pred_grid = pred_grid, 
                  srvy_in = "EBS", 
                  noaa_afsc_catch = noaa_afsc_catch)
-# NBS Extrapolation grid -------------------------------------------------------
+
+obj_name <- paste0("noaa_afsc_EBS_pred_grid_depth")
+assign(x = obj_name, value = a$pred_grid_depth)
+save(noaa_afsc_EBS_pred_grid_depth, file = here::here("data", paste0(obj_name, ".rdata")))
+
+## NBS Extrapolation grid -------------------------------------------------------
 
 load(here::here("inst", "exdata", "grids", "orig", "northern_bering_sea_grid.rda"), verbose = TRUE)
 
@@ -300,16 +318,21 @@ a <- extrap_grid(pred_grid = pred_grid,
                  srvy_in = "NBS", 
                  noaa_afsc_catch = noaa_afsc_catch)
 
-# BS (NBS+EBS) Extrapolation grid -------------------------------------------------------
+obj_name <- paste0("noaa_afsc_NBS_pred_grid_depth")
+assign(x = obj_name, value = a$pred_grid_depth)
+save(noaa_afsc_NBS_pred_grid_depth, file = here::here("data", paste0(obj_name, ".rdata")))
+
+## BS (NBS+EBS) Extrapolation grid -------------------------------------------------------
 
 # pred_grid <- dplyr::bind_rows(
 #   pred_grid_nbs %>% dplyr::mutate(srvy_in  = "NBS"), 
 #   pred_grid_ebs %>% dplyr::mutate(srvy_in  = "EBS"))
 
+crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
 shp <- akgfmaps::get_base_layers(select.region = "bs.all", set.crs = crs_latlon)
 bs_all <- shp$survey.area
 names(bs_all) <- tolower(names(bs_all))
-sf::st_write(bs_all, here::here("inst", "exdata", "grids", "orig", "bs_all.shp"))
+sf::st_write(bs_all, here::here("inst", "exdata", "grids", "orig", "bs_all.shp"), append = FALSE)
 
 pred_grid <- FishStatsUtils::convert_shapefile(
   file_path = here::here("inst", "exdata", "grids", "orig", "bs_all.shp"), 
@@ -324,48 +347,50 @@ a <- extrap_grid(pred_grid = pred_grid,
                  srvy_out = "BS", 
                  noaa_afsc_catch = noaa_afsc_catch)
 
+obj_name <- paste0("noaa_afsc_BS_pred_grid_depth")
+assign(x = obj_name, value = a$pred_grid_depth)
+save(noaa_afsc_BS_pred_grid_depth, file = here::here("data", paste0(obj_name, ".rdata")))
+
 # Load Design-based biomass data for comparison --------------------------------
 
-# locations <- c("Z:/Projects/ConnectToOracle.R")
-# for (i in 1:length(locations)){
-#   if (file.exists(locations[i])){
-#     source(locations[i])
-#   }
-# }
-# 
-# noaa_afsc_biomass_estimates <- RODBC::sqlQuery(
-#   channel = channel_products, 
-#   query = 
-#     paste0("SELECT DISTINCT 
-# bb.SURVEY_DEFINITION_ID,
-# bb.AREA_ID,
-# bb.SPECIES_CODE,
-# bb.year,
-# bb.BIOMASS_MT,
-# bb.BIOMASS_VAR,
-# bb.POPULATION_COUNT,
-# bb.POPULATION_VAR
-# FROM GAP_PRODUCTS.AKFIN_BIOMASS bb
-# 
-# WHERE bb.AREA_ID IN (99901, 99902, 99903, 99904)
-# AND bb.SPECIES_CODE IN (", paste0(spp_list$species_code, collapse = ","),") 
-# ")) %>% 
-#   #   -- WHERE bb.SURVEY_DEFINITION_ID = 98 
-#   # -- AND bb.SPECIES_CODE IN (21740, 10210, 69322) 
-#   # -- AND AREA_ID = 99901
-#   # -- AND bb.year >= 1982
-#   janitor::clean_names()
-# 
-# # Save table to local directory
-# save(noaa_afsc_biomass_estimates, file = here::here("data", "noaa_afsc_biomass_estimates.rda"))
-# 
-# dat <- noaa_afsc_biomass_estimates
-# title <- "Combined AFSC catch, haul, and species data"
-# obj_name <- "noaa_afsc_catch"
-# author <- "Alaska Fisheries Science Center, compiled by Emily Markowitz (Emily.Markowitz AT noaa.gov)"
-# source <- "https://github.com/afsc-gap-products/gap_products and https://www.fisheries.noaa.gov/foss/f?p=215:28:14951401791129:::::"
-# details <- "The Resource Assessment and Conservation Engineering (RACE) Division Groundfish Assessment Program (GAP) of the Alaska Fisheries Science Center (AFSC) conducts fisheries-independent bottom trawl surveys to assess the populations of demersal fish and crab stocks of Alaska."
-# description <- "The final, validated survey data are publicly accessible soon after surveys are completed on the Fisheries One Stop Shop (FOSS) platform. This data includes catch, haul, and environmental data collected at each station. On the FOSS data platform, users can interactively select, view, and download data. Descriptive documentation and user-examples are available on the metadata page."
-# 
-# save(noaa_afsc_catch, file = here::here("data", paste0(obj_name, ".rda")))
-# data_documentation(dat, title, obj_name, author, source, details, description)
+locations <- c("Z:/Projects/ConnectToOracle.R")
+for (i in 1:length(locations)){
+  if (file.exists(locations[i])){
+    source(locations[i])
+  }
+}
+
+noaa_afsc_biomass <- RODBC::sqlQuery(
+  channel = channel_products,
+  query =
+    paste0("SELECT DISTINCT
+bb.SURVEY_DEFINITION_ID,
+bb.AREA_ID,
+bb.SPECIES_CODE,
+bb.year,
+bb.BIOMASS_MT,
+bb.BIOMASS_VAR,
+bb.POPULATION_COUNT,
+bb.POPULATION_VAR
+FROM GAP_PRODUCTS.AKFIN_BIOMASS bb
+
+WHERE bb.AREA_ID IN (99901, 99902, 99903, 99904)
+AND bb.SPECIES_CODE IN (", paste0(spp_list$species_code, collapse = ","),")
+")) %>%
+  #   -- WHERE bb.SURVEY_DEFINITION_ID = 98
+  # -- AND bb.SPECIES_CODE IN (21740, 10210, 69322)
+  # -- AND AREA_ID = 99901
+  # -- AND bb.year >= 1982
+  janitor::clean_names()
+
+# Save table to local directory
+dat <- noaa_afsc_biomass
+title <- "AFSC biomass and population estimates data"
+obj_name <- "noaa_afsc_biomass"
+author <- "Alaska Fisheries Science Center, compiled by Emily Markowitz (Emily.Markowitz AT noaa.gov)"
+source <- "https://github.com/afsc-gap-products/gap_products"
+details <- "The Resource Assessment and Conservation Engineering (RACE) Division Groundfish Assessment Program (GAP) of the Alaska Fisheries Science Center (AFSC) conducts fisheries-independent bottom trawl surveys to assess the populations of demersal fish and crab stocks of Alaska."
+description <- "The final, validated survey data are publicly accessible soon after surveys are completed on the Fisheries One Stop Shop (FOSS) platform. This data includes catch, haul, and environmental data collected at each station. On the FOSS data platform, users can interactively select, view, and download data. Descriptive documentation and user-examples are available on the metadata page."
+
+save(noaa_afsc_biomass, file = here::here("data", paste0(obj_name, ".rdata")))
+data_documentation(dat, title, obj_name, author, source, details, description)
