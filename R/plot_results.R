@@ -25,50 +25,50 @@ plot_results <- function(srvy, dir_out) {
   dir.create(dir_fig, showWarnings = FALSE)
   
   # find files
-  aaa <- list.files(path = dir_out, pattern = srvy, full.names = TRUE)
-  aaa <- aaa[!grepl(pattern = "figures", x = aaa)]
+  aaa <- base::list.files(path = dir_out, pattern = srvy, full.names = TRUE)
+  aaa <- aaa[!base::grepl(pattern = "figures", x = aaa)]
   
   # compile files for each org
   fit_df <- fit_pars <- fit_check <- index <- data.frame()
   for (i in 1:length(aaa)) {
     if (file.exists(paste0(aaa[i], "/fit_df.csv"))) {
       fit_df <- fit_df %>% 
-        dplyr::bind_rows(read.csv(paste0(aaa[i], "/fit_df.csv")))
+        dplyr::bind_rows(utils::read.csv(paste0(aaa[i], "/fit_df.csv")))
     }    
     if (file.exists(paste0(aaa[i], "fit_pars.csv"))) {
       fit_pars <- fit_pars %>% 
-        dplyr::bind_rows(read.csv(paste0(aaa[i], "/fit_pars.csv")))
+        dplyr::bind_rows(utils::read.csv(paste0(aaa[i], "/fit_pars.csv")))
     }
     if (file.exists(paste0(aaa[i], "/fit_check.csv"))) {
       fit_check <- fit_check %>% 
-        dplyr::bind_rows(read.csv(paste0(aaa[i], "/fit_check.csv")))
+        dplyr::bind_rows(utils::read.csv(paste0(aaa[i], "/fit_check.csv")))
     }
     if (file.exists(paste0(aaa[i], "/index.csv"))) {
       index <- index %>% 
-        dplyr::bind_rows(read.csv(paste0(aaa[i], "/index.csv")))
+        dplyr::bind_rows(utils::read.csv(paste0(aaa[i], "/index.csv")))
     }
   }
   
-  write.csv(x = fit_df, file = paste0(dir_fig, "/fit_df.csv"))
-  write.csv(x = fit_pars, file = paste0(dir_fig, "/fit_pars.csv"))
-  write.csv(x = fit_check, file = paste0(dir_fig, "/fit_check.csv"))
-  write.csv(x = index, file = paste0(dir_fig, "/index.csv"))
+  utils::write.csv(x = fit_df, file = paste0(dir_fig, "/fit_df.csv"))
+  utils::write.csv(x = fit_pars, file = paste0(dir_fig, "/fit_pars.csv"))
+  utils::write.csv(x = fit_check, file = paste0(dir_fig, "/fit_check.csv"))
+  utils::write.csv(x = index, file = paste0(dir_fig, "/index.csv"))
   
   # plotting -------------------------------------------------------------------
   
   plot_list <- c()
   i <- 0
-  theme_custom <- theme_bw() + 
-    theme(
-      strip.text = element_text(size = 12, face = "bold"),
-      axis.text.x = element_text(angle = 45, hjust = 1),
+  theme_custom <- ggplot2::theme_bw() + 
+    ggplot2::theme(
+      strip.text = ggplot2::element_text(size = 12, face = "bold"),
+      axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
       legend.position = "none"
     )
   
   ## log biomass estimates boxplot ---------------------------------------------
   p1 <- ggplot2::ggplot(
     data = index, 
-    mapping = aes(
+    mapping = ggplot2::aes(
       x = as.factor(effort), 
       y = log_est, 
       color = effort)) +
@@ -87,7 +87,7 @@ plot_results <- function(srvy, dir_out) {
   # log(?) SE boxplot ----------------------------------------------------------
   p1 <- ggplot2::ggplot(
     data = index, 
-    mapping = aes(
+    mapping = ggplot2::aes(
       x = as.factor(effort), 
       y = se, 
       color = effort)) +
@@ -106,11 +106,11 @@ plot_results <- function(srvy, dir_out) {
   # biomass estimates boxplot --------------------------------------------------
   p1 <- ggplot2::ggplot(
     data = index, 
-    mapping = aes(
+    mapping = ggplot2::aes(
       x = as.factor(effort), 
       y = est, 
       color = effort)) +
-    geom_boxplot() +
+    ggplot2::geom_boxplot() +
     ggplot2::facet_wrap(~ common_name) +
     ggplot2::labs(x = "Proprotion of effort",
                   y = "Biomass estimate")  + 
@@ -125,7 +125,7 @@ plot_results <- function(srvy, dir_out) {
   # biomass estimates over time ---------------------------------------------------
   p1 <- ggplot2::ggplot(
     data = index, 
-    mapping = aes(
+    mapping = ggplot2::aes(
       x = year, 
       y = est, 
       color = effort)) +
@@ -143,7 +143,7 @@ plot_results <- function(srvy, dir_out) {
   names(plot_list)[i] <- 'index_timeseries_biomass.png'
   
   for (ii in 1:length(plot_list)) {
-    ggsave(filename = names(plot_list)[ii],
+    ggplot2::ggsave(filename = names(plot_list)[ii],
            plot = plot_list[[ii]], 
            path = dir_fig, 
            width = 8, 
@@ -152,6 +152,6 @@ plot_results <- function(srvy, dir_out) {
            dpi = 300)
   }
   
-  save(plot_list, file = paste0(dir_fig, "figures.rdata"))
+  base::save(plot_list, file = paste0(dir_fig, "figures.rdata"))
 }
 

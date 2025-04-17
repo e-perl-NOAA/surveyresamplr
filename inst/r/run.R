@@ -97,7 +97,7 @@ PKG <- c(
 )
 
 # Use pkg_install() function found in functions.R file to load packages
-lapply(unique(PKG), pkg_install)
+base::lapply(unique(PKG), pkg_install)
 
 # Update README (sometimes) ----------------------------------------------------
 
@@ -180,7 +180,7 @@ spp_list <- data.frame(
 
 # source(paste0(wd, "code/data_dl_nw.r"))
 
-catch_ca <- read.csv(paste0(wd,"data/nwfsc_bt_fmp_spp_updated.csv")) #pulled data again to get 2024
+catch_ca <- utils::read.csv(paste0(wd,"data/nwfsc_bt_fmp_spp_updated.csv")) #pulled data again to get 2024
 catch <- catch_ca %>% 
   dplyr::select(trawlid = Trawl_id, 
                 common_name = Common_name, 
@@ -283,7 +283,7 @@ save(grid_yrs_depth_temperature, file = paste0("grids/grid_yr_temperature/noaa_a
 # # test you extracted correctkt
 # ggplot(data = grid_yrs %>% 
 #          dplyr::filter(year %in% c(2022:2024)), 
-#        mapping = aes(x = longitude_dd, y = latitude_dd, color = bottom_temperature_c)) +
+#        mapping = ggplot2::aes(x = longitude_dd, y = latitude_dd, color = bottom_temperature_c)) +
 #   geom_point() +
 #   facet_wrap(facets = "year")
 
@@ -434,7 +434,7 @@ save(grid_yrs_depth_temperature, file = paste0("grids/grid_yr_temperature/noaa_a
 # # test you extracted correct
 # ggplot(data = grid_yrs %>% 
 #          dplyr::filter(year %in% c(2022:2024)), 
-#        mapping = aes(x = longitude_dd, y = latitude_dd, color = bottom_temperature_c)) +
+#        mapping = ggplot2::aes(x = longitude_dd, y = latitude_dd, color = bottom_temperature_c)) +
 #   geom_point() +
 #   facet_wrap(facets = "year")
 

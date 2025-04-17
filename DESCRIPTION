@@ -1,16 +1,42 @@
-Package: surveyresamp
+Package: surveyresamplr
 Type: Package
 Title: What the Package Does (Title Case)
-  Version: 0.0.1
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Version: 0.0.1
+Authors@R: 
+  c(person(given = "Emily",
+           family = "Markowitz", 
+           role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-5757-4230"),
+           email = "Emily.Markowitz@noaa.gov"),
+    person(given = "Derek",
+           family = "Bolser", 
+           role = c("aut"),
+           email = "Derek.Bolser@noaa.gov"),
+    person(given = "Elizabeth",
+           family = "Perl", 
+           role = c("aut"),
+           email = "Elizabeth.Perl@noaa.gov"),
+    person(given = "Ian",
+           family = "Taylor",
+           role = "aut",
+           email = "Ian.Taylor@noaa.gov"))
+Description: Resample multi-year surveys to understand effectiveness of assessing species coverage. 
+    Many examples use sse sdmtmb wrappers.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    sdmTMB
+Imports: 
+    utils, 
+    purrr, 
+    furrr, 
+    ggplot2, 
+    dplyr, 
+    arrow, 
+    callr, 
+    future
 VignetteBuilder: knitr
 RoxygenNote: 7.3.2

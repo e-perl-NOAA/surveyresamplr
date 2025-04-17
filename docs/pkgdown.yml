@@ -1,0 +1,13 @@
+pandoc: 2.19.2
+pkgdown: 2.1.1
+pkgdown_sha: ~
+articles:
+  afsc-ai: afsc-ai.html
+  afsc-bs: afsc-bs.html
+  afsc-ebs: afsc-ebs.html
+  afsc-goa: afsc-goa.html
+  afsc-nbs: afsc-nbs.html
+  nefsc: nefsc.html
+  nwfsc: nwfsc.html
+  simple-example: simple-example.html
+last_built: 2025-04-17T00:36Z

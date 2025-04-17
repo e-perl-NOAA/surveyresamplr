@@ -13,6 +13,7 @@
 #' @param replicate_num An integer specifying the number of replicates.
 #' @param grid_yrs A data frame or list containing grid years information.
 #' @param dir_out A character string specifying the directory for output files.
+#' @param test Logical. TRUE/FALSE. If TRUE, will only run first two resampling tests. 
 #'
 #' @details
 #' This function performs the following steps:

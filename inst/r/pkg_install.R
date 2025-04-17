@@ -6,7 +6,7 @@
 #' directory, run 'chmod u+x ubuntu_libraries.sh' and then run './ubuntu_libraries.sh'
 #' @example 
 #' pkgs <- c("dplyr, "nwfscSurvey", "sdmTMB)
-#' lapply(pkgs, pkg_install)
+#' base::lapply(pkgs, pkg_install)
 #' 
 pkg_install <- function(p){
   if(grepl("/home/user/", getwd())){

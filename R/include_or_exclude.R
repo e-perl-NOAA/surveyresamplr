@@ -14,14 +14,14 @@ include_or_exclude <- function(df, proportions, replicate_num) {
   # Get the number of rows in the dataframe
   num_rows <- nrow(df)
   
-  # Use lapply to create a list of dataframes
-  result_list <- lapply(proportions, function(p) {
+  # Use base::lapply to create a list of dataframes
+  result_list <- base::lapply(proportions, function(p) {
     # Generate a random vector of 1s and 0s based on the specified proportion
     set.seed(1)
-    random_vectors <- replicate(replicate_num, sample(c(1, 0), size = num_rows, replace = TRUE, prob = c(p, 1 - p)), simplify = F)
+    random_vectors <- base::replicate(replicate_num, sample(c(1, 0), size = num_rows, replace = TRUE, prob = c(p, 1 - p)), simplify = F)
     
     # Create a new dataframe with the random assignments
-    lapply(random_vectors, function(rv) {
+    base::lapply(random_vectors, function(rv) {
       cbind(df, RandomAssignment = rv)
     })
   })

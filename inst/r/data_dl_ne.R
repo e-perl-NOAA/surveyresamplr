@@ -5,9 +5,6 @@
 ## Date:          March 2025
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-library(here)
-source(here::here("code","functions.R"))
-
 # Install Libraries ------------------------------------------------------------
 
 # Here we list all the packages we will need for this whole process
@@ -28,7 +25,8 @@ PKG <- c(
 )
 
 # Use pkg_install() function found in functions.R file to load packages
-lapply(unique(PKG), pkg_install)
+source("./inst/r/pkg_install.R")
+base::lapply(unique(PKG), pkg_install)
 
 # Test species to pull ---------------------------------------------------------
 
@@ -48,8 +46,8 @@ spp_list <-
 
 # Catch Load data ---------------------------------------------------------
 
-aaa <- list.files(path = here::here("data/ne_data/"), pattern = "NEFSCBottomTrawl", full.names = TRUE)
-aa <- list.files(path = here::here("data/ne_data/"), pattern = "NEFSCBottomTrawl", full.names = FALSE)
+aaa <- list.files(path = here::here("inst/exdata/ne_data/"), pattern = "NEFSCBottomTrawl", full.names = TRUE)
+aa <- list.files(path = here::here("inst/exdata/ne_data/"), pattern = "NEFSCBottomTrawl", full.names = FALSE)
 
 dat <- c()
 for (i in 1:length(aaa)) {
@@ -84,8 +82,18 @@ noaa_nefsc_catch <- dat %>%
   ) %>%
   dplyr::left_join(y = spp_list %>%
                      dplyr::select(file_name, common_name = common_name))
+# Save data -------------------------------------------------------------------
 
-save(noaa_nefsc_catch, file = here::here("data","noaa_nefsc_catch.rda"))
+dat <- noaa_nefsc_catch
+title <- "Combined NEFSC catch, haul, and species data from FOSS"
+obj_name <- "noaa_nefsc_catch"
+author <- "Northeast Fisheries Science Center, compiled by Emily Markowitz (Emily.Markowitz AT noaa.gov)"
+source <- "Data request to the NEFSC"
+details <- "[ENTER]."
+description <- "[ENTER]."
+
+save(noaa_nefsc_catch, file = here::here("data", paste0(obj_name, ".rda")))
+data_documentation(dat, title, obj_name, author, source, details, description)
 
 # Make extrapolation grids -----------------------------------------------------
 
@@ -148,9 +156,19 @@ extrap_grid <- function(
     dplyr::rename(depth_m = var1.pred) %>% 
     dplyr::select(-var1.var) %>%
     stats::na.omit()
+
+  # save(depth_raster, file = here::here("inst", "exdata", "grids","grid_depth",paste0("noaa_nefsc_", tolower(srvy_out),"_depth_raster.rdata")))
   
-  save(pred_grid_depth, file = here::here("grids",paste0("noaa_nefsc_",tolower(srvy_out),"_pred_grid_depth.rdata")))
-  save(depth_raster, file = here::here("grids","grid_depth",paste0("noaa_nefsc_", tolower(srvy_out),"_depth_raster.rdata")))
+  obj_name <- paste0("noaa_",tolower(srvy_out),"_pred_grid_depth")
+  dat <- pred_grid_depth
+  title <- paste0("Prediction grid for ", srvy_out, " survey")
+  author <- "Northeast Fisheries Science Center, compiled by Emily Markowitz (Emily.Markowitz AT noaa.gov)"
+  source <- "Data request to the NEFSC. "
+  details <- "[ENTER]."
+  description <- "[ENTER]."
+  
+  data_documentation(dat, title, obj_name, author, source, details, description)
+  save(pred_grid_depth, file = here::here("data",paste0(obj_name, ".rdata")))  
   
   return(list("pred_grid_depth" = pred_grid_depth, 
               "depth_raster" = depth_raster))
@@ -160,7 +178,7 @@ extrap_grid <- function(
 # nwa_shp <- sf::st_read(dsn = here::here("grids","strata.shp"))
 
 pred_grid <- FishStatsUtils::convert_shapefile(
-  file_path = here::here("grids", "orig", "strata.shp"), 
+  file_path = here::here("inst", "exdata", "grids", "orig", "strata.shp"), 
   quiet = FALSE)
 pred_grid <- pred_grid$extrapolation_grid %>% 
   dplyr::rename(longitude_dd = Lon, 
