@@ -3,23 +3,31 @@
 \docType{data}
 \name{noaa_nwfsc_catch}
 \alias{noaa_nwfsc_catch}
-\title{Prediction grid for NWFSC survey}
+\title{Combined NWFSC catch, haul, and species data}
 \format{
 A data frame with 200070 observations on the following 9 variables.
 \describe{
-  \item{\code{}}{. }#'   }
+  \item{\code{srvy}}{Abbreviated survey names. Abbreviated survey names. }
+  \item{\code{trawlid}}{Trawl ID. This is a unique numeric identifier assigned to each (vessel, cruise, and haul) combination.}
+  \item{\code{common_name}}{Taxon common name. The common name of the marine organism associated with the scientific_name and species_code columns.}
+  \item{\code{total_catch_wt_kg}}{Specimen weight (g). Weight of specimen (grams).}
+  \item{\code{latitude_dd}}{Latitude (decimal degrees). Latitude (one hundred thousandth of a decimal degree).}
+  \item{\code{longitude_dd}}{Longitude (decimal degrees). Longitude (one hundred thousandth of a decimal degree).}
+  \item{\code{year}}{Survey year. Year the observation (survey) was collected.}
+  \item{\code{pass}}{Pass. Pass}
+  \item{\code{depth_m}}{Depth (m). Bottom depth (meters).}#'   }
 }
 \source{
-Northwest Fisheries Science Center; https://raw.githubusercontent.com/pfmc-assessments/indexwc/main/data/california_current_grid.rda.
+Northwest Fisheries Science Center.
 }
 \usage{
 data('noaa_nwfsc_catch')
 }
 \description{
-[ENTER].
+ENTER.
 }
 \details{
-[ENTER].
+ENTER.
 }
 \examples{
 data(noaa_nwfsc_catch)
