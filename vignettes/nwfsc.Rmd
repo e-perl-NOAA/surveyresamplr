@@ -64,9 +64,12 @@ PKG <- c(
   "INLA" 
 )
 
-# Use pkg_install() function found in functions.R file to load packages
-source("./inst/r/pkg_install.R")
-base::lapply(unique(PKG), pkg_install)
+pkg_install <- function(p){
+  if(!require(p, character.only = TRUE)) {
+    install.packages(p)
+  }
+  require(p, character.only = TRUE)
+}base::lapply(unique(PKG), pkg_install)
 
 ### Define study species -------------------------------------------------------
 
@@ -138,20 +141,11 @@ spp_list <- data.frame(
 ### Load survey data -----------------------------------------------------------
 
 # source(paste0(wd, "code/data_dl_nw.r"))
-
-catch <- utils::read.csv(paste0(wd,"data/nwfsc_bt_fmp_spp_updated.csv")) #pulled data again to get 2024
+catch <- surveyresamplr::noaa_nwfsc_catch #pulled data again to get 2024
 
 ### Load grid data -------------------------------------------------------------
 
-load(paste0(wd,"grids/noaa_nwfsc_ca_pred_grid_depth.rda"), verbose = TRUE)
-pred_grid <- california_current_grid %>% # rename x and y cols
-  dplyr::select(longitude_dd = longitude, 
-                latitude_dd = latitude, 
-                pass = pass_scaled, 
-                depth_m = depth, 
-                area_km2 = area_km2_WCGBTS) %>% 
-  dplyr::mutate(srvy = "CA")
-grid_yrs <- replicate_df(pred_grid, "year", unique(catch$year))
+grid_yrs <- replicate_df(surveyresamplr::noaa_nwfsc_catch, "year", unique(catch$year))
 
 ### Variables ------------------------------------------------------------------
 

@@ -64,8 +64,12 @@ PKG <- c(
   "INLA" 
 )
 
-# Use pkg_install() function found in functions.R file to load packages
-source("./inst/r/pkg_install.R")
+pkg_install <- function(p){
+  if(!require(p, character.only = TRUE)) {
+    install.packages(p)
+  }
+  require(p, character.only = TRUE)
+}
 base::lapply(unique(PKG), pkg_install)
 
 # Run scenarios ----------------------------------------------------------------
@@ -95,13 +99,13 @@ spp_list <- data.frame(
 
 ### Load survey data -----------------------------------------------------------
 
-load(file = paste0(wd, "/data/noaa_afsc_catch.rda"))
-catch <- noaa_afsc_catch %>% dplyr::filter(srvy == "AI")
+# source(paste0(wd, "code/data_dl_ak.r"))
+catch <- surveyresamplr::noaa_afsc_catch.rda %>% 
+  dplyr::filter(srvy == "AI")
 
 ### Load grid data -------------------------------------------------------------
 
-load(paste0(wd, "grids/noaa_afsc_ai_pred_grid_depth.rdata"), verbose = TRUE)
-grid_yrs <- replicate_df(pred_grid_depth, "year", unique(catch$year))
+grid_yrs <- replicate_df(surveyresamplr::noaa_afsc_AI_pred_grid_depth, "year", unique(catch$year))
 
 ### Variables ------------------------------------------------------------------
 

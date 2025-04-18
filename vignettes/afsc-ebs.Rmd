@@ -64,8 +64,12 @@ PKG <- c(
   "INLA" 
 )
 
-# Use pkg_install() function found in functions.R file to load packages
-source("./inst/r/pkg_install.R")
+pkg_install <- function(p){
+  if(!require(p, character.only = TRUE)) {
+    install.packages(p)
+  }
+  require(p, character.only = TRUE)
+}
 base::lapply(unique(PKG), pkg_install)
 
 ### Define study species -------------------------------------------------------

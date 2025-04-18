@@ -63,8 +63,12 @@ PKG <- c(
   "INLA" 
 )
 
-# Use pkg_install() function found in functions.R file to load packages
-source("./inst/r/pkg_install.R")
+pkg_install <- function(p){
+  if(!require(p, character.only = TRUE)) {
+    install.packages(p)
+  }
+  require(p, character.only = TRUE)
+}
 base::lapply(unique(PKG), pkg_install)
 
 ### Define study species -------------------------------------------------------
@@ -96,14 +100,11 @@ spp_list <-
 ### Load survey data -----------------------------------------------------------
 
 # source(paste0(wd, "code/data_dl_ne.r"))
-
-load(file = paste0(wd, "/data/noaa_nefsc_catch.rda"))
-catch <- noaa_nefsc_catch %>% dplyr::filter(srvy == "SPRING")
+catch <- surveyresamplr::noaa_nefsc_catch #pulled data again to get 2024
 
 ### Load grid data -------------------------------------------------------------
 
-load(paste0(wd, "grids/noaa_nefsc_nwa_pred_grid_depth.rdata"), verbose = TRUE)
-grid_yrs <- replicate_df(pred_grid_depth, "year", unique(catch$year))
+grid_yrs <- replicate_df(surveyresamplr::noaa_nefsc_pred_grid_depth, "year", unique(catch$year))
 
 ### Variables ------------------------------------------------------------------
 
