@@ -29,7 +29,7 @@ Alaska Fisheries Science Center, National Marine Fisheries Service,
 National Oceanic and Atmospheric Administration, Seattle, WA 98195
 
 **Derek Bolser** (Derek.Bolser AT noaa.gov;
-[@dgbolser](https://github.com/dgbolser))
+[@dgbolser-NOAA](https://github.com/dgbolser-NOAA))
 
 Office of Science and Technology, National Marine Fisheries Service,
 National Oceanic and Atmospheric Administration, Silver Spring, MD 98195
