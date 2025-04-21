@@ -35,7 +35,7 @@ plot_results <- function(srvy, dir_out) {
       fit_df <- fit_df %>% 
         dplyr::bind_rows(utils::read.csv(paste0(aaa[i], "/fit_df.csv")))
     }    
-    if (file.exists(paste0(aaa[i], "fit_pars.csv"))) {
+    if (file.exists(paste0(aaa[i], "/fit_pars.csv"))) {
       fit_pars <- fit_pars %>% 
         dplyr::bind_rows(utils::read.csv(paste0(aaa[i], "/fit_pars.csv")))
     }
@@ -53,6 +53,11 @@ plot_results <- function(srvy, dir_out) {
   utils::write.csv(x = fit_pars, file = paste0(dir_fig, "/fit_pars.csv"))
   utils::write.csv(x = fit_check, file = paste0(dir_fig, "/fit_check.csv"))
   utils::write.csv(x = index, file = paste0(dir_fig, "/index.csv"))
+  
+  table_list <- list("fit_df" = fit_df, 
+                     "fit_pars" = fit_pars, 
+                     "fit_check" = fit_check, 
+                     "index" = index)
   
   # plotting -------------------------------------------------------------------
   
@@ -76,13 +81,14 @@ plot_results <- function(srvy, dir_out) {
     ggplot2::facet_wrap(~ common_name) +
     ggplot2::labs(x = "Proprotion of effort",
                   y = "Log biomass estimate")  + 
-    ggplot2::scale_color_viridis_d(
-      name = "Effort", 
-      option = "D") +
+    # ggplot2::scale_color_viridis_d(
+    #   name = "Effort", 
+    #   option = "D") +
+    ggplot2::scale_color_discrete(name = "Effort") + 
     theme_custom
   
   i <- i + 1; plot_list[[i]] <- p1
-  names(plot_list)[i] <- 'index_boxplot_log_biomass.png'
+  names(plot_list)[i] <- 'index_boxplot_log_biomass'
   
   # log(?) SE boxplot ----------------------------------------------------------
   p1 <- ggplot2::ggplot(
@@ -95,13 +101,14 @@ plot_results <- function(srvy, dir_out) {
     ggplot2::facet_wrap(~ common_name) +
     ggplot2::labs(x = "Proprotion of effort",
                   y = "Standard error of log biomass estimate")  + 
-    ggplot2::scale_color_viridis_d(
-      name = "Effort", 
-      option = "D") +
+    ggplot2::scale_color_discrete(name = "Effort") + 
+    # ggplot2::scale_color_viridis_d(
+    #   name = "Effort", 
+    #   option = "D") +
     theme_custom
   
   i <- i + 1; plot_list[[i]] <- p1
-  names(plot_list)[i] <- 'index_boxplot_log_biomass_SE.png'
+  names(plot_list)[i] <- 'index_boxplot_log_biomass_SE'
   
   # biomass estimates boxplot --------------------------------------------------
   p1 <- ggplot2::ggplot(
@@ -114,13 +121,14 @@ plot_results <- function(srvy, dir_out) {
     ggplot2::facet_wrap(~ common_name) +
     ggplot2::labs(x = "Proprotion of effort",
                   y = "Biomass estimate")  + 
-    ggplot2::scale_color_viridis_d(
-      name = "Effort", 
-      option = "D") +
+    ggplot2::scale_color_discrete(name = "Effort") + 
+    # ggplot2::scale_color_viridis_d(
+    #   name = "Effort", 
+    #   option = "D") +
     theme_custom
   
   i <- i + 1; plot_list[[i]] <- p1
-  names(plot_list)[i] <- 'index_boxplot_biomass.png'
+  names(plot_list)[i] <- 'index_boxplot_biomass'
   
   # biomass estimates over time ---------------------------------------------------
   p1 <- ggplot2::ggplot(
@@ -133,17 +141,19 @@ plot_results <- function(srvy, dir_out) {
     ggplot2::facet_wrap(~ common_name) +
     ggplot2::labs(x = "years",
                   y = "Biomass estimate")  + 
-    ggplot2::scale_color_viridis_d(
-      name = "Effort", 
-      option = "D") +
+    ggplot2::scale_color_discrete(name = "Effort") + 
+    # ggplot2::scale_color_viridis_d(
+    #   name = "Effort", 
+    #   option = "D") +
     theme_custom + 
     ggplot2::theme(legend.position = "right")
   
   i <- i + 1; plot_list[[i]] <- p1
-  names(plot_list)[i] <- 'index_timeseries_biomass.png'
+  names(plot_list)[i] <- 'index_timeseries_biomass'
   
+  # save -----------------------------------------------------------------------
   for (ii in 1:length(plot_list)) {
-    ggplot2::ggsave(filename = names(plot_list)[ii],
+    ggplot2::ggsave(filename = paste0(names(plot_list)[ii], ".png"),
            plot = plot_list[[ii]], 
            path = dir_fig, 
            width = 8, 
@@ -152,8 +162,12 @@ plot_results <- function(srvy, dir_out) {
            dpi = 300)
   }
   
-  base::save(plot_list, file = paste0(dir_fig, "figures.rdata"))
+  out <- list("plots" = plot_list, 
+              "tables" = table_list)
   
-  return(plot_list)
+  base::save(out, file = paste0(dir_fig, "figures.rdata"))
+  
+  return(out)
 }
+
 

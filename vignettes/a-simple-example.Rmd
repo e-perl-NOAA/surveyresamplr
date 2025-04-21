@@ -2,7 +2,7 @@
 title: "A Simple Example"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{a-simple-example}
+  %\VignetteIndexEntry{simple-example}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
