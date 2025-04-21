@@ -13,7 +13,7 @@ link_repo <- "https://github.com/emilymarkowitz-noaa/surveyresamplr"
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# [surveyresamplr](`r link_repo`) <img src="`r paste0(link_repo, "/blob/man/inst/img/logo.png?raw=true")`" alt="Logo." align="right" width="139" height="139"/>
+# [surveyresamplr](`r link_repo`) <img src="`r paste0(link_repo, "/blob/main/inst/img/logo.png?raw=true")`" alt="Logo." align="right" width="139" height="139"/>
 
 > Last run: `r format(Sys.Date(), format = "%B %d, %Y")`
 

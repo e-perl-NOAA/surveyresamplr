@@ -105,8 +105,7 @@ catch <- surveyresamplr::noaa_afsc_catch %>%
 ### Load grid data -------------------------------------------------------------
 
 # grid_yrs <- replicate_df(surveyresamplr::noaa_afsc_GOA_pred_grid_depth, "year", unique(catch$year))
-pred_grid_depth <- surveyresamplr::noaa_afsc_GOA_pred_grid_depth
-load(paste0(wd, "grids/noaa_afsc_bs_pred_grid_depth.rdata"), verbose = TRUE)
+pred_grid_depth <- surveyresamplr::noaa_afsc_bs_pred_grid_depth
 #### Add temperature: Coldpool temperature data
 # Data that varies over space and time (bottom temperature)
 # Here, bottom temperature, and thereby the cold pool extent, have been show to drive the distribution of many species. This is especially true for walleye pollock.
