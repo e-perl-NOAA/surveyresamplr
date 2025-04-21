@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 ```{r eval = FALSE}
 
-#get rid of memory limits
+# get rid of memory limits
 options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
 
 # Set directories --------------------------------------------------------------
@@ -69,7 +69,8 @@ pkg_install <- function(p){
     install.packages(p)
   }
   require(p, character.only = TRUE)
-}base::lapply(unique(PKG), pkg_install)
+}
+base::lapply(unique(PKG), pkg_install)
 
 ### Define study species -------------------------------------------------------
 

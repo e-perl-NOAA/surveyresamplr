@@ -149,22 +149,21 @@ repository](https://github.com/emilymarkowitz-noaa/surveyresamplr/issues).
     FALSE [1] stats     graphics  grDevices utils     datasets  methods   base     
     FALSE 
     FALSE other attached packages:
-    FALSE  [1] FishStatsUtils_2.13.2  marginaleffects_0.25.1 units_0.8-7            ggspatial_1.1.9        roxygen2_7.3.2         RODBC_1.3-26           sp_2.2-0               httr_1.4.7            
-    FALSE  [9] jsonlite_2.0.0         nwfscSurvey_2.2        coldpool_3.4-3         viridis_0.6.5          stringr_1.5.1          reshape2_1.4.4         lubridate_1.9.4        fields_16.3.1         
-    FALSE [17] viridisLite_0.4.2      spam_2.11-1            gstat_2.1-3            ggthemes_5.1.0         akgfmaps_4.0.3         terra_1.8-42           stars_0.6-8            abind_1.4-8           
-    FALSE [25] sf_1.0-20              readr_2.1.5            janitor_2.2.1          tibble_3.2.1           ggplot2_3.5.2          tidyr_1.3.1            magrittr_2.0.3         dplyr_1.1.4           
-    FALSE [33] plyr_1.8.9             remotes_2.5.0          devtools_2.4.5         pkgdown_2.1.1          usethis_3.1.0          here_1.0.1             fontawesome_0.5.3     
+    FALSE  [1] fontawesome_0.5.3      FishStatsUtils_2.13.2  marginaleffects_0.25.1 units_0.8-7            ggspatial_1.1.9        pkgdown_2.1.1          roxygen2_7.3.2         RODBC_1.3-26          
+    FALSE  [9] sp_2.2-0               httr_1.4.7             jsonlite_2.0.0         nwfscSurvey_2.2        coldpool_3.4-3         viridis_0.6.5          stringr_1.5.1          reshape2_1.4.4        
+    FALSE [17] lubridate_1.9.4        fields_16.3.1          viridisLite_0.4.2      spam_2.11-1            gstat_2.1-3            ggthemes_5.1.0         akgfmaps_4.0.3         terra_1.8-42          
+    FALSE [25] stars_0.6-8            abind_1.4-8            sf_1.0-20              readr_2.1.5            here_1.0.1             janitor_2.2.1          tibble_3.2.1           ggplot2_3.5.2         
+    FALSE [33] tidyr_1.3.1            magrittr_2.0.3         dplyr_1.1.4            plyr_1.8.9             remotes_2.5.0          devtools_2.4.5         usethis_3.1.0         
     FALSE 
     FALSE loaded via a namespace (and not attached):
-    FALSE  [1] DBI_1.2.3          gridExtra_2.3      rlang_1.1.5        snakecase_0.11.1   e1071_1.7-16       compiler_4.4.3     maps_3.4.2.1       callr_3.7.6        vctrs_0.6.5        profvis_0.4.0     
-    FALSE [11] pkgconfig_2.0.3    fastmap_1.2.0      backports_1.5.0    ellipsis_0.3.2     promises_1.3.2     rmarkdown_2.29     sessioninfo_1.2.3  tzdb_0.5.0         ps_1.9.1           purrr_1.0.4       
-    FALSE [21] xfun_0.52          cachem_1.1.0       later_1.4.2        parallel_4.4.3     R6_2.6.1           stringi_1.8.7      pkgload_1.4.0      Rcpp_1.0.14        knitr_1.50         zoo_1.8-14        
-    FALSE [31] readtext_0.91      FNN_1.1.4.1        Matrix_1.7-2       httpuv_1.6.16      timechange_0.3.0   tidyselect_1.2.1   rstudioapi_0.17.1  yaml_2.3.10        codetools_0.2-20   miniUI_0.1.2      
-    FALSE [41] processx_3.8.6     pkgbuild_1.4.7     lattice_0.22-6     intervals_0.15.5   shiny_1.10.0       withr_3.0.2        evaluate_1.0.3     desc_1.4.3         proxy_0.4-27       urlchecker_1.0.1  
-    FALSE [51] xml2_1.3.8         xts_0.14.1         pillar_1.10.2      KernSmooth_2.23-26 generics_0.1.3     rprojroot_2.0.4    spacetime_1.3-3    hms_1.1.3          munsell_0.5.1      scales_1.3.0      
-    FALSE [61] chron_2.3-62       xtable_1.8-4       class_7.3-23       glue_1.8.0         tools_4.4.3        data.table_1.17.0  fs_1.6.6           dotCall64_1.2      cowplot_1.1.3      grid_4.4.3        
-    FALSE [71] colorspace_2.1-1   raster_3.6-32      cli_3.6.4          fmesher_0.3.0      gtable_0.3.6       digest_0.6.37      classInt_0.4-11    htmlwidgets_1.6.4  memoise_2.0.1      htmltools_0.5.8.1 
-    FALSE [81] lifecycle_1.0.4    mime_0.13
+    FALSE  [1] DBI_1.2.3          gridExtra_2.3      rlang_1.1.5        snakecase_0.11.1   e1071_1.7-16       compiler_4.4.3     vctrs_0.6.5        maps_3.4.2.1       profvis_0.4.0      pkgconfig_2.0.3   
+    FALSE [11] fastmap_1.2.0      backports_1.5.0    ellipsis_0.3.2     promises_1.3.2     rmarkdown_2.29     sessioninfo_1.2.3  tzdb_0.5.0         purrr_1.0.4        xfun_0.52          cachem_1.1.0      
+    FALSE [21] later_1.4.2        parallel_4.4.3     R6_2.6.1           stringi_1.8.7      pkgload_1.4.0      Rcpp_1.0.14        knitr_1.50         zoo_1.8-14         readtext_0.91      FNN_1.1.4.1       
+    FALSE [31] Matrix_1.7-2       httpuv_1.6.16      timechange_0.3.0   tidyselect_1.2.1   yaml_2.3.10        rstudioapi_0.17.1  codetools_0.2-20   miniUI_0.1.2       pkgbuild_1.4.7     lattice_0.22-6    
+    FALSE [41] intervals_0.15.5   shiny_1.10.0       withr_3.0.2        evaluate_1.0.3     proxy_0.4-27       urlchecker_1.0.1   xts_0.14.1         xml2_1.3.8         pillar_1.10.2      KernSmooth_2.23-26
+    FALSE [51] generics_0.1.3     rprojroot_2.0.4    spacetime_1.3-3    hms_1.1.3          munsell_0.5.1      scales_1.3.0       chron_2.3-62       xtable_1.8-4       class_7.3-23       glue_1.8.0        
+    FALSE [61] tools_4.4.3        data.table_1.17.0  fs_1.6.6           dotCall64_1.2      cowplot_1.1.3      grid_4.4.3         colorspace_2.1-1   raster_3.6-32      cli_3.6.4          fmesher_0.3.0     
+    FALSE [71] gtable_0.3.6       digest_0.6.37      classInt_0.4-11    htmlwidgets_1.6.4  memoise_2.0.1      htmltools_0.5.8.1  lifecycle_1.0.4    mime_0.13
 
 # Legal
 
