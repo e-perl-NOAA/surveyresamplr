@@ -26,6 +26,7 @@ library(here)
 
 wd <- paste0(here::here(),"/vignettes/")
 dir_out <- paste0(wd, "output/")
+dir_final <- paste0(dir_out, "EBS_simple_results/")
 crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
 
 # Install Libraries ------------------------------------------------------------
@@ -212,34 +213,26 @@ purrr::map(
                        catch, seq_from, seq_to, seq_by, 
                        tot_dataframes, replicate_num, grid_yrs, dir_out))
 sink()
-write.table(x = (Sys.time() - start.time), file = paste0(dir_out, srvy, "_simple_time.txt"))
+write.csv(x = data.frame(time = as.numeric(Sys.time() - start.time), units = units(Sys.time() - start.time)), file = paste0(dir_out, srvy, "_simple_time.csv"))
 ```
 
 ```{r time}
-a <- readLines(con = paste0(dir_out, srvy, "_simple_time.txt") )
-cat(paste0("Time difference of ", strsplit(x = a[2], split = " ")[[1]][2], " secs"))
+a <- read.csv(file = paste0(dir_out, srvy, "_simple_time.csv") )
+cat(paste0("Time difference of ", round(a$time, 2), " ", a$units))
 ```
 
 ```{r sink-results}
 cat(readLines(con = paste0(dir_out, srvy, "_simple_logfile.txt") ))  
 ```
 
-```{r}
+```{r sink-results-backup}
 # EBS walleye pollock
 # ...Starting parallel SDM processing
 # 
 # ...05_1
 # 
 # This mesh has > 1000 vertices. Mesh complexity has the single largest influence on fitting speed. Consider whether you require a mesh this complex, especially for initial model exploration.
-# Check `your_mesh$mesh$n` to view the number of vertices.Registered S3 methods overwritten by 'htmltools':
-#   method               from
-#   print.html           tools:rstudio
-#   print.shiny.tag      tools:rstudio
-#   print.shiny.tag.list tools:rstudio
-# Registered S3 method overwritten by 'rmarkdown':
-#   method         from
-#   print.paged_df
-# Warning: The model may not have converged: non-positive-definite Hessian matrix.Warning: The model may not have converged: non-positive-definite Hessian matrix.Warning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs produced✔ Non-linear minimizer suggests successful convergence
+# Check `your_mesh$mesh$n` to view the number of vertices.Warning: The model may not have converged: non-positive-definite Hessian matrix.Warning: The model may not have converged: non-positive-definite Hessian matrix.Warning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs produced✔ Non-linear minimizer suggests successful convergence
 # ✖ Non-positive-definite Hessian matrix: model may not have converged
 # ℹ Try simplifying the model, adjusting the mesh, or adding priors
 # 
@@ -317,7 +310,7 @@ cat(readLines(con = paste0(dir_out, srvy, "_simple_logfile.txt") ))
 ```
 
 ```{r results-run, eval = FALSE}
-out <- plot_results(srvy = paste0(srvy, "_simple"), dir_out = dir_out) 
+out <- plot_results(srvy = paste0(srvy, "_simple"), dir_out = dir_out, dir_final = dir_final) 
 ```
 
 ```{r results-plots}

@@ -18,11 +18,14 @@
 #'   \item Saves the list of plots in an RData file.
 #' }
 #'
-plot_results <- function(srvy, dir_out) {
+plot_results <- function(srvy, dir_out, dir_final = NULL) {
   
   # create directory for images to be saved to
-  dir_fig <- paste0(dir_out, paste0(srvy, "_0figures/"))
-  dir.create(dir_fig, showWarnings = FALSE)
+  if (is.null(dir_final)) {
+    dir_final <- paste0(dir_out, paste0(srvy, "_0figures/"))
+  }
+  
+  dir.create(dir_final, showWarnings = FALSE)
   
   # find files
   aaa <- base::list.files(path = dir_out, pattern = srvy, full.names = TRUE)
@@ -49,10 +52,10 @@ plot_results <- function(srvy, dir_out) {
     }
   }
   
-  utils::write.csv(x = fit_df, file = paste0(dir_fig, "/fit_df.csv"))
-  utils::write.csv(x = fit_pars, file = paste0(dir_fig, "/fit_pars.csv"))
-  utils::write.csv(x = fit_check, file = paste0(dir_fig, "/fit_check.csv"))
-  utils::write.csv(x = index, file = paste0(dir_fig, "/index.csv"))
+  utils::write.csv(x = fit_df, file = paste0(dir_final, "/fit_df.csv"))
+  utils::write.csv(x = fit_pars, file = paste0(dir_final, "/fit_pars.csv"))
+  utils::write.csv(x = fit_check, file = paste0(dir_final, "/fit_check.csv"))
+  utils::write.csv(x = index, file = paste0(dir_final, "/index.csv"))
   
   table_list <- list("fit_df" = fit_df, 
                      "fit_pars" = fit_pars, 
@@ -155,7 +158,7 @@ plot_results <- function(srvy, dir_out) {
   for (ii in 1:length(plot_list)) {
     ggplot2::ggsave(filename = paste0(names(plot_list)[ii], ".png"),
            plot = plot_list[[ii]], 
-           path = dir_fig, 
+           path = dir_final, 
            width = 8, 
            height = 8, 
            device = 'png', 
@@ -165,7 +168,7 @@ plot_results <- function(srvy, dir_out) {
   out <- list("plots" = plot_list, 
               "tables" = table_list)
   
-  base::save(out, file = paste0(dir_fig, "figures.rdata"))
+  base::save(out, file = paste0(dir_final, "figures.rdata"))
   
   return(out)
 }
