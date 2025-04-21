@@ -44,6 +44,8 @@ PKG <- c(
   "janitor", 
   "data.table", 
   
+  "terra",
+  
   # parallelizing
   "forcats",
   "purrr",
@@ -115,7 +117,7 @@ grid_yrs_temperature <- dplyr::full_join(
   dplyr::bind_cols(
     pred_grid_depth[,c("longitude_dd", "latitude_dd", "depth_m", "area_km2")], 
     terra::unwrap(coldpool::ebs_bottom_temperature) %>% #TOLEDO
-      subset(ebs_only) %>%
+      terra::subset(ebs_only) %>%
       terra::project(crs_latlon) %>%
       terra::extract(pred_grid_depth[,c("longitude_dd", "latitude_dd")])) , 
   dplyr::bind_cols(

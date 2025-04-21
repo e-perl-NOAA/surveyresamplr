@@ -206,7 +206,7 @@ sink()
 ```
 
 ```{r sink-results}
-cat(readLines(con = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt") ))  
+cat(readLines(con = paste0(dir_out, srvy, "_simple_", Sys.Date(), "_logfile.txt") ))  
 ```
 
 ```{r plot, eval = FALSE}
@@ -214,6 +214,6 @@ aaa <- plot_results(srvy = srvy, dir_out = dir_out)
 ```
 
 ```{r}
-aaa <- load(file = paste0(dir_out, paste0(srvy, "_0figures/figures.rdata")))
+aaa <- load(file = paste0(dir_out, paste0(srvy, "_simple_0figures/figures.rdata")))
 aaa
 ```
