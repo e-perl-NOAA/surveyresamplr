@@ -153,5 +153,7 @@ plot_results <- function(srvy, dir_out) {
   }
   
   base::save(plot_list, file = paste0(dir_fig, "figures.rdata"))
+  
+  return(plot_list)
 }
 

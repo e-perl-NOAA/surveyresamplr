@@ -186,7 +186,8 @@ pred_grid <- FishStatsUtils::convert_shapefile(
 pred_grid <- pred_grid$extrapolation_grid %>% 
   dplyr::rename(longitude_dd = Lon, 
                 latitude_dd = Lat, 
-                area_km2 = Area_km2) 
+                area_km2 = Area_km2) %>% 
+  dplyr::select(-N_km, -E_km, -Include)
 
 a <- extrap_grid(pred_grid = pred_grid, srvy = c("SPRING", "FALL"), 
                  srvy_out = "NWA", 

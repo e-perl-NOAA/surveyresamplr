@@ -2,7 +2,7 @@
 #' @description ENTER.
 #' @usage data('noaa_nefsc_pred_grid_depth')
 #' @author Northeast Fisheries Science Center, compiled by Emily Markowitz (Emily.Markowitz AT noaa.gov)
-#' @format A data frame with 80413 observations on the following 9 variables.
+#' @format A data frame with 80413 observations on the following 6 variables.
 #' \describe{
 #'   \item{\code{srvy}}{Abbreviated survey names. Abbreviated survey names. }
 #'   \item{\code{latitude_dd}}{Latitude (decimal degrees). Latitude (one hundred thousandth of a decimal degree).}

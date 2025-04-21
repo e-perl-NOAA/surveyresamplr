@@ -32,7 +32,7 @@ wrapper_sdmtmb <- function(x, y, z, dir_spp, spp_info, n_knots = 500) {
     family = ', spp_info$model_family,'(),
     time = "year",
     anisotropy = ', spp_info$model_anisotropy,',
-    spatiotemporal = as.list(c("', gsub(pattern = ', ', replace = '", "', x = spp_info$model_spatiotemporal),'"))
+    spatiotemporal = as.list(c("', gsub(pattern = ', ', replacement = '", "', x = spp_info$model_spatiotemporal),'"))
   )')))
   
   # get the index

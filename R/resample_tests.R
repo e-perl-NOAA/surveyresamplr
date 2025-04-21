@@ -45,7 +45,8 @@ resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE) 
   message("...Starting parallel SDM processing")
   
   # Run SDMs in parallel
-  furrr::future_map(seq_along(spp_files), function(i) {
+  for (i in seq_along(spp_files)) {
+  # furrr::future_map(seq_along(spp_files), function(i) {
     message(paste0("\n...", spp_files[[i]], "\n"))
     gc()  # Free memory
     # Load only the required dataframe
@@ -133,8 +134,9 @@ resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE) 
     rm("fit0", "spp_df")
     gc()
     # NULL
-  }, .progress = TRUE, .options = furrr::furrr_options(seed = TRUE))
-  
+  # }, .progress = TRUE, .options = furrr::furrr_options(seed = TRUE))
+}
+
   message("...Parallel SDM processing complete")
 }
 

@@ -95,7 +95,7 @@ spp_list <- data.frame(
 ### Load survey data -----------------------------------------------------------
 
 # source(paste0(wd, "code/data_dl_ak.r"))
-catch <- surveyresamplr::noaa_afsc_catch.rda %>% 
+catch <- surveyresamplr::noaa_afsc_catch %>% 
   dplyr::filter(srvy == "GOA")
 
 ### Load grid data -------------------------------------------------------------

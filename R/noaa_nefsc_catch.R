@@ -14,7 +14,9 @@
 #'   \item{\code{year}}{Survey year. Year the observation (survey) was collected.}
 #'   \item{\code{pass}}{Pass. Pass}
 #'   \item{\code{bottom_temperature_c}}{Bottom temperature (degrees Celsius). Bottom temperature (tenths of a degree Celsius); NA indicates removed or missing values.}
-#'   \item{\code{depth_m}}{Depth (m). Bottom depth (meters).}#'   }
+#'   \item{\code{depth_m}}{Depth (m). Bottom depth (meters).}
+#'   \item{\code{file_name}}{File name. Name of origonal source file.  }
+#'   \item{\code{salinity_bottom}}{Bottom salinity. Bottom salinity (parts per million); NA indicates removed or missing values.}#'   }
 #' @source Data request to the NEFSC
 #' @keywords species code data
 #' @examples

@@ -22,7 +22,7 @@ Authors@R:
            email = "Ian.Taylor@noaa.gov"))
 Description: Resample multi-year surveys to understand effectiveness of assessing species coverage. 
     Many examples use sse sdmtmb wrappers.
-License: What license is it under?
+License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
 Suggests: 
@@ -36,6 +36,7 @@ Imports:
     ggplot2, 
     dplyr, 
     arrow, 
-    future
+    future, 
+    magrittr
 VignetteBuilder: knitr
 RoxygenNote: 7.3.2

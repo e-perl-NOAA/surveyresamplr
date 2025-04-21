@@ -14,10 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(surveyresamplr)
-```
-
+## Set directories and install libraries
 
 ```{r eval = FALSE}
 
@@ -76,11 +73,15 @@ pkg_install <- function(p){
   require(p, character.only = TRUE)
 }
 base::lapply(unique(PKG), pkg_install)
+```
 
-# Run scenarios ----------------------------------------------------------------
+## Test Species List
 
-### Define study species -------------------------------------------------------
+Then we define our species and model list. In this simple example, we'll assess a model for eastern Bering Sea (EBS) walleye pollock (*Gadus chalcogrammus*) from 2010-present, using data collected by the Alaska Fisheries Science Center. 
 
+Walleye pollock are fairly well distributed across the area, very common in the area, and very economically important, so this will be a great species to start testing these models with. 
+
+```{r define-spp-list}
 spp_list <- data.frame(
   srvy = "EBS",
   common_name = c("walleye pollock"), 
@@ -95,7 +96,73 @@ spp_list <- data.frame(
 ) %>% 
   dplyr::mutate( 
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
+```
 
+## Pull in data
+
+Some example data is included in the R package for examples like this. We'll need 
+
+1. Zero-filled catch data from the survey to use for developing the model and 
+2. an extrapolation grid that you can replicate across years for your prediction matrix. Note that if your model models over depth (as with this model) your prediction grid will also need to have a depth field. 
+
+Use `?surveyresamplr::noaa_afsc_catch` and `?surveyresamplr::noaa_afsc_ebs_pred_grid_depth`) to learn more about these data sources. In the meantime, this is what these resources look like: 
+
+```{r explore-catch}
+# ?surveyresamplr::noaa_afsc_catch
+
+head(surveyresamplr::noaa_afsc_catch)
+
+# Example exploratory plot
+
+dat <- surveyresamplr::noaa_afsc_catch %>% 
+                  dplyr::filter(year %in% 2023:2024 & 
+                                  srvy %in% c("EBS") & 
+                                  species_code == 21740)
+
+ggplot2::ggplot(data = dat %>% dplyr::filter(cpue_kgkm2 != 0), 
+                mapping = aes(x = longitude_dd, 
+                              y = latitude_dd, 
+                              size = cpue_kgkm2)) + 
+  ggplot2::geom_point(alpha = .75) +
+  ggplot2::geom_point(data = dat %>% dplyr::filter(cpue_kgkm2 %in% c(0, NA)), 
+                      color = "red", 
+                      shape = 17,
+                      alpha = .75,
+                      size = 3) +
+  ggplot2::xlab("Longitude *W") +
+  ggplot2::ylab("Latitude *N") +
+  ggplot2::ggtitle(label = "CPUE (kg/km^2) of walleye pollock (Weight CPUE; kg/km2)", 
+                   subtitle = "AFSC Eastern Bering Sea bottom trawl survey") +
+  ggplot2::scale_size_continuous(name = "Weight (kg)") + 
+  ggplot2::facet_wrap(facets = vars(year)) + 
+  ggplot2::theme_bw()
+```
+
+
+```{r explore-grid}
+# ?surveyresamplr::noaa_afsc_ebs_pred_grid_depth
+
+head(surveyresamplr::noaa_afsc_ebs_pred_grid_depth)
+
+ggplot2::ggplot(data = surveyresamplr::noaa_afsc_ebs_pred_grid_depth, 
+       mapping = aes(x = longitude_dd, 
+                     y = dat$latitude_dd, 
+                     color = dat$depth_m)) + 
+  ggplot2::geom_point(alpha = .5, 
+                      size = .5)  +
+  ggplot2::xlab("Longitude *W") +
+  ggplot2::ylab("Latitude *N") +
+  ggplot2::ggtitle(label = "Prediction Grid", 
+                   subtitle = "AFSC Eastern Bering Sea bottom trawl survey") +
+  ggplot2::scale_color_continuous(name = "Depth (m)") + 
+  ggplot2::theme_bw() + 
+  
+```   
+
+
+Here we load the data for the model run, cropping it to the data we would like to include (the EBS survey and years greater than 2010) and replicating the the prediction grid across the years in the catch data. 
+
+```{r load-data}
 ### Load survey data -----------------------------------------------------------
 
 catch <- surveyresamplr::noaa_afsc_catch %>% 
@@ -104,7 +171,9 @@ catch <- surveyresamplr::noaa_afsc_catch %>%
 
 ### Load grid data -------------------------------------------------------------
 
-grid_yrs <- replicate_df(surveyresamplr::noaa_afsc_EBS_pred_grid_depth, "year", unique(catch$year))
+grid_yrs <- replicate_df(dat = surveyresamplr::noaa_afsc_ebs_pred_grid_depth, 
+                         time_name = "year", 
+                         time_values = unique(catch$year))
 
 ### Variables ------------------------------------------------------------------
 
@@ -117,15 +186,17 @@ replicate_num <- 3
 
 ### Run ------------------------------------------------------------------------
 
-# sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
+sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
 map(
   1:nrow(spp_list), 
   ~ clean_and_resample(spp_list[.x,], 
                        catch, seq_from, seq_to, seq_by, 
-                       tot_dataframes, replicate_num, grid_yrs, dir_out, test = TRUE))
-# sink()
+                       tot_dataframes, replicate_num, grid_yrs, dir_out))
+sink()
 
 ### Plot indices ---------------------------------------------------------------
 
-plot_results(srvy = srvy, dir_out = dir_out) 
+aaa <- plot_results(srvy = srvy, dir_out = dir_out) 
+
+aaa
 ```

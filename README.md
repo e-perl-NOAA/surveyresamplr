@@ -1,8 +1,8 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# [surveyresamplr](https://github.com/emilymarkowitz-noaa/surveyresamplr) <img src="https://github.com/emilymarkowitz-noaa/surveyresamplr/blob/em/man/img/logo.png?raw=true" alt="Logo." align="right" width="139" height="139"/>
+# [surveyresamplr](https://github.com/emilymarkowitz-noaa/surveyresamplr) <img src="https://github.com/emilymarkowitz-noaa/surveyresamplr/blob/man/inst/img/logo.png?raw=true" alt="Logo." align="right" width="139" height="139"/>
 
-> Last run: April 17, 2025
+> Last run: April 20, 2025
 
 # Purpose
 
@@ -140,39 +140,31 @@ repository](https://github.com/emilymarkowitz-noaa/surveyresamplr/issues).
     FALSE 
     FALSE 
     FALSE locale:
-    FALSE [1] LC_COLLATE=English_United States.utf8  LC_CTYPE=English_United States.utf8    LC_MONETARY=English_United States.utf8
-    FALSE [4] LC_NUMERIC=C                           LC_TIME=English_United States.utf8    
+    FALSE [1] LC_COLLATE=English_United States.utf8  LC_CTYPE=English_United States.utf8    LC_MONETARY=English_United States.utf8 LC_NUMERIC=C                           LC_TIME=English_United States.utf8    
     FALSE 
     FALSE time zone: America/Los_Angeles
     FALSE tzcode source: internal
     FALSE 
     FALSE attached base packages:
-    FALSE [1] stats4    stats     graphics  grDevices utils     datasets  methods   base     
+    FALSE [1] stats     graphics  grDevices utils     datasets  methods   base     
     FALSE 
     FALSE other attached packages:
-    FALSE  [1] Require_1.0.1          fontawesome_0.5.3      FishStatsUtils_2.13.2  marginaleffects_0.25.1 units_0.8-7            ggspatial_1.1.9       
-    FALSE  [7] pkgdown_2.1.1          roxygen2_7.3.2         RODBC_1.3-26           sp_2.2-0               httr_1.4.7             jsonlite_1.9.1        
-    FALSE [13] nwfscSurvey_2.2        gapindex_3.0.2         gapctd_2.1.8           plotly_4.10.4          interp_1.1-6           bbmle_1.0.25.1        
-    FALSE [19] oce_1.8-3              gsw_1.2-0              coldpool_3.4-3         viridis_0.6.5          stringr_1.5.1          reshape2_1.4.4        
-    FALSE [25] lubridate_1.9.4        fields_16.3.1          viridisLite_0.4.2      spam_2.11-1            gstat_2.1-3            ggthemes_5.1.0        
-    FALSE [31] akgfmaps_4.0.3         terra_1.8-29           stars_0.6-8            abind_1.4-8            sf_1.0-19              readr_2.1.5           
-    FALSE [37] here_1.0.1             janitor_2.2.1          tibble_3.2.1           ggplot2_3.5.2          tidyr_1.3.1            magrittr_2.0.3        
-    FALSE [43] dplyr_1.1.4            plyr_1.8.9             remotes_2.5.0          devtools_2.4.5         usethis_3.1.0         
+    FALSE  [1] FishStatsUtils_2.13.2  marginaleffects_0.25.1 units_0.8-7            ggspatial_1.1.9        roxygen2_7.3.2         RODBC_1.3-26           sp_2.2-0               httr_1.4.7            
+    FALSE  [9] jsonlite_2.0.0         nwfscSurvey_2.2        coldpool_3.4-3         viridis_0.6.5          stringr_1.5.1          reshape2_1.4.4         lubridate_1.9.4        fields_16.3.1         
+    FALSE [17] viridisLite_0.4.2      spam_2.11-1            gstat_2.1-3            ggthemes_5.1.0         akgfmaps_4.0.3         terra_1.8-42           stars_0.6-8            abind_1.4-8           
+    FALSE [25] sf_1.0-20              readr_2.1.5            janitor_2.2.1          tibble_3.2.1           ggplot2_3.5.2          tidyr_1.3.1            magrittr_2.0.3         dplyr_1.1.4           
+    FALSE [33] plyr_1.8.9             remotes_2.5.0          devtools_2.4.5         pkgdown_2.1.1          usethis_3.1.0          here_1.0.1             fontawesome_0.5.3     
     FALSE 
     FALSE loaded via a namespace (and not attached):
-    FALSE  [1] sys_3.4.3           rstudioapi_0.17.1   rmarkdown_2.29      fs_1.6.5            vctrs_0.6.5         memoise_2.0.1       htmltools_0.5.8.1  
-    FALSE  [8] curl_6.2.2          raster_3.6-31       KernSmooth_2.23-26  htmlwidgets_1.6.4   desc_1.4.3          zoo_1.8-13          cachem_1.1.0       
-    FALSE [15] mime_0.12           lifecycle_1.0.4     pkgconfig_2.0.3     Matrix_1.7-2        R6_2.6.1            fastmap_1.2.0       shiny_1.10.0       
-    FALSE [22] snakecase_0.11.1    digest_0.6.37       numDeriv_2016.8-1.1 colorspace_2.1-1    ps_1.9.0            chron_2.3-62        rprojroot_2.0.4    
-    FALSE [29] pkgload_1.4.0       timechange_0.3.0    compiler_4.4.3      proxy_0.4-27        intervals_0.15.5    downloader_0.4.1    withr_3.0.2        
-    FALSE [36] backports_1.5.0     DBI_1.2.3           pkgbuild_1.4.7      maps_3.4.2.1        MASS_7.3-64         sessioninfo_1.2.3   classInt_0.4-11    
-    FALSE [43] tools_4.4.3         httpuv_1.6.15       glue_1.8.0          callr_3.7.6         promises_1.3.2      grid_4.4.3          generics_0.1.3     
-    FALSE [50] gtable_0.3.6        tzdb_0.5.0          class_7.3-23        data.table_1.17.0   hms_1.1.3           xml2_1.3.8          pillar_1.10.2      
-    FALSE [57] later_1.4.1         lattice_0.22-6      FNN_1.1.4.1         deldir_2.0-4        tidyselect_1.2.1    miniUI_0.1.1.1      knitr_1.50         
-    FALSE [64] gridExtra_2.3       xfun_0.51           stringi_1.8.4       yaml_2.3.10         lazyeval_0.2.2      evaluate_1.0.3      codetools_0.2-20   
-    FALSE [71] cli_3.6.4           xtable_1.8-4        munsell_0.5.1       processx_3.8.6      spacetime_1.3-3     Rcpp_1.0.14         readtext_0.91      
-    FALSE [78] bdsmatrix_1.3-7     parallel_4.4.3      ellipsis_0.3.2      fmesher_0.2.0.9016  dotCall64_1.2       profvis_0.4.0       urlchecker_1.0.1   
-    FALSE [85] mvtnorm_1.3-3       scales_1.3.0        xts_0.14.1          e1071_1.7-16        purrr_1.0.4         rlang_1.1.5         cowplot_1.1.3
+    FALSE  [1] DBI_1.2.3          gridExtra_2.3      rlang_1.1.5        snakecase_0.11.1   e1071_1.7-16       compiler_4.4.3     maps_3.4.2.1       callr_3.7.6        vctrs_0.6.5        profvis_0.4.0     
+    FALSE [11] pkgconfig_2.0.3    fastmap_1.2.0      backports_1.5.0    ellipsis_0.3.2     promises_1.3.2     rmarkdown_2.29     sessioninfo_1.2.3  tzdb_0.5.0         ps_1.9.1           purrr_1.0.4       
+    FALSE [21] xfun_0.52          cachem_1.1.0       later_1.4.2        parallel_4.4.3     R6_2.6.1           stringi_1.8.7      pkgload_1.4.0      Rcpp_1.0.14        knitr_1.50         zoo_1.8-14        
+    FALSE [31] readtext_0.91      FNN_1.1.4.1        Matrix_1.7-2       httpuv_1.6.16      timechange_0.3.0   tidyselect_1.2.1   rstudioapi_0.17.1  yaml_2.3.10        codetools_0.2-20   miniUI_0.1.2      
+    FALSE [41] processx_3.8.6     pkgbuild_1.4.7     lattice_0.22-6     intervals_0.15.5   shiny_1.10.0       withr_3.0.2        evaluate_1.0.3     desc_1.4.3         proxy_0.4-27       urlchecker_1.0.1  
+    FALSE [51] xml2_1.3.8         xts_0.14.1         pillar_1.10.2      KernSmooth_2.23-26 generics_0.1.3     rprojroot_2.0.4    spacetime_1.3-3    hms_1.1.3          munsell_0.5.1      scales_1.3.0      
+    FALSE [61] chron_2.3-62       xtable_1.8-4       class_7.3-23       glue_1.8.0         tools_4.4.3        data.table_1.17.0  fs_1.6.6           dotCall64_1.2      cowplot_1.1.3      grid_4.4.3        
+    FALSE [71] colorspace_2.1-1   raster_3.6-32      cli_3.6.4          fmesher_0.3.0      gtable_0.3.6       digest_0.6.37      classInt_0.4-11    htmlwidgets_1.6.4  memoise_2.0.1      htmltools_0.5.8.1 
+    FALSE [81] lifecycle_1.0.4    mime_0.13
 
 # Legal
 

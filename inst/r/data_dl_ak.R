@@ -172,7 +172,7 @@ source <- "https://github.com/afsc-gap-products/gap_products and https://www.fis
 details <- "The Resource Assessment and Conservation Engineering (RACE) Division Groundfish Assessment Program (GAP) of the Alaska Fisheries Science Center (AFSC) conducts fisheries-independent bottom trawl surveys to assess the populations of demersal fish and crab stocks of Alaska."
 description <- "The final, validated survey data are publicly accessible soon after surveys are completed on the Fisheries One Stop Shop (FOSS) platform. This data includes catch, haul, and environmental data collected at each station. On the FOSS data platform, users can interactively select, view, and download data. Descriptive documentation and user-examples are available on the metadata page."
 
-save(noaa_afsc_catch, file = here::here("data", paste0(obj_name, ".rda")))
+save(noaa_afsc_catch, file = here::here("data", paste0(obj_name, ".rdata")))
 data_documentation(dat, title, obj_name, author, source, details, description)
 
 # Make extrapolation grids -----------------------------------------------------
@@ -259,15 +259,16 @@ pred_grid <- utils::read.csv(here::here("inst", "exdata", "grids", "orig", "goa_
 
 pred_grid <- pred_grid %>% 
   dplyr::rename(longitude_dd = lon, 
-                latitude_dd = lat)
+                latitude_dd = lat)%>% 
+  dplyr::select(-X, -Y)
 
 a <- extrap_grid(pred_grid = pred_grid, 
                  srvy_in = "GOA", 
                  noaa_afsc_catch = noaa_afsc_catch)
 
-obj_name <- paste0("noaa_afsc_GOA_pred_grid_depth")
+obj_name <- paste0("noaa_afsc_goa_pred_grid_depth")
 assign(x = obj_name, value = a$pred_grid_depth)
-save(noaa_afsc_GOA_pred_grid_depth, file = here::here("data", paste0(obj_name, ".rdata")))
+save(noaa_afsc_goa_pred_grid_depth, file = here::here("data", paste0(obj_name, ".rdata")))
 
 ## AI Extrapolation grid -------------------------------------------------------
 
@@ -282,9 +283,9 @@ a <- extrap_grid(pred_grid = pred_grid,
                  srvy_in = "AI", 
                  noaa_afsc_catch = noaa_afsc_catch)
 
-obj_name <- paste0("noaa_afsc_AI_pred_grid_depth")
+obj_name <- paste0("noaa_afsc_ai_pred_grid_depth")
 assign(x = obj_name, value = a$pred_grid_depth)
-save(noaa_afsc_AI_pred_grid_depth, file = here::here("data", paste0(obj_name, ".rdata")))
+save(noaa_afsc_ai_pred_grid_depth, file = here::here("data", paste0(obj_name, ".rdata")))
 
 ## EBS Extrapolation grid -------------------------------------------------------
 
@@ -300,9 +301,9 @@ a <- extrap_grid(pred_grid = pred_grid,
                  srvy_in = "EBS", 
                  noaa_afsc_catch = noaa_afsc_catch)
 
-obj_name <- paste0("noaa_afsc_EBS_pred_grid_depth")
+obj_name <- paste0("noaa_afsc_ebs_pred_grid_depth")
 assign(x = obj_name, value = a$pred_grid_depth)
-save(noaa_afsc_EBS_pred_grid_depth, file = here::here("data", paste0(obj_name, ".rdata")))
+save(noaa_afsc_ebs_pred_grid_depth, file = here::here("data", paste0(obj_name, ".rdata")))
 
 ## NBS Extrapolation grid -------------------------------------------------------
 
@@ -318,9 +319,9 @@ a <- extrap_grid(pred_grid = pred_grid,
                  srvy_in = "NBS", 
                  noaa_afsc_catch = noaa_afsc_catch)
 
-obj_name <- paste0("noaa_afsc_NBS_pred_grid_depth")
+obj_name <- paste0("noaa_afsc_nbs_pred_grid_depth")
 assign(x = obj_name, value = a$pred_grid_depth)
-save(noaa_afsc_NBS_pred_grid_depth, file = here::here("data", paste0(obj_name, ".rdata")))
+save(noaa_afsc_nbs_pred_grid_depth, file = here::here("data", paste0(obj_name, ".rdata")))
 
 ## BS (NBS+EBS) Extrapolation grid -------------------------------------------------------
 
@@ -340,16 +341,17 @@ pred_grid <- FishStatsUtils::convert_shapefile(
 pred_grid <- pred_grid$extrapolation_grid %>% 
   dplyr::rename(longitude_dd = Lon, 
                 latitude_dd = Lat, 
-                area_km2 = Area_km2) 
+                area_km2 = Area_km2)  %>% 
+  dplyr::select(-N_km, -E_km, -Include)
 
 a <- extrap_grid(pred_grid = pred_grid, 
                  srvy_in = c("NBS", "EBS"), 
                  srvy_out = "BS", 
                  noaa_afsc_catch = noaa_afsc_catch)
 
-obj_name <- paste0("noaa_afsc_BS_pred_grid_depth")
+obj_name <- paste0("noaa_afsc_bs_pred_grid_depth")
 assign(x = obj_name, value = a$pred_grid_depth)
-save(noaa_afsc_BS_pred_grid_depth, file = here::here("data", paste0(obj_name, ".rdata")))
+save(noaa_afsc_bs_pred_grid_depth, file = here::here("data", paste0(obj_name, ".rdata")))
 
 # Load Design-based biomass data for comparison --------------------------------
 

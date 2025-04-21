@@ -5,7 +5,13 @@
 #' @format A data frame with 738 observations on the following 8 variables.
 #' \describe{
 #'   \item{\code{species_code}}{Taxon scientific name. The species code of the organism associated with the common_name and scientific_name columns.}
-#'   \item{\code{year}}{Survey year. Year the observation (survey) was collected.}#'   }
+#'   \item{\code{year}}{Survey year. Year the observation (survey) was collected.}
+#'   \item{\code{biomass_mt}}{Estimated biomass. The estimated total biomass.}
+#'   \item{\code{biomass_var}}{Estimated biomass variance. The estimated variance associated with the total biomass.}
+#'   \item{\code{population_count}}{Estimated population. The estimated population caught in the survey for a species, group, or total for a given survey.}
+#'   \item{\code{population_var}}{Estimated population variance. The estimated population variance caught in the survey for a species, group, or total for a given survey.}
+#'   \item{\code{survey_definition_id}}{Survey ID. The survey definition ID key code is an integer that uniquely identifies a survey region/survey design. The column survey_definition_id is associated with the srvy and survey columns. }
+#'   \item{\code{area_id}}{Area ID. Area ID key code for each statistical area used to produce production estimates (e.g., biomass, population, age comps, length comps). Each area ID is unique within each survey.}#'   }
 #' @source https://github.com/afsc-gap-products/gap_products
 #' @keywords species code data
 #' @examples
