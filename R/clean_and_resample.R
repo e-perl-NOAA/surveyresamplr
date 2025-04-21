@@ -36,6 +36,12 @@ clean_and_resample <- function(spp_info, catch, seq_from, seq_to, seq_by, tot_da
   
   if (sum(aa %in% names(grid_yrs)) != length(aa)){
     stop(paste0("ERROR: Not all variables called in funciton are available in the grid_yrs object: ", aa[!(aa %in% names(grid_yrs))]))
+    # CA shortspine thornyhead
+    # Error in `map()`:
+    #   ℹ In index: 1.
+    # Caused by error in `clean_and_resample()`:
+    #   ! ERROR: Not all variables called in funciton are available in the grid_yrs object: (depth_m^2
+    #                                                                                        Run `rlang::last_trace()` to see where the error occurred.
   }
   
   if (sum(aa %in% names(catch)) != length(aa)){

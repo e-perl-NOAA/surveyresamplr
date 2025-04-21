@@ -152,7 +152,7 @@ write.table(x = aaa, file = "DESCRIPTION", quote = FALSE, row.names = FALSE, col
 
 .rs.restartR()
 
-PKG <- c("devtools", # # devtools::install_github("rstudio/fontawesome", force = T)
+PKG <- c("devtools", 
          "here", 
          "usethis", 
          "roxygen2", 

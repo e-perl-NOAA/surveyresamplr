@@ -8,7 +8,7 @@ bibliography: "https://raw.githubusercontent.com/afsc-gap-products/citations/mai
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warnings = FALSE, error = FALSE, message = FALSE, comment = FALSE)
-link_repo <- "https://github.com/emilymarkowitz-noaa/surveyresamplr"
+link_repo <- "https://github.com/nmfs-ost/surveyresamplr"
 ```
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -90,7 +90,7 @@ toc <- paste0(toc_list, "*](#", toc_link, ")", collapse = "\n")
 # Installation notes
 
 ```{r install, eval = FALSE, echo = TRUE}
-devtools::install_github("emilymarkowitz-noaa/surveyresamplr", build_vignettes = TRUE)
+devtools::install_github("nmfs-ost/surveyresamplr", build_vignettes = TRUE)
 ```
 
 

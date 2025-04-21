@@ -146,7 +146,10 @@ catch <- surveyresamplr::noaa_nwfsc_catch #pulled data again to get 2024
 
 ### Load grid data -------------------------------------------------------------
 
-grid_yrs <- replicate_df(surveyresamplr::noaa_nwfsc_catch, "year", unique(catch$year))
+grid_yrs <- replicate_df(
+  dat = surveyresamplr::noaa_nwfsc_catch, 
+  time_name = "year", 
+  time_values = unique(catch$year))
 
 ### Variables ------------------------------------------------------------------
 
@@ -161,7 +164,7 @@ replicate_num <- 10
 
 sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
 map(
-  1:nrow(spp_list), 
+  14:nrow(spp_list), 
   ~ clean_and_resample(spp_list[.x,], 
                        catch, seq_from, seq_to, seq_by, 
                        tot_dataframes, replicate_num, grid_yrs, dir_out))

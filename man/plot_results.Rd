@@ -4,7 +4,7 @@
 \alias{plot_results}
 \title{Plot Results and Save Figures}
 \usage{
-plot_results(srvy, dir_out)
+plot_results(srvy, dir_out, dir_final = NULL)
 }
 \arguments{
 \item{srvy}{A character string specifying the survey identifier.}
