@@ -2,7 +2,7 @@
 
 # [surveyresamplr](https://github.com/nmfs-ost/surveyresamplr) <img src="https://github.com/nmfs-ost/surveyresamplr/blob/main/inst/img/logo.png?raw=true" alt="Logo." align="right" width="139" height="139"/>
 
-> Last run: April 21, 2025
+> Last run: April 22, 2025
 
 # Purpose
 
@@ -52,11 +52,6 @@ National Oceanic and Atmospheric Administration, Seattle, WA 98195
 > - [*Table of contents*](#table-of-contents)
 > - [*User Resources*](#user-resources)
 > - [*Installation notes*](#installation-notes)
-> - [*Windows will not update a package already loaded, so then you have
->   to remove the package and install it from scratch. There are two
->   suggested packages, ‘graph’ and ‘Rgraphviz’, that are on
->   Bioconductor, and you can install those
->   with:*](#windows-will-not-update-a-package-already-loaded,-so-then-you-have-to-remove-the-package-and-install-it-from-scratch.-there-are-two-suggested-packages,-‘graph’-and-‘rgraphviz’,-that-are-on-bioconductor,-and-you-can-install-those-with:)
 > - [*Cite data used in analysis*](#cite-data-used-in-analysis)
 > - [*Suggestions and Comments*](#suggestions-and-comments)
 > - [*R Version Metadata*](#r-version-metadata)
@@ -88,10 +83,14 @@ National Oceanic and Atmospheric Administration, Seattle, WA 98195
 devtools::install_github("nmfs-ost/surveyresamplr", build_vignettes = TRUE)
 ```
 
+Windows will not update a package already loaded, so then you have to
+remove the package and install it from scratch. There are two suggested
+packages, ‘graph’ and ‘Rgraphviz’, that are on Bioconductor, and you can
+install those with:
+
 ``` r
 install.packages("INLA",repos=c(getOption("repos"), INLA="https://inla.r-inla-download.org/R/stable"), dep=TRUE)
 inla.upgrade() # for the stable version
-# Windows will not update a package already loaded, so then you have to remove the package and install it from scratch. There are two suggested packages, ‘graph’ and ‘Rgraphviz’, that are on Bioconductor, and you can install those with:
 
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
@@ -139,8 +138,9 @@ repository](https://github.com/nmfs-ost/surveyresamplr/issues).
     FALSE 
     FALSE 
     FALSE locale:
-    FALSE [1] LC_COLLATE=English_United States.utf8  LC_CTYPE=English_United States.utf8    LC_MONETARY=English_United States.utf8
-    FALSE [4] LC_NUMERIC=C                           LC_TIME=English_United States.utf8    
+    FALSE [1] LC_COLLATE=English_United States.utf8  LC_CTYPE=English_United States.utf8   
+    FALSE [3] LC_MONETARY=English_United States.utf8 LC_NUMERIC=C                          
+    FALSE [5] LC_TIME=English_United States.utf8    
     FALSE 
     FALSE time zone: America/Los_Angeles
     FALSE tzcode source: internal
@@ -149,27 +149,31 @@ repository](https://github.com/nmfs-ost/surveyresamplr/issues).
     FALSE [1] stats     graphics  grDevices utils     datasets  methods   base     
     FALSE 
     FALSE other attached packages:
-    FALSE  [1] fontawesome_0.5.3      FishStatsUtils_2.13.2  marginaleffects_0.25.1 units_0.8-7            ggspatial_1.1.9        pkgdown_2.1.1         
-    FALSE  [7] roxygen2_7.3.2         RODBC_1.3-26           sp_2.2-0               httr_1.4.7             jsonlite_2.0.0         nwfscSurvey_2.2       
-    FALSE [13] coldpool_3.4-3         viridis_0.6.5          stringr_1.5.1          reshape2_1.4.4         lubridate_1.9.4        fields_16.3.1         
-    FALSE [19] viridisLite_0.4.2      spam_2.11-1            gstat_2.1-3            ggthemes_5.1.0         akgfmaps_4.0.3         terra_1.8-42          
-    FALSE [25] stars_0.6-8            abind_1.4-8            sf_1.0-20              readr_2.1.5            here_1.0.1             janitor_2.2.1         
-    FALSE [31] tibble_3.2.1           ggplot2_3.5.2          tidyr_1.3.1            magrittr_2.0.3         dplyr_1.1.4            plyr_1.8.9            
+    FALSE  [1] fontawesome_0.5.3      FishStatsUtils_2.13.2  marginaleffects_0.25.1 units_0.8-7           
+    FALSE  [5] ggspatial_1.1.9        pkgdown_2.1.1          roxygen2_7.3.2         RODBC_1.3-26          
+    FALSE  [9] sp_2.2-0               httr_1.4.7             jsonlite_2.0.0         nwfscSurvey_2.2       
+    FALSE [13] coldpool_3.4-3         viridis_0.6.5          stringr_1.5.1          reshape2_1.4.4        
+    FALSE [17] lubridate_1.9.4        fields_16.3.1          viridisLite_0.4.2      spam_2.11-1           
+    FALSE [21] gstat_2.1-3            ggthemes_5.1.0         akgfmaps_4.0.3         terra_1.8-42          
+    FALSE [25] stars_0.6-8            abind_1.4-8            sf_1.0-20              readr_2.1.5           
+    FALSE [29] here_1.0.1             janitor_2.2.1          tibble_3.2.1           ggplot2_3.5.2         
+    FALSE [33] tidyr_1.3.1            magrittr_2.0.3         dplyr_1.1.4            plyr_1.8.9            
     FALSE [37] remotes_2.5.0          devtools_2.4.5         usethis_3.1.0         
     FALSE 
     FALSE loaded via a namespace (and not attached):
-    FALSE  [1] DBI_1.2.3          gridExtra_2.3      rlang_1.1.5        snakecase_0.11.1   e1071_1.7-16       compiler_4.4.3     vctrs_0.6.5       
-    FALSE  [8] maps_3.4.2.1       profvis_0.4.0      pkgconfig_2.0.3    fastmap_1.2.0      backports_1.5.0    ellipsis_0.3.2     promises_1.3.2    
-    FALSE [15] rmarkdown_2.29     sessioninfo_1.2.3  tzdb_0.5.0         purrr_1.0.4        xfun_0.52          cachem_1.1.0       later_1.4.2       
-    FALSE [22] parallel_4.4.3     R6_2.6.1           stringi_1.8.7      pkgload_1.4.0      Rcpp_1.0.14        knitr_1.50         zoo_1.8-14        
-    FALSE [29] readtext_0.91      FNN_1.1.4.1        Matrix_1.7-2       httpuv_1.6.16      timechange_0.3.0   tidyselect_1.2.1   yaml_2.3.10       
-    FALSE [36] rstudioapi_0.17.1  codetools_0.2-20   miniUI_0.1.2       pkgbuild_1.4.7     lattice_0.22-6     intervals_0.15.5   shiny_1.10.0      
-    FALSE [43] withr_3.0.2        evaluate_1.0.3     proxy_0.4-27       urlchecker_1.0.1   xts_0.14.1         xml2_1.3.8         pillar_1.10.2     
-    FALSE [50] KernSmooth_2.23-26 generics_0.1.3     rprojroot_2.0.4    spacetime_1.3-3    hms_1.1.3          munsell_0.5.1      scales_1.3.0      
-    FALSE [57] chron_2.3-62       xtable_1.8-4       class_7.3-23       glue_1.8.0         tools_4.4.3        data.table_1.17.0  fs_1.6.6          
-    FALSE [64] dotCall64_1.2      cowplot_1.1.3      grid_4.4.3         colorspace_2.1-1   raster_3.6-32      cli_3.6.4          fmesher_0.3.0     
-    FALSE [71] gtable_0.3.6       digest_0.6.37      classInt_0.4-11    htmlwidgets_1.6.4  memoise_2.0.1      htmltools_0.5.8.1  lifecycle_1.0.4   
-    FALSE [78] mime_0.13
+    FALSE  [1] DBI_1.2.3          gridExtra_2.3      rlang_1.1.5        snakecase_0.11.1   e1071_1.7-16       compiler_4.4.3    
+    FALSE  [7] vctrs_0.6.5        maps_3.4.2.1       profvis_0.4.0      pkgconfig_2.0.3    fastmap_1.2.0      backports_1.5.0   
+    FALSE [13] ellipsis_0.3.2     promises_1.3.2     rmarkdown_2.29     sessioninfo_1.2.3  tzdb_0.5.0         purrr_1.0.4       
+    FALSE [19] xfun_0.52          cachem_1.1.0       later_1.4.2        parallel_4.4.3     R6_2.6.1           stringi_1.8.7     
+    FALSE [25] pkgload_1.4.0      Rcpp_1.0.14        knitr_1.50         zoo_1.8-14         readtext_0.91      FNN_1.1.4.1       
+    FALSE [31] Matrix_1.7-2       httpuv_1.6.16      timechange_0.3.0   tidyselect_1.2.1   yaml_2.3.10        rstudioapi_0.17.1 
+    FALSE [37] codetools_0.2-20   miniUI_0.1.2       pkgbuild_1.4.7     lattice_0.22-6     intervals_0.15.5   shiny_1.10.0      
+    FALSE [43] withr_3.0.2        evaluate_1.0.3     proxy_0.4-27       urlchecker_1.0.1   xts_0.14.1         xml2_1.3.8        
+    FALSE [49] pillar_1.10.2      KernSmooth_2.23-26 generics_0.1.3     rprojroot_2.0.4    spacetime_1.3-3    hms_1.1.3         
+    FALSE [55] munsell_0.5.1      scales_1.3.0       chron_2.3-62       xtable_1.8-4       class_7.3-23       glue_1.8.0        
+    FALSE [61] tools_4.4.3        data.table_1.17.0  fs_1.6.6           dotCall64_1.2      cowplot_1.1.3      grid_4.4.3        
+    FALSE [67] colorspace_2.1-1   raster_3.6-32      cli_3.6.4          fmesher_0.3.0      gtable_0.3.6       digest_0.6.37     
+    FALSE [73] classInt_0.4-11    htmlwidgets_1.6.4  memoise_2.0.1      htmltools_0.5.8.1  lifecycle_1.0.4    mime_0.13
 
 # Legal
 

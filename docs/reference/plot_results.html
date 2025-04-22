@@ -32,6 +32,9 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
+      <a href="../articles/a-simple-example.html">A Simple Example</a>
+    </li>
+    <li>
       <a href="../articles/afsc-ai.html">AFSC Aleutian Islands</a>
     </li>
     <li>
@@ -51,9 +54,6 @@
     </li>
     <li>
       <a href="../articles/nwfsc.html">NWFSC California Current</a>
-    </li>
-    <li>
-      <a href="../articles/simple-example.html">A Simple Example</a>
     </li>
   </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
@@ -75,7 +75,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_results</span><span class="op">(</span><span class="va">srvy</span>, <span class="va">dir_out</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_results</span><span class="op">(</span><span class="va">srvy</span>, <span class="va">dir_out</span>, dir_final <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -88,6 +88,10 @@
 
 <dt id="arg-dir-out">dir_out<a class="anchor" aria-label="anchor" href="#arg-dir-out"></a></dt>
 <dd><p>A character string specifying the directory for output files.</p></dd>
+
+
+<dt id="arg-dir-final">dir_final<a class="anchor" aria-label="anchor" href="#arg-dir-final"></a></dt>
+<dd><p>A character string specifying the directory for new result files.</p></dd>
 
 </dl></div>
     <div id="details">

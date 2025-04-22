@@ -55,6 +55,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/a-simple-example.html">A Simple Example</a>
+    </li>
+    <li>
       <a href="../articles/afsc-ai.html">AFSC Aleutian Islands</a>
     </li>
     <li>
@@ -74,9 +77,6 @@
     </li>
     <li>
       <a href="../articles/nwfsc.html">NWFSC California Current</a>
-    </li>
-    <li>
-      <a href="../articles/simple-example.html">A Simple Example</a>
     </li>
   </ul>
 </li>
@@ -187,6 +187,8 @@
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span> </span>
 <span>    file_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">" "</span>, replacement <span class="op">=</span> <span class="st">"_"</span>, x <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chartr.html" class="external-link">tolower</a></span><span class="op">(</span><span class="va">common_name</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>  <span class="op">)</span></span>
 <span></span>
+<span><span class="va">spp_list</span> <span class="op">&lt;-</span> <span class="va">spp_list</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,<span class="op">]</span></span>
+<span></span>
 <span><span class="co">### Load survey data -----------------------------------------------------------</span></span>
 <span></span>
 <span><span class="co"># source(paste0(wd, "code/data_dl_ne.r"))</span></span>
@@ -221,32 +223,6 @@
 <span></span>
 <span></span>
 <span><span class="co">## Fall Northwest Atlantic ---------------------------------------------------</span></span>
-<span></span>
-<span><span class="co">### Define study species -------------------------------------------------------</span></span>
-<span></span>
-<span><span class="va">spp_list</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>    srvy <span class="op">=</span> <span class="st">"NWA_FALL"</span>,</span>
-<span>    common_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Atlantic herring"</span>, <span class="st">"black sea bass"</span>, <span class="st">"Atlantic cod"</span>, </span>
-<span>                    <span class="st">"American lobster"</span>, <span class="st">"longfin squid"</span>, <span class="st">"mackerel"</span>, </span>
-<span>                    <span class="st">"monkfish"</span>, <span class="st">"red hake"</span>, <span class="st">"scup"</span>, </span>
-<span>                    <span class="st">"sea scallop"</span>, <span class="st">"silver hake"</span>, <span class="st">"summer flounder"</span>, </span>
-<span>                    <span class="st">"winter flounder"</span><span class="op">)</span>,</span>
-<span>    file_name0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AtlanticHerring"</span>, <span class="st">"BlackSeaBass"</span>, <span class="st">"Cod"</span>, </span>
-<span>                   <span class="st">"Lobster"</span>, <span class="st">"LongfinSquid"</span>, <span class="st">"Mackerel"</span>, </span>
-<span>                   <span class="st">"Monkfish"</span>, <span class="st">"RedHake"</span>, <span class="st">"Scup"</span>, </span>
-<span>                   <span class="st">"SeaScallop"</span>, <span class="st">"SilverHake"</span>, <span class="st">"SummerFlounder"</span>, </span>
-<span>                   <span class="st">"WinterFlounder"</span><span class="op">)</span>, </span>
-<span>    filter_lat_lt <span class="op">=</span> <span class="cn">NA</span>, </span>
-<span>    filter_lat_gt <span class="op">=</span> <span class="cn">NA</span>, </span>
-<span>    filter_depth <span class="op">=</span> <span class="cn">NA</span>, </span>
-<span>    model_fn <span class="op">=</span> <span class="st">"total_catch_wt_kg ~ 0 + factor(year)"</span>,</span>
-<span>    model_family <span class="op">=</span> <span class="st">"delta_gamma"</span>,</span>
-<span>    model_anisotropy <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>    model_spatiotemporal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"iid, iid"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span> </span>
-<span>    file_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">" "</span>, replacement <span class="op">=</span> <span class="st">"_"</span>, x <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chartr.html" class="external-link">tolower</a></span><span class="op">(</span><span class="va">common_name</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="co">### Load survey data -----------------------------------------------------------</span></span>
 <span></span>

@@ -93,11 +93,11 @@ toc <- paste0(toc_list, "*](#", toc_link, ")", collapse = "\n")
 devtools::install_github("nmfs-ost/surveyresamplr", build_vignettes = TRUE)
 ```
 
+Windows will not update a package already loaded, so then you have to remove the package and install it from scratch. There are two suggested packages, ‘graph’ and ‘Rgraphviz’, that are on Bioconductor, and you can install those with:
 
 ```{r also-install, eval = FALSE, echo = TRUE}
 install.packages("INLA",repos=c(getOption("repos"), INLA="https://inla.r-inla-download.org/R/stable"), dep=TRUE)
 inla.upgrade() # for the stable version
-# Windows will not update a package already loaded, so then you have to remove the package and install it from scratch. There are two suggested packages, ‘graph’ and ‘Rgraphviz’, that are on Bioconductor, and you can install those with:
 
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")

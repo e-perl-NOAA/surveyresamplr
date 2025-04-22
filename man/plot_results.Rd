@@ -10,6 +10,8 @@ plot_results(srvy, dir_out, dir_final = NULL)
 \item{srvy}{A character string specifying the survey identifier.}
 
 \item{dir_out}{A character string specifying the directory for output files.}
+
+\item{dir_final}{A character string specifying the directory for new result files.}
 }
 \description{
 This function compiles results from species distribution models (SDMs), generates plots, and saves the figures.
