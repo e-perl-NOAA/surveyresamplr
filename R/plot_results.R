@@ -6,6 +6,7 @@
 #' @param srvy A character string specifying the survey identifier.
 #' @param dir_out A character string specifying the directory for output files.
 #' @param dir_final A character string specifying the directory for new result files.
+#' 
 #'
 #' @details
 #' This function performs the following steps:
@@ -18,6 +19,10 @@
 #'   \item Saves the generated plots as PNG files.
 #'   \item Saves the list of plots in an RData file.
 #' }
+#' 
+#' @return A list of plots and tables generated during the function execution.
+#' 
+#' @export
 #'
 plot_results <- function(srvy, dir_out, dir_final = NULL) {
   

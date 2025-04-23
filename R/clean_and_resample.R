@@ -1,9 +1,15 @@
-
-
 #' Clean and Resample Species Data
 #'
-#' This function cleans up the catch data for a specific species and then performs resampling tests.
-#'
+#' This function cleans up the catch data for a specific species and then performs 
+#' resampling tests,
+#' 
+#' @details
+#' This function performs the following steps:
+#' \itemize{
+#'   \item Cleans up the catch data for the specified species using `cleanup_by_species`.
+#'   \item Performs resampling tests on the cleaned data using `resample_tests`.
+#' }
+#' 
 #' @param spp_info A data frame row containing information about the species.
 #' @param catch A data frame containing the catch data.
 #' @param seq_from A numeric value specifying the start of the sequence for data frames.
@@ -15,14 +21,20 @@
 #' @param dir_out A character string specifying the directory for output files.
 #' @param test Logical. TRUE/FALSE. If TRUE, will only run first two resampling tests. 
 #'
-#' @details
-#' This function performs the following steps:
-#' \itemize{
-#'   \item Cleans up the catch data for the specified species using `cleanup_by_species`.
-#'   \item Performs resampling tests on the cleaned data using `resample_tests`.
-#' }
+#' @export
 #' 
-clean_and_resample <- function(spp_info, catch, seq_from, seq_to, seq_by, tot_dataframes, replicate_num, grid_yrs, dir_out, test = FALSE) {
+#' @return A list of data frames containing the cleaned and resampled catch data.
+#' 
+clean_and_resample <- function(spp_info, 
+                               catch, 
+                               seq_from, 
+                               seq_to, 
+                               seq_by, 
+                               tot_dataframes, 
+                               replicate_num, 
+                               grid_yrs, 
+                               dir_out, 
+                               test = FALSE) {
   
   message(paste0(spp_info$srvy, " ", spp_info$common_name))
   

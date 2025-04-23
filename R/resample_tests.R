@@ -1,5 +1,3 @@
-
-
 #' Resample Tests and Run SDM Processing
 #'
 #' This function resamples species data frames, runs species distribution models (SDMs) in parallel, and saves the results.
@@ -10,7 +8,9 @@
 #' @param dir_out A character string specifying the directory for output files.
 #' @param test Logical. TRUE/FALSE. If TRUE, will only run first two resampling tests. 
 #' 
-#' #' @details
+#' @export
+#' 
+#' @details
 #' This function performs the following steps:
 #' \itemize{
 #'   \item Sets up directories for output files.

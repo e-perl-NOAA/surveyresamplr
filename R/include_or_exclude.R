@@ -1,4 +1,3 @@
-
 #' Include or Exclude
 #'
 #' Specify how to downsample. For simple random sampling, a proportion of
@@ -9,6 +8,9 @@
 #' (0.1,1.0, by = 0.1)) replicated by the length of the tows dataframe. The name
 #' of the props is "trawlid".
 #' @param replicate_num going to be 10 for NWFSC and 3 for AK
+#' 
+#' @export
+#' @return List of dataframes with random assignments of which data to include
 #'
 include_or_exclude <- function(df, proportions, replicate_num) {
   # Get the number of rows in the dataframe
