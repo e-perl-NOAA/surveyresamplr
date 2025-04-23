@@ -75,7 +75,8 @@ base::lapply(unique(PKG), pkg_install)
 ### Define study species -------------------------------------------------------
 
 spp_list <- data.frame(
-  srvy = "CA",
+  srvy = c("CA", "CA", "CA", "CA", "CA", "CA", "CA", "CA",
+           "CA", "CA", "CA", "CA", "CA", "CA", "CA", "CA"),
   common_name = c("arrowtooth flounder", "bocaccio", "canary rockfish", "darkblotched rockfish",
                   "Dover sole", "lingcod", "lingcod", "longnose skate",
                   "Pacific ocean perch", "Pacific spiny dogfish",
