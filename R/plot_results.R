@@ -23,7 +23,7 @@ plot_results <- function(srvy, dir_out, dir_final = NULL) {
   
   # create directory for images to be saved to
   if (is.null(dir_final)) {
-    dir_final <- paste0(dir_out, paste0(srvy, "_0figures/"))
+    dir_final <- paste0(dir_out, paste0(srvy, "_0results/"))
   }
   
   dir.create(dir_final, showWarnings = FALSE)

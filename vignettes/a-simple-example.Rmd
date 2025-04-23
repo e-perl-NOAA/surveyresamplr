@@ -14,14 +14,20 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Install libraries
-
-```{r comment = FALSE, warning = FALSE, message = FALSE, error = FALSE, results='hide'}
-
+```{r setup}
 #get rid of memory limits
 options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
 
-# Install Libraries ------------------------------------------------------------
+# Graphics
+options(ggplot2.continuous.colour = "viridis")
+options(ggplot2.continuous.fill = "viridis")
+theme_set(theme_bw())
+```
+
+
+## Install libraries
+
+```{r comment = FALSE, warning = FALSE, message = FALSE, error = FALSE, results='hide'}
 
 # Here we list all the packages we will need for this whole process
 # We'll also use this in our works cited page. 
@@ -64,16 +70,6 @@ PKG <- c(
 for (p in 1:length(PKG)) {
   require(PKG[p], character.only = TRUE)
 }
-```
-
-# Set directories
-
-```{r set-directories}
-wd <- paste0(here::here(),"/vignettes/")
-dir_out <- paste0(wd, "output/")
-dir_final <- paste0(dir_out, "EBS_simple_results/")
-crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
-
 ```
 
 ## Test Species List
@@ -161,7 +157,6 @@ ggplot2::ggplot(data = surveyresamplr::noaa_afsc_ebs_pred_grid_depth,
                    subtitle = "AFSC Eastern Bering Sea bottom trawl survey") +
   ggplot2::scale_color_gradient(name = "Depth (m)") + 
   ggplot2::theme_bw() 
-
 ```   
 
 Here we load the data for the model run, cropping it to the data we would like to include (the EBS survey and years greater than 2010) and replicating the the prediction grid across the years in the catch data. 
@@ -187,7 +182,7 @@ head(grid_yrs) %>%
   flextable::flextable() 
 ```
 
-Set variables. This... requires more descrption. `seq(from = seq_from, to = seq_to, by = seq_by)`
+Set variables. This... requires more description. `seq(from = seq_from, to = seq_to, by = seq_by)`
 
 tot_dataframes = effort x replicates - (replicates - 1). TOLEDO: is this hard and fast?
 
@@ -200,27 +195,39 @@ tot_dataframes <- 3
 replicate_num <- 7
 ```
 
+# Set directories
+
+```{r set-directories}
+wd <- paste0(here::here(),"/vignettes/")
+dir_out <- paste0(wd, "output/")
+dir_final <- paste0(dir_out, "EBS_simple_0results/")
+dir.create(dir_final, showWarnings = FALSE)
+crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
+```
+
+# Run resampling models
+
 explain why `purrr::map` is important, what the sink files are for. 
 
 ```{r run-models, eval = FALSE}
 start.time <- Sys.time()
-sink(file = paste0(dir_out, srvy, "_simple_logfile.txt"), append = FALSE, split = TRUE)  
+sink(file = paste0(dir_final, srvy, "_simple_logfile.txt"), append = FALSE, split = TRUE)  
 purrr::map(
   1:nrow(spp_list), 
   ~ clean_and_resample(spp_list[.x,], 
                        catch, seq_from, seq_to, seq_by, 
                        tot_dataframes, replicate_num, grid_yrs, dir_out))
 sink()
-write.csv(x = data.frame(time = as.numeric(Sys.time() - start.time), units = units(Sys.time() - start.time)), file = paste0(dir_out, srvy, "_simple_time.csv"))
+write.csv(x = data.frame(time = as.numeric(Sys.time() - start.time), units = units(Sys.time() - start.time)), file = paste0(dir_final, srvy, "_simple_time.csv"))
 ```
 
 ```{r time}
-a <- read.csv(file = paste0(dir_out, srvy, "_simple_time.csv") )
+a <- read.csv(file = paste0(dir_final, srvy, "_simple_time.csv") )
 print(paste0("Time difference of ", round(a$time, 2), " ", a$units))
 ```
 
 ```{r sink-results}
-cat(readLines(con = paste0(dir_out, srvy, "_simple_logfile.txt") ))  
+cat(readLines(con = paste0(dir_final, srvy, "_simple_logfile.txt") ))  
 ```
 
 ```{r sink-results-backup}
