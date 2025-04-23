@@ -1,11 +1,14 @@
 
 #' Plot Results and Save Figures
 #'
-#' This function compiles results from species distribution models (SDMs), generates plots, and saves the figures.
+#' This function compiles results from species distribution models (SDMs) output 
+#' of the clean_and_resample function for which it generates plots, and saves the 
+#' figures.
 #'
 #' @param srvy A character string specifying the survey identifier.
 #' @param dir_out A character string specifying the directory for output files.
 #' @param dir_final A character string specifying the directory for new result files.
+#' 
 #'
 #' @details
 #' This function performs the following steps:
@@ -15,9 +18,21 @@
 #'   \item Compiles data from the found files.
 #'   \item Saves the compiled data into CSV files.
 #'   \item Generates various plots such as boxplots and time series of biomass estimates.
+#'   \item TO DO: CREATE BIO PLOTS
 #'   \item Saves the generated plots as PNG files.
 #'   \item Saves the list of plots in an RData file.
 #' }
+#' 
+#' @return A list of plots and tables generated during the function execution.
+#' 
+#' @example 
+#' dir_out <- here::here("vignettes", "output")
+#' 
+#' srvy <- "CA"
+#' 
+#' plot_results(srvy = srvy, dir_out = dir_out) 
+#' 
+#' @export
 #'
 plot_results <- function(srvy, dir_out, dir_final = NULL) {
   
@@ -154,6 +169,8 @@ plot_results <- function(srvy, dir_out, dir_final = NULL) {
   
   i <- i + 1; plot_list[[i]] <- p1
   names(plot_list)[i] <- 'index_timeseries_biomass'
+  
+  # ADD BIO COMP PLOTS HERE ----------------------------------------------------
   
   # save -----------------------------------------------------------------------
   for (ii in 1:length(plot_list)) {
