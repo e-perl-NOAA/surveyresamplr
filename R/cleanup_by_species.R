@@ -12,6 +12,28 @@
 #' replicates - (replicates - 1). 5x3-2
 #' @param replicate_num An integer specifying the number of replicates.
 #' 
+#' @example
+#' catch <- surveyresamplr::noaa_nwfsc_catch
+#' spp_list <- data.frame(srvy = "CA",
+#'                        common_name = "arrowtooth flounder", 
+#'                        file_name = "arrowtooth_flounder", 
+#'                        filter_lat_gt = 34,
+#'                        filter_lat_lt = NA,
+#'                        filter_depth = NA,
+#'                        model_fn = "total_catch_wt_kg ~ 0 + factor(year) + pass",
+#'                        model_family = "delta_gamma",
+#'                        model_anisotropy = TRUE
+#'                        model_spatiotemporal = c("iid, iid")
+#'                       )
+#'                       
+#' cleanup_by_species(catch = catch,
+#'                    spp_info = spp_info,
+#'                    seq_from = 0.1, 
+#'                    seq_to = 1, 
+#'                    seq_by = 0.1, 
+#'                    tot_dataframes = 91, 
+#'                    replicate_num = 10
+#'                    )
 #' @export
 #' @return List of resampled catch dataframes
 #'
@@ -95,7 +117,8 @@ cleanup_by_species <- function(catch,
 #'
 #' @param x catch_split data frame
 #' @return data frame of tows to include or exclude
-#'
+#' 
+#' 
 tow_fn <- function(x) {
   tows <- as.data.frame(x$trawlid)
   tows <- unique(tows)
@@ -118,6 +141,7 @@ tow_fn <- function(x) {
 #' used to join the data frames together.
 #' 
 #' @return A list of merged dataframes by the shared_column
+#' 
 #'
 join_dfs <- function(list_of_dfs, 
                      main_df, 

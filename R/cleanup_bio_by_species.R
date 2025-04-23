@@ -11,6 +11,7 @@
 #' @param filter_lat_gt numeric value for latitude to filter out of the biological data
 #' @param filter_depth numeric value for depth to filter out of the biological data
 #' 
+#' @example TO DO: NEED EXAMPLE OF HOW TO USE
 #' 
 #' @export
 #' @return List of resampled biological dataframes that match the catch data
@@ -49,6 +50,8 @@ cleanup_bio_by_species <- function(bio_df,
   # Add replicate ID as a column
   bio_resampled <- bio_resampled |>
     dplyr::mutate(source = replicate_id)
+  
+  
   
   return(bio_resampled)
 }
