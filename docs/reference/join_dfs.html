@@ -33,10 +33,16 @@ column."><meta property="og:image" content="/logo.png"><!-- mathjax --><script s
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
+      <a href="../articles/a-simple-example.html">A Simple Example</a>
+    </li>
+    <li>
       <a href="../articles/afsc-ai.html">AFSC Aleutian Islands</a>
     </li>
     <li>
       <a href="../articles/afsc-bs.html">AFSC Eastern and Northern Bering Sea</a>
+    </li>
+    <li>
+      <a href="../articles/afsc-ebs-surveyindex.html">AFSC Eastern Bering Sea using wrapper_surveyindex()</a>
     </li>
     <li>
       <a href="../articles/afsc-ebs.html">AFSC Eastern Bering Sea</a>
@@ -52,12 +58,6 @@ column."><meta property="og:image" content="/logo.png"><!-- mathjax --><script s
     </li>
     <li>
       <a href="../articles/nwfsc.html">NWFSC California Current</a>
-    </li>
-    <li>
-      <a href="../articles/run-examples.html">run-examples</a>
-    </li>
-    <li>
-      <a href="../articles/simple-example.html">simple-example</a>
     </li>
   </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
@@ -87,7 +87,12 @@ column.</p>
     <h2>Arguments</h2>
 
 
-<dl><dt id="arg-main-df">main_df<a class="anchor" aria-label="anchor" href="#arg-main-df"></a></dt>
+<dl><dt id="arg-list-of-dfs">list_of_dfs<a class="anchor" aria-label="anchor" href="#arg-list-of-dfs"></a></dt>
+<dd><p>The list of data frames that you would like to join to
+the main data frame</p></dd>
+
+
+<dt id="arg-main-df">main_df<a class="anchor" aria-label="anchor" href="#arg-main-df"></a></dt>
 <dd><p>The main data frame that you want to join the list of data
 frames</p></dd>
 
@@ -96,12 +101,11 @@ frames</p></dd>
 <dd><p>The column that all the data frames share which will be
 used to join the data frames together.</p></dd>
 
-
-<dt id="arg-list-of-d-fs">list_of_d.fs<a class="anchor" aria-label="anchor" href="#arg-list-of-d-fs"></a></dt>
-<dd><p>The list of data frames that you would like to join to
-the main data frame</p></dd>
-
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    <p>A list of merged dataframes by the shared_column</p>
+    </div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -111,7 +115,7 @@ the main data frame</p></dd>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by The package maintainer.</p>
+  <p></p><p>Developed by Emily Markowitz, Derek Bolser, Elizabeth Perl, Ian Taylor.</p>
 </div>
 
 <div class="pkgdown">

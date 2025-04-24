@@ -25,7 +25,6 @@
 #'                        model_anisotropy = TRUE
 #'                        model_spatiotemporal = c("iid, iid")
 #'                       )
-#'                       
 #' cleanup_by_species(catch = catch,
 #'                    spp_info = spp_info,
 #'                    seq_from = 0.1, 

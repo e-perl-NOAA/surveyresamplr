@@ -21,7 +21,7 @@ options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
 # Graphics
 options(ggplot2.continuous.colour = "viridis")
 options(ggplot2.continuous.fill = "viridis")
-theme_set(theme_bw())
+# theme_set(theme_bw())
 ```
 
 
@@ -226,7 +226,7 @@ a <- read.csv(file = paste0(dir_final, srvy, "_simple_time.csv") )
 print(paste0("Time difference of ", round(a$time, 2), " ", a$units))
 ```
 
-```{r sink-results}
+```{r sink-results, eval = FALSE}
 cat(readLines(con = paste0(dir_final, srvy, "_simple_logfile.txt") ))  
 ```
 
@@ -314,15 +314,14 @@ cat(readLines(con = paste0(dir_final, srvy, "_simple_logfile.txt") ))
 # ...Parallel SDM processing complete
 ```
 
-```{r results-run, eval = FALSE}
+```{r results-run, eval = TRUE}
 out <- plot_results(srvy = paste0(srvy, "_simple"), dir_out = dir_out, dir_final = dir_final) 
 ```
 
 ```{r results-plots}
-load(file = paste0(dir_out, paste0(srvy, "_simple_0figures/figures.rdata")), verbose = TRUE)
+# load(file = paste0(dir_out, paste0(srvy, "_simple_0figures/figures.rdata")), verbose = TRUE)
 out$plots
 ```
-
 
 Parameter output: 
 

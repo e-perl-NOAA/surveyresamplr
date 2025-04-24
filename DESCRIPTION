@@ -1,6 +1,6 @@
 Package: surveyresamplr
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Procedure for resampling historical groundfish survey data to understand relationships between survey effort and stock assessment uncertainty 
 Version: 0.0.1
 Authors@R: 
   c(person(given = "Emily",

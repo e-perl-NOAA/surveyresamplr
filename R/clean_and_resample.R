@@ -20,9 +20,8 @@
 #' @param grid_yrs A data frame or list containing grid years information.
 #' @param dir_out A character string specifying the directory for output files.
 #' @param test Logical. TRUE/FALSE. If TRUE, will only run first two resampling tests. 
-#'
 #' @export
-#' 
+#' @return A list of data frames containing the cleaned and resampled catch data.
 #' @example
 #' dir_out <- here::here("vignettes", "output")
 #' 
@@ -42,7 +41,6 @@
 #'                        model_anisotropy = TRUE
 #'                        model_spatiotemporal = c("iid, iid")
 #'                       )
-#'                       
 #' clean_and_resample(spp_info = spp_list, 
 #'                    catch, 
 #'                    seq_from = 0.1, 
@@ -52,8 +50,6 @@
 #'                    replicate_num = 10, 
 #'                    grid_yrs = grid_yrs, 
 #'                    dir_out = dir_out))
-#' 
-#' @return A list of data frames containing the cleaned and resampled catch data.
 #' 
 clean_and_resample <- function(spp_info, 
                                catch, 

@@ -16,10 +16,9 @@
 #' @param n_knots Numeric. Default  = 500.
 #' names(speciesname_df)
 #' @import sdmTMB
-#' 
 #' @export
-#' @example TO DO: NEED TO ADD EXAMPLE
-#'
+#' @example 
+#' 1+1 # TO DO: NEED TO ADD EXAMPLE
 wrapper_sdmtmb <- function(x, y, z, dir_spp, spp_info, n_knots = 500) {
   
   # make mesh

@@ -3,6 +3,7 @@
 <url><loc>/articles/a-simple-example.html</loc></url>
 <url><loc>/articles/afsc-ai.html</loc></url>
 <url><loc>/articles/afsc-bs.html</loc></url>
+<url><loc>/articles/afsc-ebs-surveyindex.html</loc></url>
 <url><loc>/articles/afsc-ebs.html</loc></url>
 <url><loc>/articles/afsc-goa.html</loc></url>
 <url><loc>/articles/afsc-nbs.html</loc></url>
@@ -14,6 +15,7 @@
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
 <url><loc>/LICENSE-text.html</loc></url>
+<url><loc>/reference/cleanup_bio_by_species.html</loc></url>
 <url><loc>/reference/cleanup_by_species.html</loc></url>
 <url><loc>/reference/clean_and_resample.html</loc></url>
 <url><loc>/reference/fit_check_fn.html</loc></url>

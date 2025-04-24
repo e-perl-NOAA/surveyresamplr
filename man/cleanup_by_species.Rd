@@ -25,32 +25,13 @@ cleanup_by_species(
 
 \item{seq_by}{A numeric value specifying the step size of the sequence for data frames.}
 
-\item{tot_dataframes}{the number of data frames you want to output. effort x replicates - (replicates - 1). 5x3-2}
+\item{tot_dataframes}{the number of data frames you want to output. effort x 
+replicates - (replicates - 1). 5x3-2}
 
 \item{replicate_num}{An integer specifying the number of replicates.}
-
-\item{x}{catch_split data frame
-
-Join Data Frames
-
-Function to join a list of data frames to a main data frame using a shared
-column.}
-
-\item{list_of_dfs}{The list of data frames that you would like to join to
-the main data frame}
-
-\item{main_df}{The main data frame that you want to join the list of data
-frames}
-
-\item{shared_column}{The column that all the data frames share which will be
-used to join the data frames together.}
 }
 \value{
-List of resampled catch data frames
-
-Tow Function
-
-Create a vector of tows for including or excluding.
+List of resampled catch dataframes
 }
 \description{
 Filter catch by species, create a vector of tows and give tows a random

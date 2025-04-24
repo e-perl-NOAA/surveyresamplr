@@ -64,6 +64,9 @@
       <a href="../articles/afsc-bs.html">AFSC Eastern and Northern Bering Sea</a>
     </li>
     <li>
+      <a href="../articles/afsc-ebs-surveyindex.html">AFSC Eastern Bering Sea using wrapper_surveyindex()</a>
+    </li>
+    <li>
       <a href="../articles/afsc-ebs.html">AFSC Eastern Bering Sea</a>
     </li>
     <li>
@@ -190,7 +193,7 @@
 <span></span>
 <span><span class="co">### Load grid data -------------------------------------------------------------</span></span>
 <span></span>
-<span><span class="va">grid_yrs</span> <span class="op">&lt;-</span> <span class="fu">replicate_df</span><span class="op">(</span><span class="fu">surveyresamplr</span><span class="fu">::</span><span class="va">noaa_afsc_GOA_pred_grid_depth</span>, <span class="st">"year"</span>, <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">catch</span><span class="op">$</span><span class="va">year</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">grid_yrs</span> <span class="op">&lt;-</span> <span class="fu">replicate_df</span><span class="op">(</span><span class="fu">surveyresamplr</span><span class="fu">::</span><span class="va"><a href="../reference/noaa_afsc_goa_pred_grid_depth.html">noaa_afsc_goa_pred_grid_depth</a></span>, <span class="st">"year"</span>, <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">catch</span><span class="op">$</span><span class="va">year</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">### Variables ------------------------------------------------------------------</span></span>
 <span></span>

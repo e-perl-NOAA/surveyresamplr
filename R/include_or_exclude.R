@@ -8,16 +8,13 @@
 #' (0.1,1.0, by = 0.1)) replicated by the length of the tows dataframe. The name
 #' of the props is "trawlid".
 #' @param replicate_num going to be 10 for NWFSC and 3 for AK
-#' 
 #' @example
 #' catch_split <- base::split(catch, catch$year) # This is catch data for 1 species
 #' tows <- base::lapply(catch_split, tow_fn)
 #' props <- as.data.frame(seq(from = 0.1, to = 1, by = 0.1))
 #' names(props) <- "trawlid"
 #' props <- base::rep(props, length(tows))
-#' 
 #' tows_assigned <- purrr::map2(tows, props, include_or_exclude, replicate_num = 10)
-#' 
 #' @export
 #' @return List of dataframes with random assignments of which data to include
 #'

@@ -15,9 +15,12 @@ resample_tests(spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE)
 
 \item{dir_out}{A character string specifying the directory for output files.}
 
-\item{test}{Logical. TRUE/FALSE. If TRUE, will only run first two resampling tests. 
-
-#' @details
+\item{test}{Logical. TRUE/FALSE. If TRUE, will only run first two resampling tests.}
+}
+\description{
+This function resamples species data frames, runs species distribution models (SDMs) in parallel, and saves the results.
+}
+\details{
 This function performs the following steps:
 \itemize{
   \item Sets up directories for output files.
@@ -26,8 +29,5 @@ This function performs the following steps:
   \item Sets up parallel processing using the \code{furrr} package.
   \item Runs species distribution models (SDMs) in parallel.
   \item Saves the results of the SDM processing into CSV files.
-}}
 }
-\description{
-This function resamples species data frames, runs species distribution models (SDMs) in parallel, and saves the results.
 }

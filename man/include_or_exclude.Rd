@@ -15,7 +15,10 @@ of the props is "trawlid".}
 
 \item{replicate_num}{going to be 10 for NWFSC and 3 for AK}
 }
+\value{
+List of dataframes with random assignments of which data to include
+}
 \description{
-Specify how to downsample. For simple random sampling, a proportion of
-stations should do.
+Specify how to downsample using output of tow_fn. For simple random sampling, 
+a proportion of tows should do. Utilized in the cleanup_by_species function.
 }

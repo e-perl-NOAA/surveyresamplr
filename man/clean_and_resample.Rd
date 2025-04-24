@@ -38,8 +38,12 @@ clean_and_resample(
 
 \item{test}{Logical. TRUE/FALSE. If TRUE, will only run first two resampling tests.}
 }
+\value{
+A list of data frames containing the cleaned and resampled catch data.
+}
 \description{
-This function cleans up the catch data for a specific species and then performs resampling tests.
+This function cleans up the catch data for a specific species and then performs 
+resampling tests,
 }
 \details{
 This function performs the following steps:

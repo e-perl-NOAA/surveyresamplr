@@ -41,6 +41,9 @@
       <a href="../articles/afsc-bs.html">AFSC Eastern and Northern Bering Sea</a>
     </li>
     <li>
+      <a href="../articles/afsc-ebs-surveyindex.html">AFSC Eastern Bering Sea using wrapper_surveyindex()</a>
+    </li>
+    <li>
       <a href="../articles/afsc-ebs.html">AFSC Eastern Bering Sea</a>
     </li>
     <li>
@@ -99,17 +102,18 @@
 
 
 <dt id="arg-test">test<a class="anchor" aria-label="anchor" href="#arg-test"></a></dt>
-<dd><p>Logical. TRUE/FALSE. If TRUE, will only run first two resampling tests.</p>
-<p>#' @details
-This function performs the following steps:</p><ul><li><p>Sets up directories for output files.</p></li>
+<dd><p>Logical. TRUE/FALSE. If TRUE, will only run first two resampling tests.</p></dd>
+
+</dl></div>
+    <div id="details">
+    <h2>Details</h2>
+    <p>This function performs the following steps:</p><ul><li><p>Sets up directories for output files.</p></li>
 <li><p>Reduces the list of data frames to the last two entries for testing purposes.</p></li>
 <li><p>Saves each data frame in Parquet format.</p></li>
 <li><p>Sets up parallel processing using the <code>furrr</code> package.</p></li>
 <li><p>Runs species distribution models (SDMs) in parallel.</p></li>
 <li><p>Saves the results of the SDM processing into CSV files.</p></li>
-</ul></dd>
-
-</dl></div>
+</ul></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
