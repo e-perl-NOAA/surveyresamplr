@@ -69,6 +69,8 @@ clean_and_resample <- function(spp_info,
   aa <- spp_info$model_fn
   aa <- gsub(x = aa, pattern = "factor(", replacement = "", fixed = TRUE)
   aa <- gsub(x = aa, pattern = ")", replacement = "", fixed = TRUE)  
+  aa <- gsub(x = aa, pattern = "^2", replacement = "", fixed = TRUE)  
+  aa <- gsub(x = aa, pattern = "(", replacement = "", fixed = TRUE)  
   aa <- strsplit(x = aa, split = " ")[[1]]
   aa <- aa[which(!(aa %in% c("+", "0", "~", "total_catch_wt_kg")))]
   

@@ -241,7 +241,7 @@
 <span><span class="co">### Load grid data -------------------------------------------------------------</span></span>
 <span></span>
 <span><span class="va">grid_yrs</span> <span class="op">&lt;-</span> <span class="fu">replicate_df</span><span class="op">(</span></span>
-<span>  dat <span class="op">=</span> <span class="fu">surveyresamplr</span><span class="fu">::</span><span class="va"><a href="../reference/noaa_nwfsc_catch.html">noaa_nwfsc_catch</a></span>, </span>
+<span>  dat <span class="op">=</span> <span class="fu">surveyresamplr</span><span class="fu">::</span><span class="va"><a href="../reference/noaa_nwfsc_pred_grid_depth.html">noaa_nwfsc_pred_grid_depth</a></span>, </span>
 <span>  time_name <span class="op">=</span> <span class="st">"year"</span>, </span>
 <span>  time_values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">catch</span><span class="op">$</span><span class="va">year</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -258,7 +258,7 @@
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sink.html" class="external-link">sink</a></span><span class="op">(</span>file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir_out</span>, <span class="va">srvy</span>, <span class="st">"_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"_logfile.txt"</span><span class="op">)</span>, append<span class="op">=</span><span class="cn">FALSE</span>, split<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>  <span class="co"># for screen and log</span></span>
 <span><span class="fu">map</span><span class="op">(</span></span>
-<span>  <span class="fl">14</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">spp_list</span><span class="op">)</span>, </span>
+<span>  <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">spp_list</span><span class="op">)</span>, </span>
 <span>  <span class="op">~</span> <span class="fu"><a href="../reference/clean_and_resample.html">clean_and_resample</a></span><span class="op">(</span><span class="va">spp_list</span><span class="op">[</span><span class="va">.x</span>,<span class="op">]</span>, </span>
 <span>                       <span class="va">catch</span>, <span class="va">seq_from</span>, <span class="va">seq_to</span>, <span class="va">seq_by</span>, </span>
 <span>                       <span class="va">tot_dataframes</span>, <span class="va">replicate_num</span>, <span class="va">grid_yrs</span>, <span class="va">dir_out</span><span class="op">)</span><span class="op">)</span></span>
