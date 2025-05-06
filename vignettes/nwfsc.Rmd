@@ -26,9 +26,7 @@ wd <- paste0(here::here(),"/vignettes/")
 dir_out <- paste0(wd, "output/")
 dir_final <- paste0(dir_out, "nwfsc_0results/")
 crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
-```
 
-```{r eval = FALSE}
 # Install Libraries ------------------------------------------------------------
 
 # Here we list all the packages we will need for this whole process
@@ -74,7 +72,9 @@ pkg_install <- function(p){
   require(p, character.only = TRUE)
 }
 base::lapply(unique(PKG), pkg_install)
+```
 
+```{r eval = FALSE}
 ### Define study species -------------------------------------------------------
 
 spp_list <- data.frame(
@@ -159,7 +159,7 @@ grid_yrs <- replicate_df(
 ```
 
 
-```{r}
+```{r, eval = TRUE}
 ### Variables ------------------------------------------------------------------
 
 srvy <- "CA"

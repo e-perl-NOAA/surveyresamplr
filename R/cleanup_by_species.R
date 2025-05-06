@@ -12,7 +12,7 @@
 #' replicates - (replicates - 1). 5x3-2
 #' @param replicate_num An integer specifying the number of replicates.
 #' 
-#' @example
+#' @examples
 #' catch <- surveyresamplr::noaa_nwfsc_catch
 #' spp_list <- data.frame(srvy = "CA",
 #'                        common_name = "arrowtooth flounder", 
@@ -23,16 +23,14 @@
 #'                        model_fn = "total_catch_wt_kg ~ 0 + factor(year) + pass",
 #'                        model_family = "delta_gamma",
 #'                        model_anisotropy = TRUE
-#'                        model_spatiotemporal = c("iid, iid")
-#'                       )
+#'                        model_spatiotemporal = c("iid, iid") )
 #' cleanup_by_species(catch = catch,
 #'                    spp_info = spp_info,
 #'                    seq_from = 0.1, 
 #'                    seq_to = 1, 
 #'                    seq_by = 0.1, 
 #'                    tot_dataframes = 91, 
-#'                    replicate_num = 10
-#'                    )
+#'                    replicate_num = 10)
 #' @export
 #' @return List of resampled catch dataframes
 #'

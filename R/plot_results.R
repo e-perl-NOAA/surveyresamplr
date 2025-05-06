@@ -23,7 +23,7 @@
 #'   \item Saves the list of plots in an RData file.
 #' }
 #' @return A list of plots and tables generated during the function execution.
-#' @example 
+#' @examples
 #' dir_out <- here::here("vignettes", "output")
 #' srvy <- "CA"
 #' plot_results(srvy = srvy, dir_out = dir_out) 

@@ -23,8 +23,10 @@
 #'   \item Runs species distribution models (SDMs) in parallel.
 #'   \item Saves the results of the SDM processing into CSV files.
 #' }
-#' @example 
-#' 1+1 # TO DO: NEED EXAMPLE OF USAGE
+#' @examples 
+#' \dontrun{
+#' resample_tests() # TO DO: NEED EXAMPLE OF HOW TO USE
+#' }
 resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE, parallel = FALSE, n_knots, model_type = "wrapper_sdmtmb") {
   # set directories for outputs
   dir_spp <- paste0(dir_out, paste0(spp_info$srvy, "_", spp_info$file_name, "/"))

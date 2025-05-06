@@ -46,3 +46,8 @@ This function performs the following steps:
   \item Saves the results of the SDM processing into CSV files.
 }
 }
+\examples{
+\dontrun{
+resample_tests() # TO DO: NEED EXAMPLE OF HOW TO USE
+}
+}

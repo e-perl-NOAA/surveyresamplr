@@ -16,9 +16,11 @@
 #' names(speciesname_df)
 #' @import surveyIndex
 #' @export
-#' @example 
-#' 1+1 # TO DO: NEED TO ADD EXAMPLE
-wrapper_sdmtmb <- function(x, y, z, dir_spp, spp_info, n_knots = 500) {
+#' @examples
+#' \dontrun{
+#' wrapper_surveyIndex() # TO DO: NEED EXAMPLE OF HOW TO USE
+#' }
+wrapper_surveyIndex <- function(x, y, z, dir_spp, spp_info, n_knots = 500) {
   
   # make mesh
   mesh <- sdmTMB::make_mesh(x, xy_cols = c("longitude_dd", "latitude_dd"), n_knots = n_knots)

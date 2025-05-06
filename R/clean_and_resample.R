@@ -24,14 +24,11 @@
 #' @param model_type String. Default = "wrapper_sdmtmb", but can be any preset wrapper_*() function or a premade home built function.
 #' @export
 #' @return A list of data frames containing the cleaned and resampled catch data.
-#' @example
+#' @examples
 #' dir_out <- here::here("vignettes", "output")
-#' 
 #' catch <- surveyresamplr::noaa_nwfsc_catch
-#' 
 #' grid_yrs <- replicate_df(dat = surveyresamplr::noaa_nwfsc_catch, time_name = "year", 
 #'                          time_values = unique(catch$year))
-#' 
 #' spp_list <- data.frame(srvy = "CA",
 #'                        common_name = "arrowtooth flounder", 
 #'                        file_name = "arrowtooth_flounder", 

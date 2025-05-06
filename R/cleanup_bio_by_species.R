@@ -10,13 +10,13 @@
 #' @param filter_lat_lt numeric value for latitude to filter out of the biological data
 #' @param filter_lat_gt numeric value for latitude to filter out of the biological data
 #' @param filter_depth numeric value for depth to filter out of the biological data
-#' @example 
-#' 1+1 # TO DO: NEED EXAMPLE OF HOW TO USE
+#' @examples
+#' \dontrun{
+#' cleanup_bio_by_species() # TO DO: NEED EXAMPLE OF HOW TO USE
+#' }
 #' @export
 #' @return List of resampled biological dataframes that match the catch data
 #'
-
-
 cleanup_bio_by_species <- function(bio_df,
                                    catch_cleaned,
                                    filter_lat_lt,

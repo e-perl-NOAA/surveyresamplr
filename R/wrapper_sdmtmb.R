@@ -15,8 +15,10 @@
 #' names(speciesname_df)
 #' @import sdmTMB
 #' @export
-#' @example 
-#' 1+1 # TO DO: NEED TO ADD EXAMPLE
+#' @examples 
+#' \dontrun{
+#' wrapper_sdmtmb()
+#' }
 wrapper_sdmtmb <- function(x, y, z, dir_spp, spp_info, n_knots = 500) {
   
   # make mesh

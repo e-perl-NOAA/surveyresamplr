@@ -1,5 +1,5 @@
 pandoc: 2.19.2
-pkgdown: 2.1.1
+pkgdown: 2.1.2
 pkgdown_sha: ~
 articles:
   a-simple-example: a-simple-example.html
@@ -11,4 +11,4 @@ articles:
   afsc-nbs: afsc-nbs.html
   nefsc: nefsc.html
   nwfsc: nwfsc.html
-last_built: 2025-05-05T18:39Z
+last_built: 2025-05-06T16:56Z

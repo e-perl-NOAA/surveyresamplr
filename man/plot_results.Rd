@@ -34,3 +34,8 @@ This function performs the following steps:
   \item Saves the list of plots in an RData file.
 }
 }
+\examples{
+dir_out <- here::here("vignettes", "output")
+srvy <- "CA"
+plot_results(srvy = srvy, dir_out = dir_out) 
+}

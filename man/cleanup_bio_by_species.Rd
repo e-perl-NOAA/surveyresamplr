@@ -34,3 +34,8 @@ List of resampled biological dataframes that match the catch data
 \description{
 Filter biological by species
 }
+\examples{
+\dontrun{
+cleanup_bio_by_species() # TO DO: NEED EXAMPLE OF HOW TO USE
+}
+}
