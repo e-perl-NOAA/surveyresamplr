@@ -24,7 +24,7 @@ library(here)
 
 wd <- paste0(here::here(),"/vignettes/")
 dir_out <- paste0(wd, "output/")
-dir_final <- paste0(dir_out, "nwfsc_0results/")
+dir_final <- paste0(dir_out, "CA_0results/")
 crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
 
 # Install Libraries ------------------------------------------------------------
