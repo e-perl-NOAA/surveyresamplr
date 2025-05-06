@@ -353,7 +353,7 @@ obj_name <- paste0("noaa_afsc_bs_pred_grid_depth")
 assign(x = obj_name, value = a$pred_grid_depth)
 save(noaa_afsc_bs_pred_grid_depth, file = here::here("data", paste0(obj_name, ".rdata")))
 
-# Load Design-based biomass data for comparison --------------------------------
+# Load Design-based age composition data --------------------------------
 
 locations <- c("Z:/Projects/ConnectToOracle.R")
 for (i in 1:length(locations)){
@@ -362,19 +362,21 @@ for (i in 1:length(locations)){
   }
 }
 
-noaa_afsc_biomass <- RODBC::sqlQuery(
+noaa_afsc_age <- RODBC::sqlQuery(
   channel = channel_products,
   query =
     paste0("SELECT DISTINCT
 bb.SURVEY_DEFINITION_ID,
 bb.AREA_ID,
 bb.SPECIES_CODE,
-bb.year,
-bb.BIOMASS_MT,
-bb.BIOMASS_VAR,
+bb.SEX,
+bb.AGE,
+bb.YEAR,
+bb.LENGTH_MM_MEAN,
+bb.LENGTH_MM_SD,
 bb.POPULATION_COUNT,
-bb.POPULATION_VAR
-FROM GAP_PRODUCTS.AKFIN_BIOMASS bb
+bb.AREA_ID_FOOTPRINT
+FROM GAP_PRODUCTS.AKFIN_AGECOMP bb
 
 WHERE bb.AREA_ID IN (99901, 99902, 99903, 99904)
 AND bb.SPECIES_CODE IN (", paste0(spp_list$species_code, collapse = ","),")
@@ -386,13 +388,50 @@ AND bb.SPECIES_CODE IN (", paste0(spp_list$species_code, collapse = ","),")
   janitor::clean_names()
 
 # Save table to local directory
-dat <- noaa_afsc_biomass
-title <- "AFSC biomass and population estimates data"
-obj_name <- "noaa_afsc_biomass"
+dat <- noaa_afsc_age
+title <- "AFSC age composition estimate data"
+obj_name <- "noaa_afsc_age"
 author <- "Alaska Fisheries Science Center, compiled by Emily Markowitz (Emily.Markowitz AT noaa.gov)"
 source <- "https://github.com/afsc-gap-products/gap_products"
 details <- "The Resource Assessment and Conservation Engineering (RACE) Division Groundfish Assessment Program (GAP) of the Alaska Fisheries Science Center (AFSC) conducts fisheries-independent bottom trawl surveys to assess the populations of demersal fish and crab stocks of Alaska."
 description <- "The final, validated survey data are publicly accessible soon after surveys are completed on the Fisheries One Stop Shop (FOSS) platform. This data includes catch, haul, and environmental data collected at each station. On the FOSS data platform, users can interactively select, view, and download data. Descriptive documentation and user-examples are available on the metadata page."
 
-save(noaa_afsc_biomass, file = here::here("data", paste0(obj_name, ".rdata")))
+save(noaa_afsc_age, file = here::here("data", paste0(obj_name, ".rdata")))
 data_documentation(dat, title, obj_name, author, source, details, description)
+
+# Load Design-based length composition data --------------------------------
+
+noaa_afsc_length <- RODBC::sqlQuery(
+  channel = channel_products,
+  query =
+    paste0("SELECT DISTINCT
+bb.SURVEY_DEFINITION_ID,
+bb.AREA_ID,
+bb.SPECIES_CODE,
+bb.YEAR,
+bb.LENGTH_MM,
+bb.SEX,
+bb.POPULATION_COUNT
+FROM GAP_PRODUCTS.AKFIN_SIZECOMP bb
+
+WHERE bb.AREA_ID IN (99901, 99902, 99903, 99904)
+AND bb.SPECIES_CODE IN (", paste0(spp_list$species_code, collapse = ","),")
+")) %>%
+  #   -- WHERE bb.SURVEY_DEFINITION_ID = 98
+  # -- AND bb.SPECIES_CODE IN (21740, 10210, 69322)
+  # -- AND AREA_ID = 99901
+  # -- AND bb.year >= 1982
+  janitor::clean_names()
+
+# Save table to local directory
+dat <- noaa_afsc_length
+title <- "AFSC length (size) estimate data"
+obj_name <- "noaa_afsc_length"
+author <- "Alaska Fisheries Science Center, compiled by Emily Markowitz (Emily.Markowitz AT noaa.gov)"
+source <- "https://github.com/afsc-gap-products/gap_products"
+details <- "The Resource Assessment and Conservation Engineering (RACE) Division Groundfish Assessment Program (GAP) of the Alaska Fisheries Science Center (AFSC) conducts fisheries-independent bottom trawl surveys to assess the populations of demersal fish and crab stocks of Alaska."
+description <- "The final, validated survey data are publicly accessible soon after surveys are completed on the Fisheries One Stop Shop (FOSS) platform. This data includes catch, haul, and environmental data collected at each station. On the FOSS data platform, users can interactively select, view, and download data. Descriptive documentation and user-examples are available on the metadata page."
+
+save(noaa_afsc_length, file = here::here("data", paste0(obj_name, ".rdata")))
+data_documentation(dat, title, obj_name, author, source, details, description)
+
