@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r eval = FALSE}
+```{r eval = TRUE}
 
 # get rid of memory limits
 options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
@@ -24,8 +24,11 @@ library(here)
 
 wd <- paste0(here::here(),"/vignettes/")
 dir_out <- paste0(wd, "output/")
+dir_final <- paste0(dir_out, "nwfsc_0results/")
 crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
+```
 
+```{r eval = FALSE}
 # Install Libraries ------------------------------------------------------------
 
 # Here we list all the packages we will need for this whole process
@@ -140,6 +143,8 @@ spp_list <- data.frame(
                            c("off, off") )
   )
 
+spp_list <- spp_list[1:2,] # for testing
+
 ### Load survey data -----------------------------------------------------------
 
 # source(paste0(wd, "code/data_dl_nw.r"))
@@ -151,7 +156,10 @@ grid_yrs <- replicate_df(
   dat = surveyresamplr::noaa_nwfsc_pred_grid_depth, 
   time_name = "year", 
   time_values = unique(catch$year))
+```
 
+
+```{r}
 ### Variables ------------------------------------------------------------------
 
 srvy <- "CA"
@@ -160,7 +168,9 @@ seq_to = 1
 seq_by = 0.1
 tot_dataframes = 91
 replicate_num <- 10
+```
 
+```{r, eval = FALSE}
 ### Run ------------------------------------------------------------------------
 
 sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
@@ -170,9 +180,15 @@ map(
                        catch, seq_from, seq_to, seq_by, 
                        tot_dataframes, replicate_num, grid_yrs, dir_out))
 sink()
+```
 
+```{r results-run, eval = TRUE}
 ### Plot indices ---------------------------------------------------------------
 
-plot_results(srvy = srvy, dir_out = dir_out) 
+out <- plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final) 
+```
 
+```{r results-plots}
+# load(file = paste0(dir_out, paste0(srvy, "_simple_0figures/figures.rdata")), verbose = TRUE)
+out$plots
 ```

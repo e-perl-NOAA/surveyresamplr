@@ -6,7 +6,10 @@
 #' @param spp_info A data frame containing information about the test species.
 #' @param grid_yrs A data frame or list containing grid years information.
 #' @param dir_out A character string specifying the directory for output files.
-#' @param test Logical. TRUE/FALSE. If TRUE, will only run first two resampling tests. 
+#' @param test Logical. Default = FALSE. If TRUE, will only run first two resampling tests. 
+#' @param parallel Logical. Default = FALSE. If TRUE, will run models using \code{furrr::future_map()}. 
+#' @param n_knots Numeric. Default  = 500.
+#' @param model_type String. Default = "wrapper_sdmtmb", but can be any preset wrapper_*() function or a premade home built function.
 #' 
 #' @export
 #' 
@@ -22,7 +25,7 @@
 #' }
 #' @example 
 #' 1+1 # TO DO: NEED EXAMPLE OF USAGE
-resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE) {
+resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE, parallel = FALSE, n_knots, model_type = "wrapper_sdmtmb") {
   # set directories for outputs
   dir_spp <- paste0(dir_out, paste0(spp_info$srvy, "_", spp_info$file_name, "/"))
   dir.create(dir_spp, showWarnings = FALSE)
@@ -45,20 +48,21 @@ resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE) 
   
   message("...Starting parallel SDM processing")
   
-  # Run SDMs in parallel
-  for (i in seq_along(spp_files)) {
-  # furrr::future_map(seq_along(spp_files), function(i) {
+  assign(value = get(model_type), x = "wrapper_model")
+  
+  innards <- function(i, dir_spp, n_knots){
     message(paste0("\n...", spp_files[[i]], "\n"))
     gc()  # Free memory
     # Load only the required dataframe
     spp_df <- arrow::read_parquet(paste0(dir_spp, paste0("df_", i, ".parquet")))
     # Run species SDM function
-    fit0 <- wrapper_sdmtmb(
+    fit0 <- wrapper(
       x = spp_df, 
       y = spp_files[[i]], 
       z = grid_yrs, 
       dir_spp = dir_spp, 
-      spp_info = spp_info)
+      spp_info = spp_info, 
+      n_knots = n_knots)
     # fit <- readRDS(file = paste0(dir_spp, "fit_", spp_files[[i]], ".rds")) # for testing
     # index <- readRDS(file = paste0(dir_spp, "index_", spp_files[[i]], ".rds")) # for testing
     # fit0 <- list("fit" = fit, "index" = index)
@@ -134,10 +138,19 @@ resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE) 
     # Explicitly remove objects after processing
     rm("fit0", "spp_df")
     gc()
-    # NULL
-  # }, .progress = TRUE, .options = furrr::furrr_options(seed = TRUE))
+  }
+  
+  if (parallel == TRUE) {
+  # Run SDMs in parallel
+  furrr::future_map(seq_along(spp_files), function(i) {
+    innards(i, dir_spp)
+  # NULL
+  }, .progress = TRUE, .options = furrr::furrr_options(seed = TRUE))
+  } else {
+  for (i in seq_along(spp_files)) {
+    innards(i, dir_spp)
 }
-
+}
   message("...Parallel SDM processing complete")
 }
 

@@ -169,7 +169,7 @@ devtools::check()
 
 ## Create Documentation GitHub-Pages -------------------------------------------
 
-.rs.restartR()
+# .rs.restartR()
 
 PKG <- c("fontawesome", # # devtools::install_github("rstudio/fontawesome", force = T)
          "here", 

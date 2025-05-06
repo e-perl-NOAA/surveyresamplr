@@ -40,6 +40,8 @@ plot_results <- function(srvy, dir_out, dir_final = NULL) {
   # find files
   aaa <- base::list.files(path = dir_out, pattern = srvy, full.names = TRUE)
   aaa <- aaa[!base::grepl(pattern = "figures", x = aaa)]
+  aaa <- aaa[!base::grepl(pattern = ".txt", x = aaa)]
+  aaa <- aaa[!base::grepl(pattern = "0results", x = aaa)]
   
   # compile files for each org
   fit_df <- fit_pars <- fit_check <- index <- data.frame()

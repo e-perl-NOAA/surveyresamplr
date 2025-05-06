@@ -14,7 +14,9 @@ clean_and_resample(
   replicate_num,
   grid_yrs,
   dir_out,
-  test = FALSE
+  test = FALSE,
+  n_knots = NA,
+  model_type = NA
 )
 }
 \arguments{
@@ -37,6 +39,10 @@ clean_and_resample(
 \item{dir_out}{A character string specifying the directory for output files.}
 
 \item{test}{Logical. TRUE/FALSE. If TRUE, will only run first two resampling tests.}
+
+\item{n_knots}{Numeric. Default  = 500.}
+
+\item{model_type}{String. Default = "wrapper_sdmtmb", but can be any preset wrapper_*() function or a premade home built function.}
 }
 \value{
 A list of data frames containing the cleaned and resampled catch data.

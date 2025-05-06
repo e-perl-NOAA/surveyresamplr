@@ -90,7 +90,9 @@ resampling tests,</p>
 <span>  <span class="va">replicate_num</span>,</span>
 <span>  <span class="va">grid_yrs</span>,</span>
 <span>  <span class="va">dir_out</span>,</span>
-<span>  test <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  test <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  n_knots <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  model_type <span class="op">=</span> <span class="cn">NA</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -136,6 +138,14 @@ resampling tests,</p>
 
 <dt id="arg-test">test<a class="anchor" aria-label="anchor" href="#arg-test"></a></dt>
 <dd><p>Logical. TRUE/FALSE. If TRUE, will only run first two resampling tests.</p></dd>
+
+
+<dt id="arg-n-knots">n_knots<a class="anchor" aria-label="anchor" href="#arg-n-knots"></a></dt>
+<dd><p>Numeric. Default  = 500.</p></dd>
+
+
+<dt id="arg-model-type">model_type<a class="anchor" aria-label="anchor" href="#arg-model-type"></a></dt>
+<dd><p>String. Default = "wrapper_sdmtmb", but can be any preset wrapper_*() function or a premade home built function.</p></dd>
 
 </dl></div>
     <div id="value">

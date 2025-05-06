@@ -4,7 +4,16 @@
 \alias{resample_tests}
 \title{Resample Tests and Run SDM Processing}
 \usage{
-resample_tests(spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE)
+resample_tests(
+  spp_dfs,
+  spp_info,
+  grid_yrs,
+  dir_out,
+  test = FALSE,
+  parallel = FALSE,
+  n_knots,
+  model_type = "wrapper_sdmtmb"
+)
 }
 \arguments{
 \item{spp_dfs}{A list of species data frames.}
@@ -15,7 +24,13 @@ resample_tests(spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE)
 
 \item{dir_out}{A character string specifying the directory for output files.}
 
-\item{test}{Logical. TRUE/FALSE. If TRUE, will only run first two resampling tests.}
+\item{test}{Logical. Default = FALSE. If TRUE, will only run first two resampling tests.}
+
+\item{parallel}{Logical. Default = FALSE. If TRUE, will run models using \code{furrr::future_map()}.}
+
+\item{n_knots}{Numeric. Default  = 500.}
+
+\item{model_type}{String. Default = "wrapper_sdmtmb", but can be any preset wrapper_*() function or a premade home built function.}
 }
 \description{
 This function resamples species data frames, runs species distribution models (SDMs) in parallel, and saves the results.

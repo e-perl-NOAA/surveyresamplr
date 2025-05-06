@@ -20,6 +20,8 @@
 #' @param grid_yrs A data frame or list containing grid years information.
 #' @param dir_out A character string specifying the directory for output files.
 #' @param test Logical. TRUE/FALSE. If TRUE, will only run first two resampling tests. 
+#' @param n_knots Numeric. Default  = 500.
+#' @param model_type String. Default = "wrapper_sdmtmb", but can be any preset wrapper_*() function or a premade home built function.
 #' @export
 #' @return A list of data frames containing the cleaned and resampled catch data.
 #' @example
@@ -60,7 +62,9 @@ clean_and_resample <- function(spp_info,
                                replicate_num, 
                                grid_yrs, 
                                dir_out, 
-                               test = FALSE) {
+                               test = FALSE, 
+                               n_knots = NA, 
+                               model_type = NA) {
   
   message(paste0(spp_info$srvy, " ", spp_info$common_name))
   

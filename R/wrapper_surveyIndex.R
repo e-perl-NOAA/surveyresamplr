@@ -1,9 +1,10 @@
-#' Species distribution model function using sdmTMB
+#' Species distribution model function using surveyIndex GAM model
 #'
-#' Function to create a mesh, fit the sdmTMB model, and get the index.
+#' Function to create a mesh, fit the GAM model, and get the index.
+#' TOLEDO: need to build out, this is just a holding spot
 #' Exports fit.rds and index.rds files to the designated species folder.
-#' Learn more: https://github.com/pbs-assess/sdmTMB/
-#' 
+#' Learn more: https://github.com/casperwberg/surveyIndex
+#'
 #' @param x speciesname_df[[i]] which is a data frame from a list of data frames
 #' created from the cleanup_by_species() function and any further post-processing
 #' of depth filters (see the smaller_function.R file for those).
@@ -13,7 +14,7 @@
 #' @param spp_info information about the species test run. 
 #' @param n_knots Numeric. Default  = 500.
 #' names(speciesname_df)
-#' @import sdmTMB
+#' @import surveyIndex
 #' @export
 #' @example 
 #' 1+1 # TO DO: NEED TO ADD EXAMPLE
