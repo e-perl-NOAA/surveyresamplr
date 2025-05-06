@@ -12,6 +12,9 @@
 #' replicates - (replicates - 1). 5x3-2
 #' @param replicate_num An integer specifying the number of replicates.
 #' 
+#' @import dplyr filter bind_rows
+#' @importFrom purrr map2 map
+#' 
 #' @examples
 #' catch <- surveyresamplr::noaa_nwfsc_catch
 #' spp_list <- data.frame(srvy = "CA",
@@ -90,7 +93,7 @@ cleanup_by_species <- function(catch,
   
   alldata_resampled <- join_dfs(tows_assigned_resampled, df, "trawlid")
     
-  names(alldata_resampled) <- substr(names(alldata_resampled), 6, 50)
+  names(alldata_resampled) <- base::substr(names(alldata_resampled), 6, 50)
   # it would be good to replace 50 with a logical indicating the end
   
   species_all_yrs <- alldata_resampled |>
@@ -99,7 +102,7 @@ cleanup_by_species <- function(catch,
   # Split the data frame by source
   species_all_yrs <- base::split(species_all_yrs, species_all_yrs$source)
   
-  names(species_all_yrs) <- gsub(x = names(species_all_yrs), pattern = ".", replacement = "", fixed = TRUE)
+  names(species_all_yrs) <- base::gsub(x = names(species_all_yrs), pattern = ".", replacement = "", fixed = TRUE)
     
   # Remove dfs and lists so they don't take up memory
   rm("df", "catch_split", "tows", "props", "tows_assigned", "alldata_resampled")
@@ -146,7 +149,7 @@ join_dfs <- function(list_of_dfs,
   
   # Merge the list of data frames with the main data frame using the shared_column
   merged_dfs <- base::lapply(list_of_dfs, function(df) {
-    merged_df <- merge(df, main_df, by = shared_column)
+    merged_df <- base::merge(df, main_df, by = shared_column)
     return(merged_df)
   })
   return(merged_dfs)

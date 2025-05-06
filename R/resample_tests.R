@@ -11,6 +11,12 @@
 #' @param n_knots Numeric. Default  = 500.
 #' @param model_type String. Default = "wrapper_sdmtmb", but can be any preset wrapper_*() function or a premade home built function.
 #' 
+#' @importFrom arrow write_parquet read_parquet
+#' @importFrom future plan
+#' @importFrom utils read.csv write.csv
+#' @importFrom sdmTMB tidy sanity
+#' @importFrom dplyr filter mutate across everything bind_rows bind_cols
+#' 
 #' @export
 #' 
 #' @details
@@ -30,7 +36,10 @@
 resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE, parallel = FALSE, n_knots, model_type = "wrapper_sdmtmb") {
   # set directories for outputs
   dir_spp <- paste0(dir_out, paste0(spp_info$srvy, "_", spp_info$file_name, "/"))
-  dir.create(dir_spp, showWarnings = FALSE)
+  
+  if(!dir.exists(dir_spp)) {
+    dir.create(dir_spp, showWarnings = FALSE)
+  }
   
   if (test) {
     spp_dfs <- spp_dfs[names(spp_dfs)[(length(names(spp_dfs))-1):length(names(spp_dfs))]] # reduce DFs for testing

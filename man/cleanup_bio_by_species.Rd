@@ -32,10 +32,13 @@ biological data if more than one species}
 List of resampled biological dataframes that match the catch data
 }
 \description{
-Filter biological by species
+Filter biological data by species, apply depth and latitude filters, and 
+filter biological data by the trawl ids that were resampled in the catch data.
+This requires cleanup_by_species to be run first on the catch data.
 }
 \examples{
 \dontrun{
 cleanup_bio_by_species() # TO DO: NEED EXAMPLE OF HOW TO USE
 }
+
 }

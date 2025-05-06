@@ -31,8 +31,6 @@ base::lapply(unique(PKG), pkg_install)
 # Get cpue data ----------------------------------------------------------------
 
 #pull BT data for all spp 
-# PullCatch.fn and PullBio.fn have been deprecated, switching to pull_catch() and 
-# pull_bio()
 noaa_nwfsc_catch <- nwfscSurvey::pull_catch(survey = "NWFSC.Combo", 
                                common_name = c("Pacific spiny dogfish",
                                                "longnose skate",
@@ -46,28 +44,28 @@ noaa_nwfsc_catch <- nwfscSurvey::pull_catch(survey = "NWFSC.Combo",
                                                "darkblotched rockfish",
                                                "widow rockfish",
                                                "yellowtail rockfish",
-                                               # "chilipepper", I didn't see this one in Derek's OG species list
                                                "bocaccio",
                                                "canary rockfish",
-                                               "lingcod")) %>% 
-  unique() %>% 
+                                               "lingcod")) |> 
+  unique() |>
   dplyr::select(trawlid = Trawl_id, 
                 common_name = Common_name, 
                 longitude_dd = Longitude_dd, 
                 latitude_dd = Latitude_dd, 
                 year = Year, 
                 pass = Pass, 
+                area_swept_ha = Area_swept_ha,
+                total_catch_numbers,
                 total_catch_wt_kg, 
-                depth_m = Depth_m) %>% 
+                depth_m = Depth_m) |> 
   dplyr::mutate(srvy = "CA")
+
+# nwfscSurvey::get_expanded comps requires the following in the catch data: year,
+# trawl_id, depth_m, latitude_dd, area_swept_ha, total_catch_numbers
 
 # table(catch$common_name)
 
-# Save data -------------------------------------------------------------------
-
-#write csv
-# setwd(data)
-# utils::write.csv(catch,here::here("data", "nwfsc_bt_fmp_spp_updated.csv"), row.names = F)
+# Save catch data --------------------------------------------------------------
 
 dat <- noaa_nwfsc_catch
 obj_name <- "noaa_nwfsc_catch"
@@ -78,6 +76,54 @@ details <- "ENTER."
 description <- "ENTER."
 
 save(noaa_nwfsc_catch, file = here::here("data", paste0(obj_name, ".rdata")))
+data_documentation(dat, title, obj_name, author, source, details, description)
+
+# Pull biological data ---------------------------------------------------------
+
+noaa_nwfsc_bio <- nwfscSurvey::pull_bio(survey = "NWFSC.Combo", 
+                                        common_name = c("Pacific spiny dogfish",
+                                                        "longnose skate",
+                                                        "arrowtooth flounder",
+                                                        "petrale sole",
+                                                        "rex sole",
+                                                        "Dover sole",
+                                                        "sablefish",
+                                                        "shortspine thornyhead",
+                                                        "Pacific ocean perch",
+                                                        "darkblotched rockfish",
+                                                        "widow rockfish",
+                                                        "yellowtail rockfish",
+                                                        "bocaccio",
+                                                        "canary rockfish",
+                                                        "lingcod")) |>
+  dplyr::select(trawlid = Trawl_id,
+                common_name = Common_name, 
+                longitude_dd = Longitude_dd, 
+                latitude_dd = Latitude_dd, 
+                year = Year, 
+                pass = Pass, 
+                sex = Sex,
+                length_cm = Length_cm,
+                age = Age,
+                depth_m = Depth_m,
+                project = Project
+  ) |> 
+  dplyr::mutate(srvy = "CA")
+
+# nwfscSurvey::get_expanded_comps requires sex, year, trawl_id, depth_m, latitude_dd, 
+# common_name, project, age, and length
+
+# Save biological data ---------------------------------------------------------
+
+dat <- noaa_nwfsc_bio
+obj_name <- "noaa_nwfsc_bio"
+title <- "Combined NWFSC biological (length and age composition), haul, and species data"
+author <- "Northwest Fisheries Science Center, compiled by Emily Markowitz (Emily.Markowitz AT noaa.gov), Elizabeth Perl (Elizabeth.Gugliotti AT noaa.gov), and Derek Bolser (Derek.Bolser AT noaa.gov)"
+source <- "Northwest Fisheries Science Center. "
+details <- "ENTER."
+description <- "ENTER."
+
+save(noaa_nwfsc_bio, file = here::here("data", paste0(obj_name, ".rdata")))
 data_documentation(dat, title, obj_name, author, source, details, description)
 
 # Get grid ---------------------------------------------------------------------

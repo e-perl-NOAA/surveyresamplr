@@ -149,6 +149,7 @@ spp_list <- spp_list[1:2,] # for testing
 
 # source(paste0(wd, "code/data_dl_nw.r"))
 catch <- surveyresamplr::noaa_nwfsc_catch #pulled data again to get 2024
+bio <- surveyresamplr::noaa_nwfsc_bio
 
 ### Load grid data -------------------------------------------------------------
 
@@ -177,7 +178,7 @@ sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE
 map(
   1:nrow(spp_list), 
   ~ clean_and_resample(spp_list[.x,], 
-                       catch, seq_from, seq_to, seq_by, 
+                       catch, bio, seq_from, seq_to, seq_by, 
                        tot_dataframes, replicate_num, grid_yrs, dir_out))
 sink()
 ```
@@ -192,3 +193,6 @@ out <- plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final)
 # load(file = paste0(dir_out, paste0(srvy, "_simple_0figures/figures.rdata")), verbose = TRUE)
 out$plots
 ```
+
+
+

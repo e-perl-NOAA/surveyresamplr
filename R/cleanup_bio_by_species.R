@@ -1,6 +1,8 @@
 #' Cleanup bio data species function
 #'
-#' Filter biological by species
+#' Filter biological data by species, apply depth and latitude filters, and 
+#' filter biological data by the trawl ids that were resampled in the catch data.
+#' This requires cleanup_by_species to be run first on the catch data.
 #'
 #' @param bio_df Dataframe of biological data - length and age compositions that
 #' has a Trawl_id column
@@ -14,6 +16,8 @@
 #' \dontrun{
 #' cleanup_bio_by_species() # TO DO: NEED EXAMPLE OF HOW TO USE
 #' }
+#' 
+#' @importFrom dplyr filter mutate
 #' @export
 #' @return List of resampled biological dataframes that match the catch data
 #'

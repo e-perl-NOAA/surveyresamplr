@@ -12,6 +12,7 @@
 #' 
 #' @param spp_info A data frame row containing information about the species.
 #' @param catch A data frame containing the catch data.
+#' @param bio A data frame containing the biological data, if applicable.
 #' @param seq_from A numeric value specifying the start of the sequence for data frames.
 #' @param seq_to A numeric value specifying the end of the sequence for data frames.
 #' @param seq_by A numeric value specifying the step size of the sequence for data frames.
@@ -27,6 +28,7 @@
 #' @examples
 #' dir_out <- here::here("vignettes", "output")
 #' catch <- surveyresamplr::noaa_nwfsc_catch
+#' bio <- surveyresamplr::noaa_nwfsc_bio
 #' grid_yrs <- replicate_df(dat = surveyresamplr::noaa_nwfsc_catch, time_name = "year", 
 #'                          time_values = unique(catch$year))
 #' spp_list <- data.frame(srvy = "CA",
@@ -42,6 +44,7 @@
 #'                       )
 #' clean_and_resample(spp_info = spp_list, 
 #'                    catch, 
+#'                    bio, 
 #'                    seq_from = 0.1, 
 #'                    seq_to = 1, 
 #'                    seq_by = 0.1, 
@@ -51,7 +54,8 @@
 #'                    dir_out = dir_out))
 #' 
 clean_and_resample <- function(spp_info, 
-                               catch, 
+                               catch,
+                               bio,
                                seq_from, 
                                seq_to, 
                                seq_by, 
@@ -98,6 +102,20 @@ clean_and_resample <- function(spp_info,
     tot_dataframes = tot_dataframes, 
     replicate_num = replicate_num
   )
+  
+  if(!is.null(bio)){
+  bio_spp_dfs <- cleanup_bio_by_species(bio_df = bio,
+                                        catch_cleaned = spp_dfs,
+                                        filter_lat_lt = spp_info$filter_lat_gt,
+                                        filter_lat_gt = spp_info$filter_lat_lt,
+                                        filter_depth = spp_info$filter_depth,
+                                        species = spp_info$common_name)
+  dir_spp <- paste0(dir_out, paste0(spp_info$srvy, "_", spp_info$file_name, "/"))
+  if(!dir.exists(dir_spp)) {
+    dir.create(dir_spp, showWarnings = FALSE)
+  }
+  utils::write.csv(index, file = paste0(dir_spp, "bio.csv"))
+  }
   
   try({
     resample_tests(
