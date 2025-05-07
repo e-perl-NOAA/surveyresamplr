@@ -3,9 +3,11 @@ name: call-doc-and-style-r
 # on specifies the build triggers. See more info at https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
 on:
   push:
-    branches: [main]
-  pull-request:
-    branches: [main]
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 jobs:
   call-workflow:
     uses: nmfs-ost/ghactions4r/.github/workflows/doc-and-style-r.yml@main
