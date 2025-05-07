@@ -31,13 +31,14 @@ jobs:
       
       - name: Install R package dependencies
         run: |
+          install.packages(c("devtools", "remotes")
           PKG <- c(
-            "devtools","remotes","jsonlite","httr","sp","RODBC","roxygen2","usethis",
+            "jsonlite","httr","sp","RODBC","roxygen2","usethis",
             "plyr","dplyr","magrittr","tidyr","ggplot2","tibble","janitor","here",
             "readr","akgfmaps","coldpool","nwfscSurvey","sf","ggspatial","FishStatsUtils",
             "fontawesome"
           )
-          source("./inst/r/pkg_install.R")
+          source("inst/r/pkg_install.R")
           base::lapply(unique(PKG), pkg_install)
         shell: Rscript {0}
         
