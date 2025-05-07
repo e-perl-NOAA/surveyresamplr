@@ -66,9 +66,7 @@ PKG <- c(
 )
 
 pkg_install <- function(p){
-  if(!require(p, character.only = TRUE)) {
-    install.packages(p)
-  }
+  install.packages(p)
   require(p, character.only = TRUE)
 }
 base::lapply(unique(PKG), pkg_install)
