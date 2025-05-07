@@ -27,7 +27,7 @@
 #' \dontrun{
 #' resample_tests() # TO DO: NEED EXAMPLE OF HOW TO USE
 #' }
-resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE, parallel = FALSE, n_knots, model_type = "wrapper_sdmtmb") {
+resample_tests <- function(spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE, parallel = FALSE, n_knots, model_type = "wrapper_sdmtmb") {
   # set directories for outputs
   dir_spp <- paste0(dir_out, paste0(spp_info$srvy, "_", spp_info$file_name, "/"))
   dir.create(dir_spp, showWarnings = FALSE)
@@ -58,7 +58,7 @@ resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE, 
     # Load only the required dataframe
     spp_df <- arrow::read_parquet(paste0(dir_spp, paste0("df_", i, ".parquet")))
     # Run species SDM function
-    fit0 <- wrapper(
+    fit0 <- wrapper_model(
       x = spp_df, 
       y = spp_files[[i]], 
       z = grid_yrs, 

@@ -15,7 +15,7 @@ clean_and_resample(
   grid_yrs,
   dir_out,
   test = FALSE,
-  n_knots = NA,
+  n_knots = 300,
   model_type = NA
 )
 }

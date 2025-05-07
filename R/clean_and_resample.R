@@ -60,7 +60,7 @@ clean_and_resample <- function(spp_info,
                                grid_yrs, 
                                dir_out, 
                                test = FALSE, 
-                               n_knots = NA, 
+                               n_knots = 300, 
                                model_type = NA) {
   
   message(paste0(spp_info$srvy, " ", spp_info$common_name))
