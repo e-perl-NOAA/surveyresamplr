@@ -4,7 +4,7 @@
 \alias{wrapper_sdmtmb}
 \title{Species distribution model function using sdmTMB}
 \usage{
-wrapper_sdmtmb(x, y, z, dir_spp, spp_info, n_knots = 500)
+wrapper_sdmtmb(x, y, z, dir_spp, spp_info, n_knots = 300)
 }
 \arguments{
 \item{x}{speciesname_df[[i]] which is a data frame from a list of data frames
@@ -19,7 +19,7 @@ of depth filters (see the smaller_function.R file for those).}
 
 \item{spp_info}{information about the species test run.}
 
-\item{n_knots}{Numeric. Default  = 500.
+\item{n_knots}{Numeric. 
 names(speciesname_df)}
 }
 \description{

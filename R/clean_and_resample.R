@@ -61,7 +61,7 @@ clean_and_resample <- function(spp_info,
                                dir_out, 
                                test = FALSE, 
                                n_knots = 300, 
-                               model_type = NA) {
+                               model_type = "wrapper_sdmtmb") {
   
   message(paste0(spp_info$srvy, " ", spp_info$common_name))
   
@@ -105,7 +105,9 @@ clean_and_resample <- function(spp_info,
       spp_info = spp_info, 
       grid_yrs = grid_yrs, 
       dir_out = dir_out, 
-      test = test
+      test = test, 
+      n_knots = n_knots, 
+      model_type = model_type
     ) 
   }, silent = FALSE)
 }

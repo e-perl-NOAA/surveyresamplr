@@ -16,7 +16,7 @@ clean_and_resample(
   dir_out,
   test = FALSE,
   n_knots = 300,
-  model_type = NA
+  model_type = "wrapper_sdmtmb"
 )
 }
 \arguments{

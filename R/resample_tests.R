@@ -145,12 +145,12 @@ resample_tests <- function(spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE, p
   if (parallel == TRUE) {
   # Run SDMs in parallel
   furrr::future_map(seq_along(spp_files), function(i) {
-    innards(i, dir_spp)
+    innards(i, dir_spp, n_knots)
   # NULL
   }, .progress = TRUE, .options = furrr::furrr_options(seed = TRUE))
   } else {
   for (i in seq_along(spp_files)) {
-    innards(i, dir_spp)
+    innards(i, dir_spp, n_knots)
 }
 }
   message("...Parallel SDM processing complete")
