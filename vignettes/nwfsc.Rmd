@@ -28,12 +28,12 @@ dir_final <- paste0(dir_out, "CA_0results/")
 crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
 
 # Install Libraries ------------------------------------------------------------
+library(surveyresamplr)
 
 # Here we list all the packages we will need for this whole process
 # We'll also use this in our works cited page. 
 PKG <- c(
   "here",
-  "surveyresamplr",
 
   # tidyverse
   "dplyr",
