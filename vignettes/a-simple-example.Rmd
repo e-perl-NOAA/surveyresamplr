@@ -25,7 +25,7 @@ options(ggplot2.continuous.fill = "viridis")
 ```
 
 
-## Install libraries
+## Install and load libraries
 
 ```{r comment = FALSE, warning = FALSE, message = FALSE, error = FALSE, results='hide'}
 
@@ -67,9 +67,13 @@ PKG <- c(
   "INLA" 
 )
 
-for (p in 1:length(PKG)) {
-  require(PKG[p], character.only = TRUE)
+pkg_install <- function(p){
+  if(!require(p, character.only = TRUE)) {
+    install.packages(p)
+  }
+  require(p, character.only = TRUE)
 }
+base::lapply(unique(PKG), pkg_install)
 ```
 
 ## Test Species List
