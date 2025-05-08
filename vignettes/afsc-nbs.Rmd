@@ -122,7 +122,7 @@ purrr::map(
                        catch, seq_from, seq_to, seq_by, 
                        tot_dataframes, replicate_num, grid_yrs, dir_out, 
                        n_knots = 300, 
-                       test = TRUE))
+                       test = FALSE))
 sink()
 
 ### Plot indices ---------------------------------------------------------------
