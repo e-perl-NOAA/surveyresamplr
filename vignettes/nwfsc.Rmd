@@ -19,22 +19,13 @@ knitr::opts_chunk$set(
 # get rid of memory limits
 options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
 
-# Set directories --------------------------------------------------------------
-library(here)
-
-wd <- paste0(here::here(),"/vignettes/")
-dir_out <- paste0(wd, "output/")
-dir.create(dir_out)
-dir_final <- paste0(dir_out, "CA_0results/")
-dir.create(dir_final)
-crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
-
 # Install Libraries ------------------------------------------------------------
 library(surveyresamplr)
 
 # Here we list all the packages we will need for this whole process
 # We'll also use this in our works cited page. 
 PKG <- c(
+  "here"
   # tidyverse
   "dplyr",
   "magrittr",
@@ -67,12 +58,18 @@ PKG <- c(
 )
 
 pkg_install <- function(p){
-  if(!require(p, character.only = TRUE)){
-    install.packages(p)
-  }
+  install.packages(p)
   require(p, character.only = TRUE)
 }
 base::lapply(unique(PKG), pkg_install)
+
+# Set directories --------------------------------------------------------------
+wd <- paste0(here::here(),"/vignettes/")
+dir_out <- paste0(wd, "output/")
+dir.create(dir_out)
+dir_final <- paste0(dir_out, "CA_0results/")
+dir.create(dir_final)
+crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
 ```
 
 ```{r eval = FALSE}
