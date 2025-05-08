@@ -12,7 +12,7 @@
 #' 
 #' @param spp_info A data frame row containing information about the species.
 #' @param catch A data frame containing the catch data.
-#' @param bio A data frame containing the biological data, if applicable.
+#' @param bio A data frame containing the biological data, if applicable. NULL is default.
 #' @param seq_from A numeric value specifying the start of the sequence for data frames.
 #' @param seq_to A numeric value specifying the end of the sequence for data frames.
 #' @param seq_by A numeric value specifying the step size of the sequence for data frames.
@@ -55,7 +55,6 @@
 #' 
 clean_and_resample <- function(spp_info, 
                                catch,
-                               bio,
                                seq_from, 
                                seq_to, 
                                seq_by, 
@@ -65,10 +64,10 @@ clean_and_resample <- function(spp_info,
                                dir_out, 
                                test = FALSE, 
                                n_knots = NA, 
-                               model_type = NA) {
+                               model_type = NA,
+                               bio = NULL) {
   
   message(paste0(spp_info$srvy, " ", spp_info$common_name))
-  
   # check input variables
   ## do all of the model function variables exist in grid_yrs and the catch data?
   aa <- spp_info$model_fn

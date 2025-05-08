@@ -35,8 +35,6 @@ library(surveyresamplr)
 # Here we list all the packages we will need for this whole process
 # We'll also use this in our works cited page. 
 PKG <- c(
-  "here",
-
   # tidyverse
   "dplyr",
   "magrittr",
@@ -45,7 +43,7 @@ PKG <- c(
   "ggplot2", 
   "tibble",
   "janitor", 
-  "data.table", 
+  # "data.table", 
   
   # parallelizing
   "forcats",
@@ -65,11 +63,13 @@ PKG <- c(
   "MASS",
   "cluster", 
   "TMB", 
-  "INLA" 
+  "INLA"
 )
 
 pkg_install <- function(p){
-  install.packages(p)
+  if(!require(p, character.only = TRUE)){
+    install.packages(p)
+  }
   require(p, character.only = TRUE)
 }
 base::lapply(unique(PKG), pkg_install)
@@ -154,7 +154,7 @@ catch <- surveyresamplr::noaa_nwfsc_catch #pulled data again to get 2024
 
 ### Load grid data -------------------------------------------------------------
 
-grid_yrs <- replicate_df(
+grid_yrs <- sdmTMB::replicate_df(
   dat = surveyresamplr::noaa_nwfsc_pred_grid_depth, 
   time_name = "year", 
   time_values = unique(catch$year))
@@ -176,11 +176,17 @@ replicate_num <- 10
 ### Run ------------------------------------------------------------------------
 
 sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
-map(
+purrr::map(
   1:nrow(spp_list), 
   ~ clean_and_resample(spp_list[.x,], 
-                       catch, seq_from, seq_to, seq_by, 
-                       tot_dataframes, replicate_num, grid_yrs, dir_out))
+                       catch,
+                       seq_from, 
+                       seq_to, 
+                       seq_by, 
+                       tot_dataframes, 
+                       replicate_num, 
+                       grid_yrs, 
+                       dir_out))
 sink()
 ``` 
 

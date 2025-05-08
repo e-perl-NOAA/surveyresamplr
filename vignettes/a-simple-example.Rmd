@@ -71,11 +71,10 @@ PKG <- c(
 )
 
 pkg_install <- function(p){
-  install.packages(p)
-  require(p, character.only = TRUE)
-}
-
-base::lapply(unique(PKG), pkg_install)
+  if(!require(p, character.only = TRUE)){
+    install.packages(p)
+  }
+base::lapply(PKG, pkg_install)
 ```
 
 ## Test Species List
@@ -176,7 +175,7 @@ catch <- surveyresamplr::noaa_afsc_catch %>%
 
 ### Load grid data -------------------------------------------------------------
 
-grid_yrs <- replicate_df(dat = surveyresamplr::noaa_afsc_ebs_pred_grid_depth, 
+grid_yrs <- sdmTMB::replicate_df(dat = surveyresamplr::noaa_afsc_ebs_pred_grid_depth, 
                          time_name = "year", 
                          time_values = unique(catch$year))
 ```
