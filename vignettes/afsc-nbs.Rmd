@@ -136,7 +136,7 @@ plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final)
 
 
 ```{r results-run, eval = TRUE}
-out <- plot_results(srvy = srvy), dir_out = dir_out, dir_final = dir_final) 
+out <- plot_results(srvy = srvy), dir_out = dir_out, dir_final = dirg_final) 
 ```
 
 ```{r results-plots}

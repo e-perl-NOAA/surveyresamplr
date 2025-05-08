@@ -1,9 +1,2 @@
 .Rproj.user/*
 .Rproj.user
-
-
-output/
-
-inst/doc
-
-vignettes/output/
