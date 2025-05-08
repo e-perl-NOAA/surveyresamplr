@@ -1,0 +1,7 @@
+"","X","srvy","common_name","species_code","filter_lat_lt","filter_lat_gt","filter_depth","model_fn","model_family","model_anisotropy","model_spatiotemporal","file_name","effort","term","estimate","std.error","conf.low","conf.high"
+"1","1","GOA","Pacific ocean perch","30060",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","pacific_ocean_perch","08_3","range","7.99471637164964","8240.01647757357","0","Inf"
+"2","2","GOA","Pacific ocean perch","30060",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","pacific_ocean_perch","08_3","sigma_O","0.250339182301426","NaN","NaN","NaN"
+"3","3","GOA","Pacific ocean perch","30060",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","pacific_ocean_perch","08_3","sigma_E","0.350935258730941","365.085580363342","0","Inf"
+"4",NA,"GOA","Pacific ocean perch","30060",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","pacific_ocean_perch","1_1","range","15.4251978562889","8820.63877657167","0","Inf"
+"5",NA,"GOA","Pacific ocean perch","30060",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","pacific_ocean_perch","1_1","sigma_O","0.166902472992394","83.5503290486951","0","Inf"
+"6",NA,"GOA","Pacific ocean perch","30060",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","pacific_ocean_perch","1_1","sigma_E","0.246734244764343","141.255407188516","0","Inf"

@@ -1,0 +1,7 @@
+"","X","srvy","common_name","species_code","filter_lat_lt","filter_lat_gt","filter_depth","model_fn","model_family","model_anisotropy","model_spatiotemporal","file_name","effort","term","estimate","std.error","conf.low","conf.high"
+"1","1","NBS","snow crab","68580",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","snow_crab","08_3","range","2.82771926280115","NaN","NaN","NaN"
+"2","2","NBS","snow crab","68580",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","snow_crab","08_3","sigma_O","0.281992961493514","NaN","NaN","NaN"
+"3","3","NBS","snow crab","68580",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","snow_crab","08_3","sigma_E","0.281994285322806","NaN","NaN","NaN"
+"4",NA,"NBS","snow crab","68580",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","snow_crab","1_1","range","2.63020699011669","714.752289725359","1.28251108152427e-231","5.39409671426569e+231"
+"5",NA,"NBS","snow crab","68580",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","snow_crab","1_1","sigma_O","0.908471534361603","441.121317379801","0","Inf"
+"6",NA,"NBS","snow crab","68580",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","snow_crab","1_1","sigma_E","0.355491296015471","114.22278291224","1.12605968167587e-274","1.12226788330331e+273"

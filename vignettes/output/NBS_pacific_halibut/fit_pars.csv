@@ -1,0 +1,7 @@
+"","X","srvy","common_name","species_code","filter_lat_lt","filter_lat_gt","filter_depth","model_fn","model_family","model_anisotropy","model_spatiotemporal","file_name","effort","term","estimate","std.error","conf.low","conf.high"
+"1","1","NBS","Pacific halibut","10120",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","pacific_halibut","08_3","range","2.96388764992156","52.2322632419575","2.95958878553212e-15","2968192758501133"
+"2","2","NBS","Pacific halibut","10120",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","pacific_halibut","08_3","sigma_O","0.295295434732523","5.21027294405053","2.82764740921904e-16","308381425101204"
+"3","3","NBS","Pacific halibut","10120",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","pacific_halibut","08_3","sigma_E","0.296069543542422","5.2170313412685","2.96756566073434e-16","295384111540526"
+"4",NA,"NBS","Pacific halibut","10120",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","pacific_halibut","1_1","range","3.01750059650027","NaN","NaN","NaN"
+"5",NA,"NBS","Pacific halibut","10120",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","pacific_halibut","1_1","sigma_O","0.305254669859649","NaN","NaN","NaN"
+"6",NA,"NBS","Pacific halibut","10120",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","pacific_halibut","1_1","sigma_E","0.303751112732684","NaN","NaN","NaN"

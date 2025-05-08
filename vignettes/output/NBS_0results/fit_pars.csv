@@ -1,0 +1,55 @@
+"","X.1","X","srvy","common_name","species_code","filter_lat_lt","filter_lat_gt","filter_depth","model_fn","model_family","model_anisotropy","model_spatiotemporal","file_name","effort","term","estimate","std.error","conf.low","conf.high"
+"1",1,1,"NBS","Alaska plaice",10285,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","alaska_plaice","08_3","range",5.70090075522932,1908.38599791759,6.52849247755187e-285,4.97821963228522e+285
+"2",2,2,"NBS","Alaska plaice",10285,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","alaska_plaice","08_3","sigma_O",0.483272818895683,160.044725288998,6.20969646405753e-283,3.76109555169457e+281
+"3",3,3,"NBS","Alaska plaice",10285,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","alaska_plaice","08_3","sigma_E",0.561443500983196,188.256634884589,2.15978543958904e-286,1.45949129491417e+285
+"4",4,NA,"NBS","Alaska plaice",10285,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","alaska_plaice","1_1","range",2.55508753627121,892.452951142612,1.24663962897695e-297,5.23685607793947e+297
+"5",5,NA,"NBS","Alaska plaice",10285,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","alaska_plaice","1_1","sigma_O",0.484860510433367,299.678158024203,0,Inf
+"6",6,NA,"NBS","Alaska plaice",10285,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","alaska_plaice","1_1","sigma_E",0.223872864831491,94.6571939422591,0,Inf
+"7",1,1,"NBS","blue king crab",69323,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","blue_king_crab","08_3","range",2.82510101092475,NA,NA,NA
+"8",2,2,"NBS","blue king crab",69323,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","blue_king_crab","08_3","sigma_O",0.281645868478064,NA,NA,NA
+"9",3,3,"NBS","blue king crab",69323,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","blue_king_crab","08_3","sigma_E",0.281617138989023,NA,NA,NA
+"10",4,NA,"NBS","blue king crab",69323,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","blue_king_crab","1_1","range",1.87091439690524,3779.79079334146,0,Inf
+"11",5,NA,"NBS","blue king crab",69323,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","blue_king_crab","1_1","sigma_O",0.0788286830284032,292.370978899904,0,Inf
+"12",6,NA,"NBS","blue king crab",69323,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","blue_king_crab","1_1","sigma_E",0.19644680354471,455.287342650366,0,Inf
+"13",1,1,"NBS","northern rock sole",10261,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rock_sole","08_3","range",1.85271303353742,2189.50908358381,0,Inf
+"14",2,2,"NBS","northern rock sole",10261,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rock_sole","08_3","sigma_O",0.180338318409879,144.54141166692,0,Inf
+"15",3,3,"NBS","northern rock sole",10261,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rock_sole","08_3","sigma_E",0.192189601899704,226.239776140905,0,Inf
+"16",4,NA,"NBS","northern rock sole",10261,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rock_sole","1_1","range",2.63741715235907,1614.8153640763,0,Inf
+"17",5,NA,"NBS","northern rock sole",10261,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rock_sole","1_1","sigma_O",0.0383406149177817,NA,NA,NA
+"18",6,NA,"NBS","northern rock sole",10261,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rock_sole","1_1","sigma_E",0.347878747750116,138.201935795924,0,Inf
+"19",1,1,"NBS","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","08_3","range",2.82736266355663,1503.35826150453,0,Inf
+"20",2,2,"NBS","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","08_3","sigma_O",0.281942471977096,149.596521398462,0,Inf
+"21",3,3,"NBS","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","08_3","sigma_E",0.281940950632975,150.389029226176,0,Inf
+"22",4,NA,"NBS","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","1_1","range",2.82172875020483,NA,NA,NA
+"23",5,NA,"NBS","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","1_1","sigma_O",0.281128570375719,NA,NA,NA
+"24",6,NA,"NBS","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","1_1","sigma_E",0.282012513469952,NA,NA,NA
+"25",1,1,"NBS","Pacific halibut",10120,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_halibut","08_3","range",2.96388764992156,52.2322632419575,2.95958878553212e-15,2968192758501133
+"26",2,2,"NBS","Pacific halibut",10120,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_halibut","08_3","sigma_O",0.295295434732523,5.21027294405053,2.82764740921904e-16,308381425101204
+"27",3,3,"NBS","Pacific halibut",10120,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_halibut","08_3","sigma_E",0.296069543542422,5.2170313412685,2.96756566073434e-16,295384111540526
+"28",4,NA,"NBS","Pacific halibut",10120,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_halibut","1_1","range",3.01750059650027,NA,NA,NA
+"29",5,NA,"NBS","Pacific halibut",10120,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_halibut","1_1","sigma_O",0.305254669859649,NA,NA,NA
+"30",6,NA,"NBS","Pacific halibut",10120,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_halibut","1_1","sigma_E",0.303751112732684,NA,NA,NA
+"31",1,1,"NBS","red king crab",69322,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","red_king_crab","08_3","range",2.82447842577177,24.1272428606858,1.51289743518569e-07,52731125.0063097
+"32",2,2,"NBS","red king crab",69322,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","red_king_crab","08_3","sigma_O",0.283130544155999,2.41865339343687,1.51553270295834e-08,5289420.99880741
+"33",3,3,"NBS","red king crab",69322,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","red_king_crab","08_3","sigma_E",0.313119395323984,2.67450033567274,1.67956338614327e-08,5837454.93245076
+"34",4,NA,"NBS","red king crab",69322,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","red_king_crab","1_1","range",2.83656915483349,0.0300406816391242,2.77829736658123,2.89606313094331
+"35",5,NA,"NBS","red king crab",69322,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","red_king_crab","1_1","sigma_O",0.284686221846551,0.00323382041340317,0.278418085202622,0.291095475533786
+"36",6,NA,"NBS","red king crab",69322,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","red_king_crab","1_1","sigma_E",0.280572986492339,0.00295375697655806,0.274843047397357,0.286422383591965
+"37",1,1,"NBS","snow crab",68580,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","snow_crab","08_3","range",2.82771926280115,NA,NA,NA
+"38",2,2,"NBS","snow crab",68580,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","snow_crab","08_3","sigma_O",0.281992961493514,NA,NA,NA
+"39",3,3,"NBS","snow crab",68580,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","snow_crab","08_3","sigma_E",0.281994285322806,NA,NA,NA
+"40",4,NA,"NBS","snow crab",68580,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","snow_crab","1_1","range",2.63020699011669,714.752289725359,1.28251108152427e-231,5.39409671426569e+231
+"41",5,NA,"NBS","snow crab",68580,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","snow_crab","1_1","sigma_O",0.908471534361603,441.121317379801,0,Inf
+"42",6,NA,"NBS","snow crab",68580,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","snow_crab","1_1","sigma_E",0.355491296015471,114.22278291224,1.12605968167587e-274,1.12226788330331e+273
+"43",1,1,"NBS","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","08_3","range",1.89123299141879,1070.22344749127,0,Inf
+"44",2,2,"NBS","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","08_3","sigma_O",0.192244551763682,95.8763731416689,0,Inf
+"45",3,3,"NBS","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","08_3","sigma_E",0.186929228476443,107.100227395526,0,Inf
+"46",4,NA,"NBS","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","1_1","range",2.52429640588412,2792.50659743609,0,Inf
+"47",5,NA,"NBS","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","1_1","sigma_O",0.258926481367646,297.585950619235,0,Inf
+"48",6,NA,"NBS","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","1_1","sigma_E",0.24760975949757,274.008494959945,0,Inf
+"49",1,1,"NBS","yellowfin sole",10210,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","yellowfin_sole","08_3","range",2.48463726370023,4085.38125763337,0,Inf
+"50",2,2,"NBS","yellowfin sole",10210,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","yellowfin_sole","08_3","sigma_O",0.244432819522199,372.438807625757,0,Inf
+"51",3,3,"NBS","yellowfin sole",10210,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","yellowfin_sole","08_3","sigma_E",0.238583194496264,374.148555904296,0,Inf
+"52",4,NA,"NBS","yellowfin sole",10210,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","yellowfin_sole","1_1","range",1.69984139166941,1169.00703560167,0,Inf
+"53",5,NA,"NBS","yellowfin sole",10210,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","yellowfin_sole","1_1","sigma_O",0.0379754545780354,NA,NA,NA
+"54",6,NA,"NBS","yellowfin sole",10210,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","yellowfin_sole","1_1","sigma_E",0.115054097367027,113.843318861004,0,Inf

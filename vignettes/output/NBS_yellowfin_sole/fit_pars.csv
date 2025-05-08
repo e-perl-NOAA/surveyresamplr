@@ -1,0 +1,7 @@
+"","X","srvy","common_name","species_code","filter_lat_lt","filter_lat_gt","filter_depth","model_fn","model_family","model_anisotropy","model_spatiotemporal","file_name","effort","term","estimate","std.error","conf.low","conf.high"
+"1","1","NBS","yellowfin sole","10210",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","yellowfin_sole","08_3","range","2.48463726370023","4085.38125763337","0","Inf"
+"2","2","NBS","yellowfin sole","10210",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","yellowfin_sole","08_3","sigma_O","0.244432819522199","372.438807625757","0","Inf"
+"3","3","NBS","yellowfin sole","10210",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","yellowfin_sole","08_3","sigma_E","0.238583194496264","374.148555904296","0","Inf"
+"4",NA,"NBS","yellowfin sole","10210",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","yellowfin_sole","1_1","range","1.69984139166941","1169.00703560167","0","Inf"
+"5",NA,"NBS","yellowfin sole","10210",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","yellowfin_sole","1_1","sigma_O","0.0379754545780354","NaN","NaN","NaN"
+"6",NA,"NBS","yellowfin sole","10210",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","yellowfin_sole","1_1","sigma_E","0.115054097367027","113.843318861004","0","Inf"

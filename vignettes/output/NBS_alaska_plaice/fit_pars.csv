@@ -1,0 +1,7 @@
+"","X","srvy","common_name","species_code","filter_lat_lt","filter_lat_gt","filter_depth","model_fn","model_family","model_anisotropy","model_spatiotemporal","file_name","effort","term","estimate","std.error","conf.low","conf.high"
+"1","1","NBS","Alaska plaice","10285",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","alaska_plaice","08_3","range","5.70090075522932","1908.38599791759","6.52849247755187e-285","4.97821963228522e+285"
+"2","2","NBS","Alaska plaice","10285",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","alaska_plaice","08_3","sigma_O","0.483272818895683","160.044725288998","6.20969646405753e-283","3.76109555169457e+281"
+"3","3","NBS","Alaska plaice","10285",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","alaska_plaice","08_3","sigma_E","0.561443500983196","188.256634884589","2.15978543958904e-286","1.45949129491417e+285"
+"4",NA,"NBS","Alaska plaice","10285",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","alaska_plaice","1_1","range","2.55508753627121","892.452951142612","1.24663962897695e-297","5.23685607793947e+297"
+"5",NA,"NBS","Alaska plaice","10285",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","alaska_plaice","1_1","sigma_O","0.484860510433367","299.678158024203","0","Inf"
+"6",NA,"NBS","Alaska plaice","10285",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","alaska_plaice","1_1","sigma_E","0.223872864831491","94.6571939422591","0","Inf"

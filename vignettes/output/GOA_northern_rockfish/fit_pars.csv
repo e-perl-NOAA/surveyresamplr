@@ -1,0 +1,7 @@
+"","X","srvy","common_name","species_code","filter_lat_lt","filter_lat_gt","filter_depth","model_fn","model_family","model_anisotropy","model_spatiotemporal","file_name","effort","term","estimate","std.error","conf.low","conf.high"
+"1","1","GOA","northern rockfish","30420",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","northern_rockfish","08_3","range","11.5084348311607","18796.7662117298","0","Inf"
+"2","2","GOA","northern rockfish","30420",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","northern_rockfish","08_3","sigma_O","0.265029089346399","720.643860340543","0","Inf"
+"3","3","GOA","northern rockfish","30420",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","northern_rockfish","08_3","sigma_E","0.280121292182088","451.072708544918","0","Inf"
+"4",NA,"GOA","northern rockfish","30420",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","northern_rockfish","1_1","range","0.743316998492507","NaN","NaN","NaN"
+"5",NA,"GOA","northern rockfish","30420",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","northern_rockfish","1_1","sigma_O","0.299477116052679","710.029707086494","0","Inf"
+"6",NA,"GOA","northern rockfish","30420",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","northern_rockfish","1_1","sigma_E","0.448806793656652","691.343223428797","0","Inf"
