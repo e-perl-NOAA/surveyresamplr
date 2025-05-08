@@ -25,7 +25,7 @@ library(surveyresamplr)
 # Here we list all the packages we will need for this whole process
 # We'll also use this in our works cited page. 
 PKG <- c(
-  "here"
+  "here",
   # tidyverse
   "dplyr",
   "magrittr",
