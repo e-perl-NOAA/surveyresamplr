@@ -1,4 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 
-vignettes/output/
+^\vignettes/output/notforgit/
+^\*.rds 
+^\*.parquet 
