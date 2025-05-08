@@ -23,6 +23,7 @@ library(here)
 
 wd <- paste0(here::here(),"/vignettes/")
 dir_out <- paste0(wd, "output/")
+dir_final <- paste0(dir_out, "NBS_0results/")
 crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
 
 # Install Libraries ------------------------------------------------------------
@@ -115,7 +116,8 @@ replicate_num <- 3
 
 ### Run ------------------------------------------------------------------------
 
-sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append = FALSE, split = TRUE)  # for screen and log
+start.time <- Sys.time()
+sink(file = paste0(dir_final, srvy, Sys.Date(), "_logfile.txt"), append = FALSE, split = TRUE)  
 purrr::map(
   1:nrow(spp_list), 
   ~ clean_and_resample(spp_list[.x,], 
@@ -124,11 +126,56 @@ purrr::map(
                        n_knots = 300, 
                        test = FALSE))
 sink()
+write.csv(x = data.frame(time = as.numeric(Sys.time() - start.time), units = units(Sys.time() - start.time)), file = paste0(dir_final, srvy, "_time.csv"))
 
 ### Plot indices ---------------------------------------------------------------
 
-plot_results(srvy = srvy, dir_out = dir_out) 
+plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final) 
 
 ```
+
+
+```{r results-run, eval = TRUE}
+out <- plot_results(srvy = srvy), dir_out = dir_out, dir_final = dir_final) 
+```
+
+```{r results-plots}
+# load(file = paste0(dir_out, paste0(srvy, "_simple_0figures/figures.rdata")), verbose = TRUE)
+out$plots
+```
+
+Parameter output: 
+
+```{r results-tables-1}
+i <- 1
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>% 
+  flextable::flextable() 
+```
+
+
+```{r results-tables-2}
+i <- 1 + i
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>% 
+  flextable::flextable() 
+```
+
+
+```{r results-tables-3}
+i <- 1 + i
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>% 
+  flextable::flextable() 
+```
+
+
+```{r results-tables-4}
+i <- 1 + i
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>% 
+  flextable::flextable() 
+```
+
 
 
