@@ -24,7 +24,7 @@ library(here)
 
 wd <- paste0(here::here(),"/vignettes/")
 dir_out <- paste0(wd, "output/")
-dir_final <- paste0(dir_out, "/CA_0results/")
+dir_final <- paste0(dir_out, "CA_0results/")
 crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
 
 # Install Libraries ------------------------------------------------------------
@@ -191,4 +191,15 @@ out <- plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final)
 ```{r results-plots}
 # load(file = paste0(dir_out, paste0(srvy, "_simple_0figures/figures.rdata")), verbose = TRUE)
 out$plots
+```
+
+```{r, echo = FALSE}
+for (i in 1:nrow(spp_list)) {
+  file0 <- paste0(dir_out, "/", srvy, "_", spp_list$file_name[i])
+  if (dir.exists(file0)) {
+    aaa <- list.files(paste0(dir_out, "/", srvy, "_", spp_list$file_name[i]), full.names = TRUE)
+    aaa <- aaa[!grepl(pattern = ".csv", x = aaa)]
+    file.remove(aaa)
+  }
+}
 ```

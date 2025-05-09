@@ -177,5 +177,14 @@ head(out$tables[i][[1]]) %>%
   flextable::flextable() 
 ```
 
-
+```{r, echo = FALSE}
+for (i in 1:nrow(spp_list)) {
+  file0 <- paste0(dir_out, "/", srvy, "_", spp_list$file_name[i])
+  if (dir.exists(file0)) {
+    aaa <- list.files(paste0(dir_out, "/", srvy, "_", spp_list$file_name[i]), full.names = TRUE)
+    aaa <- aaa[!grepl(pattern = ".csv", x = aaa)]
+    file.remove(aaa)
+  }
+}
+```
 
