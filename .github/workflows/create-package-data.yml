@@ -1,6 +1,16 @@
 name: create-package-data
 on:
+  pull-request:
+    branches:
+      - main
+    paths:
+      - inst/r/data_dl_ak.R
+      - inst/r/data_dl_ne.R
+      - inst/r/data_dl_nw.R
+      - inst/r/data_documentation.R
   push:
+    branches:
+      - main
     paths:
       - inst/r/data_dl_ak.R
       - inst/r/data_dl_ne.R
@@ -36,7 +46,7 @@ jobs:
             "jsonlite","httr","sp","RODBC","roxygen2","usethis",
             "plyr","dplyr","magrittr","tidyr","ggplot2","tibble","janitor","here",
             "readr","akgfmaps","coldpool","nwfscSurvey","sf","ggspatial","FishStatsUtils",
-            "fontawesome"
+            "fontawesome", "rmarkdown"
           )
           source("inst/r/pkg_install.R")
           base::lapply(unique(PKG), pkg_install)
