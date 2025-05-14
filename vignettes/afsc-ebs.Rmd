@@ -14,8 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r eval = FALSE}
-
+```{r}
 #get rid of memory limits
 options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
 
@@ -71,6 +70,12 @@ pkg_install <- function(p){
   require(p, character.only = TRUE)
 }
 base::lapply(unique(PKG), pkg_install)
+
+```
+
+
+
+```{r eval = FALSE}
 
 ### Define study species -------------------------------------------------------
 
@@ -148,20 +153,23 @@ map(
                        catch, seq_from, seq_to, seq_by, 
                        tot_dataframes, replicate_num, grid_yrs, dir_out, test = TRUE))
 sink()
+```
+
+```{r}
 
 ### Plot indices ---------------------------------------------------------------
-
+srvy <- "EBS"
 plot_results(srvy = srvy, dir_out = dir_out) 
 
 ```
 
 ```{r, echo = FALSE}
-for (i in 1:nrow(spp_list)) {
-  file0 <- paste0(dir_out, "/", srvy, "_", spp_list$file_name[i])
-  if (dir.exists(file0)) {
-    aaa <- list.files(paste0(dir_out, "/", srvy, "_", spp_list$file_name[i]), full.names = TRUE)
-    aaa <- aaa[!grepl(pattern = ".csv", x = aaa)]
-    file.remove(aaa)
-  }
-}
+# for (i in 1:nrow(spp_list)) {
+#   file0 <- paste0(dir_out, "/", srvy, "_", spp_list$file_name[i])
+#   if (dir.exists(file0)) {
+#     aaa <- list.files(paste0(dir_out, "/", srvy, "_", spp_list$file_name[i]), full.names = TRUE)
+#     aaa <- aaa[!grepl(pattern = ".csv", x = aaa)]
+#     file.remove(aaa)
+#   }
+# }
 ```

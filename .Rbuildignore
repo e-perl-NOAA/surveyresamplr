@@ -1,6 +1,20 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 
+vignettes/output
 ^\vignettes/output/
-^.*\.rds
-^.*\.parquet
+docs/
+log$
+
+.gitignore
+^\.github$
+
+^[\.]rds$$
+^[\.]parquet$$
+^[\.]log$$
+[.]log$
+[.]parquet$
+[.]rds$
+^vignettes/output$
+^docs$
+^\.log$
