@@ -17,13 +17,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 #get rid of memory limits
 options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
-
-# Graphics
-options(ggplot2.continuous.colour = "viridis")
-options(ggplot2.continuous.fill = "viridis")
-# theme_set(theme_bw())
 ```
-
 
 ## Install libraries
 
@@ -314,8 +308,14 @@ cat(readLines(con = paste0(dir_final, srvy, "_simple_logfile.txt") ))
 # ...Parallel SDM processing complete
 ```
 
-```{r results-run, eval = TRUE}
+```{r results-run1, eval = TRUE}
 out <- plot_results(srvy = paste0(srvy, "_simple"), dir_out = dir_out, dir_final = dir_final) 
+```
+
+```{r results-run, eval = TRUE, echo = FALSE}
+load(file = paste0(dir_final, "analysisoutput.rdata"))
+library(flextable)
+library(magrittr)
 ```
 
 ```{r results-plots}
@@ -355,4 +355,3 @@ print(names(out$tables)[i])
 head(out$tables[i][[1]]) %>% 
   flextable::flextable() 
 ```
-

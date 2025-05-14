@@ -14,17 +14,17 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r eval = FALSE}
-#get rid of memory limits
-options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
-
+```{r}
 # Set directories --------------------------------------------------------------
 library(here)
-
 wd <- paste0(here::here(),"/vignettes/")
 dir_out <- paste0(wd, "output/")
 dir_final <- paste0(dir_out, "NBS_0results/")
-crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
+```
+
+```{r eval = FALSE}
+#get rid of memory limits
+options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
 
 # Install Libraries ------------------------------------------------------------
 
@@ -35,6 +35,7 @@ PKG <- c(
 
   # tidyverse
   "dplyr",
+  "here",
   "magrittr",
   "tidyr",
   "viridis",
@@ -123,24 +124,22 @@ purrr::map(
   ~ clean_and_resample(spp_list[.x,], 
                        catch, seq_from, seq_to, seq_by, 
                        tot_dataframes, replicate_num, grid_yrs, dir_out, 
-                       n_knots = 300, 
+                       n_knots = 150, 
                        test = FALSE))
 sink()
 write.csv(x = data.frame(time = as.numeric(Sys.time() - start.time), units = units(Sys.time() - start.time)), file = paste0(dir_final, srvy, "_time.csv"))
 
 ### Plot indices ---------------------------------------------------------------
-
-plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final) 
-
+out <- plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final) 
 ```
 
-
-```{r results-run, eval = TRUE}
-out <- plot_results(srvy = srvy), dir_out = dir_out, dir_final = dirg_final) 
+```{r results-run, eval = TRUE, echo = FALSE}
+load(file = paste0(dir_final, "analysisoutput.rdata"))
+library(flextable)
+library(magrittr)
 ```
 
 ```{r results-plots}
-# load(file = paste0(dir_out, paste0(srvy, "_simple_0figures/figures.rdata")), verbose = TRUE)
 out$plots
 ```
 
@@ -175,16 +174,5 @@ i <- 1 + i
 print(names(out$tables)[i])
 head(out$tables[i][[1]]) %>% 
   flextable::flextable() 
-```
-
-```{r, echo = FALSE}
-# for (i in 1:nrow(spp_list)) {
-#   file0 <- paste0(dir_out, "/", srvy, "_", spp_list$file_name[i])
-#   if (dir.exists(file0)) {
-#     aaa <- list.files(paste0(dir_out, "/", srvy, "_", spp_list$file_name[i]), full.names = TRUE)
-#     aaa <- aaa[!grepl(pattern = ".csv", x = aaa)]
-#     file.remove(aaa)
-#   }
-# }
 ```
 

@@ -14,6 +14,7 @@ PKG <- c(
   "remotes",
   
   # other tidyverse
+  "flextable",
   "plyr",
   "dplyr",
   "magrittr",
