@@ -33,8 +33,12 @@
 #' \dontrun{
 #' resample_tests() # TO DO: NEED EXAMPLE OF HOW TO USE
 #' }
-resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE, parallel = FALSE, n_knots, model_type = "wrapper_sdmtmb") {
+resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE, parallel = FALSE, n_knots = 500, model_type = "wrapper_sdmtmb") {
+  # rename n_knots to knots or else wrapper function gets confused since it also has an n_knots
+  knots <- n_knots
+  
   # set directories for outputs
+  
   dir_spp <- paste0(dir_out, paste0(spp_info$srvy, "_", spp_info$file_name, "/"))
   
   if(!dir.exists(dir_spp)) {
@@ -67,13 +71,13 @@ resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE, 
     # Load only the required dataframe
     spp_df <- arrow::read_parquet(paste0(dir_spp, paste0("df_", i, ".parquet")))
     # Run species SDM function
-    fit0 <- wrapper(
+    fit0 <- wrapper_model(
       x = spp_df, 
       y = spp_files[[i]], 
       z = grid_yrs, 
       dir_spp = dir_spp, 
       spp_info = spp_info, 
-      n_knots = n_knots)
+      n_knots = knots)
     # fit <- readRDS(file = paste0(dir_spp, "fit_", spp_files[[i]], ".rds")) # for testing
     # index <- readRDS(file = paste0(dir_spp, "index_", spp_files[[i]], ".rds")) # for testing
     # fit0 <- list("fit" = fit, "index" = index)

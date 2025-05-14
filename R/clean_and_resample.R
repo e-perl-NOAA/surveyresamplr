@@ -12,7 +12,6 @@
 #' 
 #' @param spp_info A data frame row containing information about the species.
 #' @param catch A data frame containing the catch data.
-#' @param bio A data frame containing the biological data, if applicable. NULL is default.
 #' @param seq_from A numeric value specifying the start of the sequence for data frames.
 #' @param seq_to A numeric value specifying the end of the sequence for data frames.
 #' @param seq_by A numeric value specifying the step size of the sequence for data frames.
@@ -23,6 +22,7 @@
 #' @param test Logical. TRUE/FALSE. If TRUE, will only run first two resampling tests. 
 #' @param n_knots Numeric. Default  = 500.
 #' @param model_type String. Default = "wrapper_sdmtmb", but can be any preset wrapper_*() function or a premade home built function.
+#' @param bio A data frame containing the biological data, if applicable. NULL is default.
 #' @export
 #' @return A list of data frames containing the cleaned and resampled catch data.
 #' @examples
@@ -44,14 +44,14 @@
 #'                       )
 #' clean_and_resample(spp_info = spp_list, 
 #'                    catch, 
-#'                    bio, 
 #'                    seq_from = 0.1, 
 #'                    seq_to = 1, 
 #'                    seq_by = 0.1, 
 #'                    tot_dataframes = 91, 
 #'                    replicate_num = 10, 
 #'                    grid_yrs = grid_yrs, 
-#'                    dir_out = dir_out))
+#'                    dir_out = dir_out,
+#'                    bio = bio))
 #' 
 clean_and_resample <- function(spp_info, 
                                catch,
@@ -63,8 +63,8 @@ clean_and_resample <- function(spp_info,
                                grid_yrs, 
                                dir_out, 
                                test = FALSE, 
-                               n_knots = NA, 
-                               model_type = NA,
+                               n_knots = 500, 
+                               model_type = "wrapper_sdmtmb",
                                bio = NULL) {
   
   message(paste0(spp_info$srvy, " ", spp_info$common_name))
@@ -92,6 +92,7 @@ clean_and_resample <- function(spp_info,
     stop(paste0("ERROR: Not all variables called in funciton are available in the catch data object: ", aa[!(aa %in% names(catch))]))
   }
   
+  message("Starting cleanup of catch data")
   spp_dfs <- cleanup_by_species(
     catch = catch, 
     spp_info = spp_info, 
@@ -103,17 +104,19 @@ clean_and_resample <- function(spp_info,
   )
   
   if(!is.null(bio)){
-  bio_spp_dfs <- cleanup_bio_by_species(bio_df = bio,
-                                        catch_cleaned = spp_dfs,
-                                        filter_lat_lt = spp_info$filter_lat_gt,
-                                        filter_lat_gt = spp_info$filter_lat_lt,
-                                        filter_depth = spp_info$filter_depth,
-                                        species = spp_info$common_name)
-  dir_spp <- paste0(dir_out, paste0(spp_info$srvy, "_", spp_info$file_name, "/"))
-  if(!dir.exists(dir_spp)) {
-    dir.create(dir_spp, showWarnings = FALSE)
-  }
-  utils::write.csv(index, file = paste0(dir_spp, "bio.csv"))
+    message("Starting cleanup of bio data")
+    bio_spp_dfs <- cleanup_bio_by_species(bio_df = bio,
+                                          catch_cleaned = spp_dfs,
+                                          filter_lat_lt = spp_info$filter_lat_gt,
+                                          filter_lat_gt = spp_info$filter_lat_lt,
+                                          filter_depth = spp_info$filter_depth,
+                                          species = spp_info$common_name)
+    dir_spp <- paste0(dir_out, paste0(spp_info$srvy, "_", spp_info$file_name, "/"))
+    if(!dir.exists(dir_spp)) {
+      dir.create(dir_spp, showWarnings = FALSE)
+    }
+    message("Write bio data to CSV")
+    utils::write.csv(bio_spp_dfs, file = paste0(dir_spp, "bio.csv"))
   }
   
   try({
@@ -122,7 +125,9 @@ clean_and_resample <- function(spp_info,
       spp_info = spp_info, 
       grid_yrs = grid_yrs, 
       dir_out = dir_out, 
-      test = test
+      test = test,
+      n_knots = n_knots, 
+      model_type = model_type
     ) 
   }, silent = FALSE)
 }

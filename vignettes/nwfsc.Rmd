@@ -147,7 +147,7 @@ spp_list <- spp_list[1:2,] # for testing
 
 # source(paste0(wd, "code/data_dl_nw.r"))
 catch <- surveyresamplr::noaa_nwfsc_catch #pulled data again to get 2024
-# bio <- surveyresamplr::noaa_nwfsc_bio
+bio <- surveyresamplr::noaa_nwfsc_bio
 
 ### Load grid data -------------------------------------------------------------
 
@@ -183,7 +183,9 @@ purrr::map(
                        tot_dataframes, 
                        replicate_num, 
                        grid_yrs, 
-                       dir_out))
+                       dir_out,
+                       n_knots = 500,
+                       bio = bio))
 sink()
 ``` 
 

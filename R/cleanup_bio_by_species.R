@@ -5,7 +5,8 @@
 #' This requires cleanup_by_species to be run first on the catch data.
 #'
 #' @param bio_df Dataframe of biological data - length and age compositions that
-#' has a Trawl_id column
+#' must have the following columns: Trawl_id, common_name, latitude_dd, longitude_dd,
+#' and depth_m.
 #' @param catch_cleaned output of cleanup_by_species
 #' @param species character vector of the species name to filter out of all the 
 #' biological data if more than one species
@@ -34,7 +35,7 @@ cleanup_bio_by_species <- function(bio_df,
   
   # Apply depth and latitude filters
   if (!is.na(filter_lat_lt) | is.null(filter_lat_lt)) {
-    bio_f <- bio_df |> dplyr::filter(latitude_dd < filter_lat_lt)
+    bio_df <- bio_df |> dplyr::filter(latitude_dd < filter_lat_lt)
   }
   if (!is.na(filter_lat_gt) | is.null(filter_lat_gt)) {
     bio_df <- bio_df |> dplyr::filter(latitude_dd > filter_lat_gt)
@@ -53,8 +54,6 @@ cleanup_bio_by_species <- function(bio_df,
   # Add replicate ID as a column
   bio_resampled <- bio_resampled |>
     dplyr::mutate(source = replicate_id)
-  
-  
   
   return(bio_resampled)
 }
