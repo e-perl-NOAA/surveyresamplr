@@ -182,7 +182,7 @@ plot_results <- function(srvy, dir_out, dir_final = NULL) {
   out <- list("plots" = plot_list, 
               "tables" = table_list)
   
-  base::save(out, file = paste0(dir_final, "figures.rdata"))
+  base::save(out, file = paste0(dir_final, "analysisoutput.rdata"))
   
   return(out)
 }

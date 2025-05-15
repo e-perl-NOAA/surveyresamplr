@@ -1,0 +1,7 @@
+"","X","srvy","common_name","species_code","filter_lat_lt","filter_lat_gt","filter_depth","model_fn","model_family","model_anisotropy","model_spatiotemporal","file_name","effort","term","estimate","std.error","conf.low","conf.high"
+"1","1","GOA","flathead sole","10130",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","flathead_sole","08_3","range","0.423044579257759","3307.7297977323","0","Inf"
+"2","2","GOA","flathead sole","10130",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","flathead_sole","08_3","sigma_O","0.223582868459805","1245.43395323592","0","Inf"
+"3","3","GOA","flathead sole","10130",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","flathead_sole","08_3","sigma_E","0.206147809350166","797.896762735271","0","Inf"
+"4",NA,"GOA","flathead sole","10130",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","flathead_sole","1_1","range","3.24006164041444","16000.5811625603","0","Inf"
+"5",NA,"GOA","flathead sole","10130",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","flathead_sole","1_1","sigma_O","0.318123435003746","1172.79334956607","0","Inf"
+"6",NA,"GOA","flathead sole","10130",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","flathead_sole","1_1","sigma_E","0.248663905306722","1162.19136608106","0","Inf"

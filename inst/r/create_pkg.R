@@ -12,8 +12,10 @@ PKG <- c(
   
   "devtools", 
   "remotes",
+  "here", 
   
   # other tidyverse
+  "flextable",
   "plyr",
   "dplyr",
   "magrittr",

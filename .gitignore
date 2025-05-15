@@ -2,8 +2,7 @@
 .Rproj.user
 
 
-output/
+vignettes/output/notforgit/
+*.rds 
+*.parquet 
 
-inst/doc
-
-vignettes/output/

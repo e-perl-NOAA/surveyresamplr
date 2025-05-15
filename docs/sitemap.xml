@@ -25,12 +25,14 @@
 <url><loc>/reference/include_or_exclude.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/join_dfs.html</loc></url>
+<url><loc>/reference/noaa_afsc_age.html</loc></url>
 <url><loc>/reference/noaa_afsc_ai_pred_grid_depth.html</loc></url>
 <url><loc>/reference/noaa_afsc_biomass.html</loc></url>
 <url><loc>/reference/noaa_afsc_bs_pred_grid_depth.html</loc></url>
 <url><loc>/reference/noaa_afsc_catch.html</loc></url>
 <url><loc>/reference/noaa_afsc_ebs_pred_grid_depth.html</loc></url>
 <url><loc>/reference/noaa_afsc_goa_pred_grid_depth.html</loc></url>
+<url><loc>/reference/noaa_afsc_length.html</loc></url>
 <url><loc>/reference/noaa_afsc_nbs_pred_grid_depth.html</loc></url>
 <url><loc>/reference/noaa_nefsc_catch.html</loc></url>
 <url><loc>/reference/noaa_nefsc_pred_grid_depth.html</loc></url>
@@ -40,5 +42,7 @@
 <url><loc>/reference/resample_tests.html</loc></url>
 <url><loc>/reference/tow_fn.html</loc></url>
 <url><loc>/reference/wrapper_sdmtmb.html</loc></url>
+<url><loc>/reference/wrapper_surveyIndex.html</loc></url>
+<url><loc>/reference/wrapper_tinyVAST.html</loc></url>
 </urlset>
 

@@ -1,0 +1,7 @@
+"","X","srvy","common_name","species_code","filter_lat_lt","filter_lat_gt","filter_depth","model_fn","model_family","model_anisotropy","model_spatiotemporal","file_name","effort","term","estimate","std.error","conf.low","conf.high"
+"1","1","GOA","walleye pollock","21740",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","walleye_pollock","08_3","range","2.82837062903246","9223.34549723373","0","Inf"
+"2","2","GOA","walleye pollock","21740",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","walleye_pollock","08_3","sigma_O","0.282086397795366","NaN","NaN","NaN"
+"3","3","GOA","walleye pollock","21740",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","walleye_pollock","08_3","sigma_E","0.282086399692672","NaN","NaN","NaN"
+"4",NA,"GOA","walleye pollock","21740",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","walleye_pollock","1_1","range","4.73693379640233","5163.18612389331","0","Inf"
+"5",NA,"GOA","walleye pollock","21740",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","walleye_pollock","1_1","sigma_O","0.216188932532007","NaN","NaN","NaN"
+"6",NA,"GOA","walleye pollock","21740",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","walleye_pollock","1_1","sigma_E","0.8409643259279","933.391044915103","0","Inf"

@@ -16,6 +16,16 @@ knitr::opts_chunk$set(
 
 ```{r eval = TRUE}
 
+# Set directories --------------------------------------------------------------
+library(here)
+
+wd <- paste0(here::here(),"/vignettes/")
+dir_out <- paste0(wd, "output/")
+dir_final <- paste0(dir_out, "CA_0results/")
+```
+
+
+```{r eval = FALSE}
 # get rid of memory limits
 options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
 
@@ -28,6 +38,7 @@ PKG <- c(
   "here",
   # tidyverse
   "dplyr",
+  "here",
   "magrittr",
   "tidyr",
   "viridis",
@@ -63,16 +74,6 @@ pkg_install <- function(p){
 }
 base::lapply(unique(PKG), pkg_install)
 
-# Set directories --------------------------------------------------------------
-wd <- paste0(here::here(),"/vignettes/")
-dir_out <- paste0(wd, "output/")
-dir.create(dir_out)
-dir_final <- paste0(dir_out, "CA_0results/")
-dir.create(dir_final)
-crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
-```
-
-```{r eval = FALSE}
 ### Define study species -------------------------------------------------------
 
 spp_list <- data.frame(
@@ -155,10 +156,7 @@ grid_yrs <- sdmTMB::replicate_df(
   dat = surveyresamplr::noaa_nwfsc_pred_grid_depth, 
   time_name = "year", 
   time_values = unique(catch$year))
-```
 
-
-```{r, eval = TRUE}
 ### Variables ------------------------------------------------------------------
 
 srvy <- "CA"
@@ -167,9 +165,7 @@ seq_to = 1
 seq_by = 0.1
 tot_dataframes = 91
 replicate_num <- 10
-```
 
-```{r, eval = FALSE}
 ### Run ------------------------------------------------------------------------
 
 sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
@@ -187,18 +183,51 @@ purrr::map(
                        n_knots = 500,
                        bio = bio))
 sink()
-``` 
 
-```{r results-run, eval = TRUE}
 ### Plot indices ---------------------------------------------------------------
 
 out <- plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final) 
 ```
 
+```{r results-run, eval = TRUE, echo = FALSE}
+load(file = paste0(dir_final, "analysisoutput.rdata"))
+library(flextable)
+library(magrittr)
+```
+
 ```{r results-plots}
-# load(file = paste0(dir_out, paste0(srvy, "_simple_0figures/figures.rdata")), verbose = TRUE)
 out$plots
 ```
 
+Parameter output: 
+
+```{r results-tables-1}
+i <- 1
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>% 
+  flextable::flextable() 
+```
 
 
+```{r results-tables-2}
+i <- 1 + i
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>% 
+  flextable::flextable() 
+```
+
+
+```{r results-tables-3}
+i <- 1 + i
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>% 
+  flextable::flextable() 
+```
+
+
+```{r results-tables-4}
+i <- 1 + i
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>% 
+  flextable::flextable() 
+```

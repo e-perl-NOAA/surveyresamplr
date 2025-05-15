@@ -93,7 +93,8 @@
 
 
 
-      </header><div class="row">
+      </header><link href="afsc-nbs_files/tabwid-1.1.3/tabwid.css" rel="stylesheet">
+<script src="afsc-nbs_files/tabwid-1.1.3/tabwid.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>AFSC Northern Bering Sea</h1>
@@ -107,15 +108,15 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#get rid of memory limits</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>future.globals.maxSize <span class="op">=</span> <span class="fl">1</span> <span class="op">*</span> <span class="fl">1024</span><span class="op">^</span><span class="fl">4</span><span class="op">)</span>  <span class="co"># Allow up to 1 TB for globals</span></span>
-<span></span>
-<span><span class="co"># Set directories --------------------------------------------------------------</span></span>
+<code class="sourceCode R"><span><span class="co"># Set directories --------------------------------------------------------------</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://here.r-lib.org/" class="external-link">here</a></span><span class="op">)</span></span>
-<span></span>
+<span><span class="co">#&gt; here() starts at Z:/Projects/surveyresamplr_general/surveyresamplr</span></span>
 <span><span class="va">wd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>,<span class="st">"/vignettes/"</span><span class="op">)</span></span>
 <span><span class="va">dir_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wd</span>, <span class="st">"output/"</span><span class="op">)</span></span>
-<span><span class="va">crs_latlon</span> <span class="op">&lt;-</span> <span class="st">"+proj=longlat +datum=WGS84"</span> <span class="co"># decimal degrees</span></span>
+<span><span class="va">dir_final</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir_out</span>, <span class="st">"NBS_0results/"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#get rid of memory limits</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>future.globals.maxSize <span class="op">=</span> <span class="fl">1</span> <span class="op">*</span> <span class="fl">1024</span><span class="op">^</span><span class="fl">4</span><span class="op">)</span>  <span class="co"># Allow up to 1 TB for globals</span></span>
 <span></span>
 <span><span class="co"># Install Libraries ------------------------------------------------------------</span></span>
 <span></span>
@@ -126,6 +127,7 @@
 <span></span>
 <span>  <span class="co"># tidyverse</span></span>
 <span>  <span class="st">"dplyr"</span>,</span>
+<span>  <span class="st">"here"</span>,</span>
 <span>  <span class="st">"magrittr"</span>,</span>
 <span>  <span class="st">"tidyr"</span>,</span>
 <span>  <span class="st">"viridis"</span>,</span>
@@ -194,7 +196,7 @@
 <span></span>
 <span><span class="co">### Load grid data -------------------------------------------------------------</span></span>
 <span></span>
-<span><span class="va">grid_yrs</span> <span class="op">&lt;-</span> <span class="fu">replicate_df</span><span class="op">(</span><span class="fu">surveyresamplr</span><span class="fu">::</span><span class="va">noaa_afsc_NBS_pred_grid_depth</span>, <span class="st">"year"</span>, <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">catch</span><span class="op">$</span><span class="va">year</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">grid_yrs</span> <span class="op">&lt;-</span> <span class="fu">replicate_df</span><span class="op">(</span><span class="fu">surveyresamplr</span><span class="fu">::</span><span class="va"><a href="../reference/noaa_afsc_nbs_pred_grid_depth.html">noaa_afsc_nbs_pred_grid_depth</a></span>, <span class="st">"year"</span>, <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">catch</span><span class="op">$</span><span class="va">year</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">### Variables ------------------------------------------------------------------</span></span>
 <span></span>
@@ -207,17 +209,1278 @@
 <span></span>
 <span><span class="co">### Run ------------------------------------------------------------------------</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/sink.html" class="external-link">sink</a></span><span class="op">(</span>file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir_out</span>, <span class="va">srvy</span>, <span class="st">"_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"_logfile.txt"</span><span class="op">)</span>, append <span class="op">=</span> <span class="cn">FALSE</span>, split <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>  <span class="co"># for screen and log</span></span>
-<span><span class="fu">map</span><span class="op">(</span></span>
+<span><span class="va">start.time</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sink.html" class="external-link">sink</a></span><span class="op">(</span>file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir_final</span>, <span class="va">srvy</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"_logfile.txt"</span><span class="op">)</span>, append <span class="op">=</span> <span class="cn">FALSE</span>, split <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>  </span>
+<span><span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span></span>
 <span>  <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">spp_list</span><span class="op">)</span>, </span>
 <span>  <span class="op">~</span> <span class="fu"><a href="../reference/clean_and_resample.html">clean_and_resample</a></span><span class="op">(</span><span class="va">spp_list</span><span class="op">[</span><span class="va">.x</span>,<span class="op">]</span>, </span>
 <span>                       <span class="va">catch</span>, <span class="va">seq_from</span>, <span class="va">seq_to</span>, <span class="va">seq_by</span>, </span>
-<span>                       <span class="va">tot_dataframes</span>, <span class="va">replicate_num</span>, <span class="va">grid_yrs</span>, <span class="va">dir_out</span>, test <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span>                       <span class="va">tot_dataframes</span>, <span class="va">replicate_num</span>, <span class="va">grid_yrs</span>, <span class="va">dir_out</span>, </span>
+<span>                       n_knots <span class="op">=</span> <span class="fl">150</span>, </span>
+<span>                       test <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sink.html" class="external-link">sink</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="va">start.time</span><span class="op">)</span>, units <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/units.html" class="external-link">units</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="va">start.time</span><span class="op">)</span><span class="op">)</span>, file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir_final</span>, <span class="va">srvy</span>, <span class="st">"_time.csv"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">### Plot indices ---------------------------------------------------------------</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/plot_results.html">plot_results</a></span><span class="op">(</span>srvy <span class="op">=</span> <span class="va">srvy</span>, dir_out <span class="op">=</span> <span class="va">dir_out</span><span class="op">)</span> </span></code></pre></div>
+<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_results.html">plot_results</a></span><span class="op">(</span>srvy <span class="op">=</span> <span class="va">srvy</span>, dir_out <span class="op">=</span> <span class="va">dir_out</span>, dir_final <span class="op">=</span> <span class="va">dir_final</span><span class="op">)</span> </span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">out</span><span class="op">$</span><span class="va">plots</span></span>
+<span><span class="co">#&gt; $index_boxplot_log_biomass</span></span></code></pre></div>
+<p><img src="afsc-nbs_files/figure-html/results-plots-1.png" width="700"></p>
+<pre><code><span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $index_boxplot_log_biomass_SE</span></span>
+<span><span class="co">#&gt; Warning: Removed 16 rows containing non-finite outside the scale range</span></span>
+<span><span class="co">#&gt; (`stat_boxplot()`).</span></span></code></pre>
+<p><img src="afsc-nbs_files/figure-html/results-plots-2.png" width="700"></p>
+<pre><code><span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $index_boxplot_biomass</span></span></code></pre>
+<p><img src="afsc-nbs_files/figure-html/results-plots-3.png" width="700"></p>
+<pre><code><span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $index_timeseries_biomass</span></span></code></pre>
+<p><img src="afsc-nbs_files/figure-html/results-plots-4.png" width="700"></p>
+<p>Parameter output:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">i</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tables</span><span class="op">)</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "fit_df"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tables</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/flextable.html" class="external-link">flextable</a></span><span class="op">(</span><span class="op">)</span> </span></code></pre></div>
+<div class="tabwid">
+<style>.cl-b842b726{}.cl-b82b0842{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-b8345ba4{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-b8345bb8{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-b8349d30{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b8349d44{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b8349d45{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b8349d4e{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b8349d58{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b8349d59{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-b842b726">
+<thead><tr style="overflow-wrap:break-word;">
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.14</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.13</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.12</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.11</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.10</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.9</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.8</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.7</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.6</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.5</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.4</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.3</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.2</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.1</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X</span></p></th>
+<th class="cl-b8349d44"><p class="cl-b8345bb8"><span class="cl-b82b0842">srvy</span></p></th>
+<th class="cl-b8349d44"><p class="cl-b8345bb8"><span class="cl-b82b0842">common_name</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">species_code</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">filter_lat_lt</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">filter_lat_gt</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">filter_depth</span></p></th>
+<th class="cl-b8349d44"><p class="cl-b8345bb8"><span class="cl-b82b0842">model_fn</span></p></th>
+<th class="cl-b8349d44"><p class="cl-b8345bb8"><span class="cl-b82b0842">model_family</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">model_anisotropy</span></p></th>
+<th class="cl-b8349d44"><p class="cl-b8345bb8"><span class="cl-b82b0842">model_spatiotemporal</span></p></th>
+<th class="cl-b8349d44"><p class="cl-b8345bb8"><span class="cl-b82b0842">file_name</span></p></th>
+<th class="cl-b8349d44"><p class="cl-b8345bb8"><span class="cl-b82b0842">effort</span></p></th>
+<th class="cl-b8349d44"><p class="cl-b8345bb8"><span class="cl-b82b0842">term</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">estimate</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">std.error</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">conf.low</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">conf.high</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.21</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.20</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.19</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.18</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.17</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.16</span></p></th>
+<th class="cl-b8349d30"><p class="cl-b8345ba4"><span class="cl-b82b0842">X.15</span></p></th>
+</tr></thead>
+<tbody>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">NBS</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">Alaska plaice</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">10,285</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">delta_gamma</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">TRUE</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">iid, iid</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">alaska_plaice</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">08_3</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">factor(year)2010</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">19.29414</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1,033.6822</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">-2,006.686</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">2,045.274</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">2</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">2</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">2</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">2</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">2</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">2</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">2</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">2</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">2</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">2</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">2</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">2</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">2</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">2</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">2</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">NBS</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">Alaska plaice</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">10,285</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">delta_gamma</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">TRUE</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">iid, iid</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">alaska_plaice</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">08_3</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">factor(year)2017</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">20.50210</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1,515.1146</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">-2,949.068</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">2,990.072</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">3</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">3</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">3</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">3</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">3</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">3</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">3</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">3</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">3</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">3</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">3</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">3</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">3</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">3</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">3</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">NBS</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">Alaska plaice</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">10,285</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">delta_gamma</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">TRUE</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">iid, iid</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">alaska_plaice</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">08_3</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">factor(year)2019</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">19.30325</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">984.1635</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">-1,909.622</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1,948.228</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">4</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">4</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">4</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">4</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">4</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">4</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">4</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">4</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">4</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">4</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">4</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">4</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">4</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">4</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">4</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">NBS</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">Alaska plaice</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">10,285</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">delta_gamma</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">TRUE</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">iid, iid</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">alaska_plaice</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">08_3</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">factor(year)2021</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">18.66980</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">818.4425</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">-1,585.448</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1,622.788</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">5</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">5</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">5</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">5</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">5</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">5</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">5</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">5</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">5</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">5</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">5</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">5</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">5</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">5</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">5</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">NBS</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">Alaska plaice</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">10,285</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">delta_gamma</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">TRUE</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">iid, iid</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">alaska_plaice</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">08_3</span></p></td>
+<td class="cl-b8349d4e"><p class="cl-b8345bb8"><span class="cl-b82b0842">factor(year)2022</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">19.38829</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">1,178.7108</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">-2,290.842</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842">2,329.619</span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d45"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">6</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">6</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">6</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">6</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">6</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">6</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">6</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">6</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">6</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">6</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">6</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">6</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">6</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">6</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">6</span></p></td>
+<td class="cl-b8349d59"><p class="cl-b8345bb8"><span class="cl-b82b0842">NBS</span></p></td>
+<td class="cl-b8349d59"><p class="cl-b8345bb8"><span class="cl-b82b0842">Alaska plaice</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">10,285</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d59"><p class="cl-b8345bb8"><span class="cl-b82b0842">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b8349d59"><p class="cl-b8345bb8"><span class="cl-b82b0842">delta_gamma</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">TRUE</span></p></td>
+<td class="cl-b8349d59"><p class="cl-b8345bb8"><span class="cl-b82b0842">iid, iid</span></p></td>
+<td class="cl-b8349d59"><p class="cl-b8345bb8"><span class="cl-b82b0842">alaska_plaice</span></p></td>
+<td class="cl-b8349d59"><p class="cl-b8345bb8"><span class="cl-b82b0842">08_3</span></p></td>
+<td class="cl-b8349d59"><p class="cl-b8345bb8"><span class="cl-b82b0842">factor(year)2023</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">20.72199</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">2,760.2047</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">-5,389.180</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842">5,430.624</span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+<td class="cl-b8349d58"><p class="cl-b8345ba4"><span class="cl-b82b0842"></span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">i</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">+</span> <span class="va">i</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tables</span><span class="op">)</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "fit_pars"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tables</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/flextable.html" class="external-link">flextable</a></span><span class="op">(</span><span class="op">)</span> </span></code></pre></div>
+<div class="tabwid">
+<style>.cl-b8bc41fe{}.cl-b8a488fc{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-b8ac29c2{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-b8ac29d6{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-b8ac6676{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b8ac6680{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b8ac668a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b8ac6694{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b8ac6695{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b8ac669e{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-b8bc41fe">
+<thead><tr style="overflow-wrap:break-word;">
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.14</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.13</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.12</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.11</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.10</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.9</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.8</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.7</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.6</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.5</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.4</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.3</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.2</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.1</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X</span></p></th>
+<th class="cl-b8ac6680"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">srvy</span></p></th>
+<th class="cl-b8ac6680"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">common_name</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">species_code</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">filter_lat_lt</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">filter_lat_gt</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">filter_depth</span></p></th>
+<th class="cl-b8ac6680"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">model_fn</span></p></th>
+<th class="cl-b8ac6680"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">model_family</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">model_anisotropy</span></p></th>
+<th class="cl-b8ac6680"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">model_spatiotemporal</span></p></th>
+<th class="cl-b8ac6680"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">file_name</span></p></th>
+<th class="cl-b8ac6680"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">effort</span></p></th>
+<th class="cl-b8ac6680"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">term</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">estimate</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">std.error</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">conf.low</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">conf.high</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.21</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.20</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.19</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.18</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.17</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.16</span></p></th>
+<th class="cl-b8ac6676"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">X.15</span></p></th>
+</tr></thead>
+<tbody>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">1</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">1</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">1</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">1</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">1</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">1</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">1</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">1</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">1</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">1</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">1</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">1</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">1</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">1</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">1</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">NBS</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">Alaska plaice</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">10,285</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">delta_gamma</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">TRUE</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">iid, iid</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">alaska_plaice</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">08_3</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">range</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">5.7009008</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">1,908.38600</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000652849247755187019</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">4,978,219,632,285,219,505,460,684,604,846,068,826,066,004,440,060,864,440,064,620,886,462,642,424,480,640,088,468,486,662,440,044,662,602,046,222,668,400,000,022,028,648,848,082,226,020,444,462,804,246,080,220,260,068,240,460,200,466,642,846,420,808,864,688,248,842,806,082,820,048,682,424,244,062,046,668,862,420,404,684,488,866,666,400,020,624,206,426,244,006,026,402,208,424,848</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">2</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">2</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">2</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">2</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">2</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">2</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">2</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">2</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">2</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">2</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">2</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">2</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">2</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">2</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">2</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">NBS</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">Alaska plaice</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">10,285</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">delta_gamma</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">TRUE</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">iid, iid</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">alaska_plaice</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">08_3</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">sigma_O</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">0.4832728</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">160.04473</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000062096964640575303511</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">376,109,555,169,457,015,808,002,842,466,460,220,424,008,226,064,864,660,628,628,860,020,642,226,462,062,040,006,482,262,464,262,088,624,088,482,222,406,022,806,046,264,442,060,224,206,040,044,886,620,266,082,484,680,666,084,262,428,624,068,848,684,602,264,020,426,806,440,866,626,420,246,400,226,284,842,466,020,244,606,622,684,228,044,444,620,608,266,820,264,804,206,808,028</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">3</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">3</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">3</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">3</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">3</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">3</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">3</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">3</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">3</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">3</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">3</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">3</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">3</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">3</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">3</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">NBS</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">Alaska plaice</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">10,285</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">delta_gamma</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">TRUE</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">iid, iid</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">alaska_plaice</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">08_3</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">sigma_E</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">0.5614435</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">188.25663</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000021597854395890401</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">1,459,491,294,914,169,903,282,426,284,486,024,828,682,264,260,820,620,208,666,062,084,262,024,288,684,028,402,044,882,826,680,400,608,622,088,402,204,464,808,282,606,644,466,082,468,464,488,640,224,848,040,626,004,080,840,646,022,860,824,804,288,806,446,006,202,862,660,200,466,280,242,482,882,628,200,668,264,424,460,800,620,220,800,282,422,488,608,004,488,280,808,440,862,448,282</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">4</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">4</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">4</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">4</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">4</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">4</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">4</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">4</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">4</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">4</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">4</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">4</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">4</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">4</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">NBS</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">Alaska plaice</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">10,285</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">delta_gamma</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">TRUE</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">iid, iid</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">alaska_plaice</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">1_1</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">range</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">2.5550875</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">892.45295</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000124664</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">5,236,856,077,939,469,783,240,044,480,042,802,002,668,602,086,886,482,008,644,008,402,866,402,484,402,646,408,620,682,828,882,284,064,266,840,686,648,668,046,684,222,442,264,082,048,064,042,840,068,420,828,286,222,020,444,428,804,826,864,208,882,068,468,444,066,242,886,468,086,206,020,408,484,644,808,260,862,886,226,406,002,402,040,008,262,048,488,642,024,668,020,042,264,826,040,222,846,668,260</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">5</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">5</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">5</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">5</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">5</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">5</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">5</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">5</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">5</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">5</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">5</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">5</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">5</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">5</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">NBS</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">Alaska plaice</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">10,285</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">delta_gamma</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">TRUE</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">iid, iid</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">alaska_plaice</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">1_1</span></p></td>
+<td class="cl-b8ac6694"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">sigma_O</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">0.4848605</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">299.67816</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">Inf</span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac668a"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">6</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">6</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">6</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">6</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">6</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">6</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">6</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">6</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">6</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">6</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">6</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">6</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">6</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">6</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac669e"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">NBS</span></p></td>
+<td class="cl-b8ac669e"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">Alaska plaice</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">10,285</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac669e"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b8ac669e"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">delta_gamma</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">TRUE</span></p></td>
+<td class="cl-b8ac669e"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">iid, iid</span></p></td>
+<td class="cl-b8ac669e"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">alaska_plaice</span></p></td>
+<td class="cl-b8ac669e"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">1_1</span></p></td>
+<td class="cl-b8ac669e"><p class="cl-b8ac29d6"><span class="cl-b8a488fc">sigma_E</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">0.2238729</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">94.65719</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc">Inf</span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+<td class="cl-b8ac6695"><p class="cl-b8ac29c2"><span class="cl-b8a488fc"></span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">i</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">+</span> <span class="va">i</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tables</span><span class="op">)</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "fit_check"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tables</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/flextable.html" class="external-link">flextable</a></span><span class="op">(</span><span class="op">)</span> </span></code></pre></div>
+<div class="tabwid">
+<style>.cl-b94b3238{}.cl-b930ca9c{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-b93870b2{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-b93870c6{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-b938ad70{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b938ad7a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b938ad84{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b938ad85{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b938ad8e{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b938ad98{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-b94b3238">
+<thead><tr style="overflow-wrap:break-word;">
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.14</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.13</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.12</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.11</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.10</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.9</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.8</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.7</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.6</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.5</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.4</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.3</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.2</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.1</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X</span></p></th>
+<th class="cl-b938ad7a"><p class="cl-b93870c6"><span class="cl-b930ca9c">srvy</span></p></th>
+<th class="cl-b938ad7a"><p class="cl-b93870c6"><span class="cl-b930ca9c">common_name</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">species_code</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">filter_lat_lt</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">filter_lat_gt</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">filter_depth</span></p></th>
+<th class="cl-b938ad7a"><p class="cl-b93870c6"><span class="cl-b930ca9c">model_fn</span></p></th>
+<th class="cl-b938ad7a"><p class="cl-b93870c6"><span class="cl-b930ca9c">model_family</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">model_anisotropy</span></p></th>
+<th class="cl-b938ad7a"><p class="cl-b93870c6"><span class="cl-b930ca9c">model_spatiotemporal</span></p></th>
+<th class="cl-b938ad7a"><p class="cl-b93870c6"><span class="cl-b930ca9c">file_name</span></p></th>
+<th class="cl-b938ad7a"><p class="cl-b93870c6"><span class="cl-b930ca9c">effort</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">hessian_ok</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">eigen_values_ok</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">nlminb_ok</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">range_ok</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">gradients_ok</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">se_magnitude_ok</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">se_na_ok</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">sigmas_ok</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">all_ok</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.21</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.20</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.19</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.18</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.17</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.16</span></p></th>
+<th class="cl-b938ad70"><p class="cl-b93870b2"><span class="cl-b930ca9c">X.15</span></p></th>
+</tr></thead>
+<tbody>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">1</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">1</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">1</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">1</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">1</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">1</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">1</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">1</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">1</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">1</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">1</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">1</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">1</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">1</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">1</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">NBS</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">Alaska plaice</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">10,285</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">delta_gamma</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">iid, iid</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">alaska_plaice</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">08_3</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">2</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">2</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">2</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">2</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">2</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">2</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">2</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">2</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">2</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">2</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">2</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">2</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">2</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">2</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">NBS</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">Alaska plaice</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">10,285</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">delta_gamma</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">iid, iid</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">alaska_plaice</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">1_1</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">3</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">3</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">3</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">3</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">3</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">3</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">3</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">3</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">3</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">3</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">3</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">3</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">3</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">NBS</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">Alaska plaice</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">10,285</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">delta_gamma</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">iid, iid</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">alaska_plaice</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">02_1</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">4</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">4</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">4</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">4</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">4</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">4</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">4</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">4</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">4</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">4</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">4</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">4</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">NBS</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">Alaska plaice</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">10,285</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">delta_gamma</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">iid, iid</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">alaska_plaice</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">02_2</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">5</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">5</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">5</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">5</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">5</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">5</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">5</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">5</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">5</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">5</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">5</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">NBS</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">Alaska plaice</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">10,285</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">delta_gamma</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">iid, iid</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">alaska_plaice</span></p></td>
+<td class="cl-b938ad85"><p class="cl-b93870c6"><span class="cl-b930ca9c">02_3</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad84"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">6</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">6</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">6</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">6</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">6</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">6</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">6</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">6</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">6</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">6</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad98"><p class="cl-b93870c6"><span class="cl-b930ca9c">NBS</span></p></td>
+<td class="cl-b938ad98"><p class="cl-b93870c6"><span class="cl-b930ca9c">Alaska plaice</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">10,285</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad98"><p class="cl-b93870c6"><span class="cl-b930ca9c">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b938ad98"><p class="cl-b93870c6"><span class="cl-b930ca9c">delta_gamma</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad98"><p class="cl-b93870c6"><span class="cl-b930ca9c">iid, iid</span></p></td>
+<td class="cl-b938ad98"><p class="cl-b93870c6"><span class="cl-b930ca9c">alaska_plaice</span></p></td>
+<td class="cl-b938ad98"><p class="cl-b93870c6"><span class="cl-b930ca9c">04_1</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">TRUE</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c">FALSE</span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+<td class="cl-b938ad8e"><p class="cl-b93870b2"><span class="cl-b930ca9c"></span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">i</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">+</span> <span class="va">i</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tables</span><span class="op">)</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "index"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tables</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/flextable.html" class="external-link">flextable</a></span><span class="op">(</span><span class="op">)</span> </span></code></pre></div>
+<div class="tabwid">
+<style>.cl-b9c9c698{}.cl-b9b467d0{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-b9bc7358{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-b9bc736c{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-b9bcb642{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b9bcb656{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b9bcb660{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b9bcb661{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b9bcb66a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b9bcb66b{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-b9c9c698">
+<thead><tr style="overflow-wrap:break-word;">
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.14</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.13</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.12</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.11</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.10</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.9</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.8</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.7</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.6</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.5</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.4</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.3</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.2</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.1</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X</span></p></th>
+<th class="cl-b9bcb656"><p class="cl-b9bc736c"><span class="cl-b9b467d0">srvy</span></p></th>
+<th class="cl-b9bcb656"><p class="cl-b9bc736c"><span class="cl-b9b467d0">common_name</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">species_code</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">filter_lat_lt</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">filter_lat_gt</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">filter_depth</span></p></th>
+<th class="cl-b9bcb656"><p class="cl-b9bc736c"><span class="cl-b9b467d0">model_fn</span></p></th>
+<th class="cl-b9bcb656"><p class="cl-b9bc736c"><span class="cl-b9b467d0">model_family</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">model_anisotropy</span></p></th>
+<th class="cl-b9bcb656"><p class="cl-b9bc736c"><span class="cl-b9b467d0">model_spatiotemporal</span></p></th>
+<th class="cl-b9bcb656"><p class="cl-b9bc736c"><span class="cl-b9b467d0">file_name</span></p></th>
+<th class="cl-b9bcb656"><p class="cl-b9bc736c"><span class="cl-b9b467d0">effort</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">year</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">est</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">lwr</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">upr</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">log_est</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">se</span></p></th>
+<th class="cl-b9bcb656"><p class="cl-b9bc736c"><span class="cl-b9b467d0">type</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.21</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.20</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.19</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.18</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.17</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.16</span></p></th>
+<th class="cl-b9bcb642"><p class="cl-b9bc7358"><span class="cl-b9b467d0">X.15</span></p></th>
+</tr></thead>
+<tbody>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">1</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">1</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">1</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">1</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">1</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">1</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">1</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">1</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">1</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">1</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">1</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">1</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">1</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">1</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">1</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">NBS</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">Alaska plaice</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">10,285</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">delta_gamma</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">TRUE</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">iid, iid</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">alaska_plaice</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">08_3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2,010</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">15,239,425</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">11,323,483</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">20,509,598</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">16.53940</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">0.1515370</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">index</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">NBS</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">Alaska plaice</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">10,285</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">delta_gamma</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">TRUE</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">iid, iid</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">alaska_plaice</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">08_3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2,017</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">12,938,506</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">9,928,303</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">16,861,384</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">16.37572</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">0.1351138</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">index</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">3</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">NBS</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">Alaska plaice</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">10,285</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">delta_gamma</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">TRUE</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">iid, iid</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">alaska_plaice</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">08_3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2,019</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">12,446,100</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">9,630,105</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">16,085,535</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">16.33692</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">0.1308764</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">index</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">4</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">4</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">4</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">4</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">4</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">4</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">4</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">4</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">4</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">4</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">4</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">4</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">4</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">4</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">4</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">NBS</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">Alaska plaice</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">10,285</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">delta_gamma</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">TRUE</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">iid, iid</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">alaska_plaice</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">08_3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2,021</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">15,569,676</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">11,399,325</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">21,265,716</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">16.56084</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">0.1590698</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">index</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">5</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">5</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">5</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">5</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">5</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">5</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">5</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">5</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">5</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">5</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">5</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">5</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">5</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">5</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">5</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">NBS</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">Alaska plaice</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">10,285</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">delta_gamma</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">TRUE</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">iid, iid</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">alaska_plaice</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">08_3</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2,022</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">12,415,246</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">8,918,799</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">17,282,410</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">16.33444</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0">0.1687602</span></p></td>
+<td class="cl-b9bcb661"><p class="cl-b9bc736c"><span class="cl-b9b467d0">index</span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb660"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">6</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">6</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">6</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">6</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">6</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">6</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">6</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">6</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">6</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">6</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">6</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">6</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">6</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">6</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">6</span></p></td>
+<td class="cl-b9bcb66b"><p class="cl-b9bc736c"><span class="cl-b9b467d0">NBS</span></p></td>
+<td class="cl-b9bcb66b"><p class="cl-b9bc736c"><span class="cl-b9b467d0">Alaska plaice</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">10,285</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb66b"><p class="cl-b9bc736c"><span class="cl-b9b467d0">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-b9bcb66b"><p class="cl-b9bc736c"><span class="cl-b9b467d0">delta_gamma</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">TRUE</span></p></td>
+<td class="cl-b9bcb66b"><p class="cl-b9bc736c"><span class="cl-b9b467d0">iid, iid</span></p></td>
+<td class="cl-b9bcb66b"><p class="cl-b9bc736c"><span class="cl-b9b467d0">alaska_plaice</span></p></td>
+<td class="cl-b9bcb66b"><p class="cl-b9bc736c"><span class="cl-b9b467d0">08_3</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">2,023</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">9,822,836</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">6,932,646</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">13,917,935</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">16.10022</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0">0.1777933</span></p></td>
+<td class="cl-b9bcb66b"><p class="cl-b9bc736c"><span class="cl-b9b467d0">index</span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+<td class="cl-b9bcb66a"><p class="cl-b9bc7358"><span class="cl-b9b467d0"></span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

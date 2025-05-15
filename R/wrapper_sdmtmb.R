@@ -11,7 +11,7 @@
 #' @param z A dataframe with the new data to predict on. 
 #' @param dir_spp A character string specifying the directory for output files.
 #' @param spp_info information about the species test run. 
-#' @param n_knots Numeric. Default  = 500.
+#' @param n_knots Numeric. 
 #' names(speciesname_df)
 #' 
 #' @import sdmTMB
@@ -22,7 +22,7 @@
 #' \dontrun{
 #' wrapper_sdmtmb()
 #' }
-wrapper_sdmtmb <- function(x, y, z, dir_spp, spp_info, n_knots = 500) {
+wrapper_sdmtmb <- function(x, y, z, dir_spp, spp_info, n_knots = 300) {
   
   # make mesh
   mesh <- sdmTMB::make_mesh(x, xy_cols = c("longitude_dd", "latitude_dd"), n_knots = n_knots)
@@ -34,7 +34,8 @@ wrapper_sdmtmb <- function(x, y, z, dir_spp, spp_info, n_knots = 500) {
     family = ', spp_info$model_family,'(),
     time = "year",
     anisotropy = ', spp_info$model_anisotropy,',
-    spatiotemporal = as.list(c("', gsub(pattern = ', ', replacement = '", "', x = spp_info$model_spatiotemporal),'"))
+    spatiotemporal = as.list(c("', 
+    gsub(pattern = ', ', replacement = '", "', x = spp_info$model_spatiotemporal),'"))
   )')))
   
   # get the index

@@ -14,17 +14,18 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r eval = FALSE}
-
-#get rid of memory limits
-options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
-
+```{r}
 # Set directories --------------------------------------------------------------
 library(here)
 
 wd <- paste0(here::here(),"/vignettes/")
 dir_out <- paste0(wd, "output/")
-crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
+dir_final <- paste0(dir_out, "EBS_0results/")
+```
+
+```{r eval = FALSE}
+#get rid of memory limits
+options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
 
 # Install Libraries ------------------------------------------------------------
 
@@ -110,6 +111,7 @@ load(paste0(wd, "grids/noaa_afsc_ebs_pred_grid_depth.rdata"), verbose = TRUE)
 # Data that varies over space and time (bottom temperature)
 # Here, bottom temperature, and thereby the cold pool extent, have been show to drive the distribution of many species. This is especially true for walleye pollock.
 # For this we are going to lean on our in-house prepared validated and pre-prepared [{coldpool} R package](https://github.com/afsc-gap-products/coldpool) (S. Rohan, L. Barnett, and N. Charriere). This data interpolates over the whole area of the survey so there are no missing data.
+crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
 grid_yrs <-
   dplyr::bind_cols(
     pred_grid_depth[,c("longitude_dd", "latitude_dd", "depth_m")], 
@@ -149,8 +151,60 @@ map(
                        tot_dataframes, replicate_num, grid_yrs, dir_out, test = TRUE))
 sink()
 
-### Plot indices ---------------------------------------------------------------
+out <- plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final) 
+```
 
-plot_results(srvy = srvy, dir_out = dir_out) 
+```{r results-run, eval = TRUE, echo = FALSE}
+load(file = paste0(dir_final, "analysisoutput.rdata"))
+library(flextable)
+library(magrittr)
+```
 
+```{r results-plots}
+out$plots
+```
+
+Parameter output: 
+
+```{r results-tables-1}
+i <- 1
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>% 
+  flextable::flextable() 
+```
+
+
+```{r results-tables-2}
+i <- 1 + i
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>% 
+  flextable::flextable() 
+```
+
+
+```{r results-tables-3}
+i <- 1 + i
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>% 
+  flextable::flextable() 
+```
+
+
+```{r results-tables-4}
+i <- 1 + i
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>% 
+  flextable::flextable() 
+```
+
+
+```{r, echo = FALSE}
+# for (i in 1:nrow(spp_list)) {
+#   file0 <- paste0(dir_out, "/", srvy, "_", spp_list$file_name[i])
+#   if (dir.exists(file0)) {
+#     aaa <- list.files(paste0(dir_out, "/", srvy, "_", spp_list$file_name[i]), full.names = TRUE)
+#     aaa <- aaa[!grepl(pattern = ".csv", x = aaa)]
+#     file.remove(aaa)
+#   }
+# }
 ```
