@@ -73,16 +73,16 @@ resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE, 
     if (!file.exists(paste0(dir_spp, "fit_df.csv"))) {
       fit_df <- c()
     } else {
-      fit_df <- utils::read.csv(file = paste0(dir_spp, "fit_df.csv")) %>%  
+      fit_df <- utils::read.csv(file = paste0(dir_spp, "fit_df.csv")) |>  
         dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
     }
-    fit_df <- fit_df %>%
+    fit_df <- fit_df |>
       dplyr::bind_rows(
         dplyr::bind_cols(
-          spp_info %>% 
+          spp_info |> 
             dplyr::mutate(effort = as.character(spp_files[[i]])), 
           data.frame(
-            data.frame(sdmTMB::tidy(fit0$fit, conf.int = TRUE))) ) %>%
+            data.frame(sdmTMB::tidy(fit0$fit, conf.int = TRUE))) ) |>
           dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) 
       )
     utils::write.csv(fit_df, file = paste0(dir_spp, "fit_df.csv"))
@@ -90,16 +90,16 @@ resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE, 
     if (!file.exists(paste0(dir_spp, "fit_pars.csv"))) {
       fit_pars <- c()
     } else {
-      fit_pars <- utils::read.csv(file = paste0(dir_spp, "fit_pars.csv")) %>%  
+      fit_pars <- utils::read.csv(file = paste0(dir_spp, "fit_pars.csv")) |>  
         dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
     }
-    fit_pars <- fit_pars %>%
+    fit_pars <- fit_pars |>
       dplyr::bind_rows(
         dplyr::bind_cols(
-          spp_info %>% 
+          spp_info |> 
             dplyr::mutate(effort = as.character(spp_files[[i]])), 
           data.frame(
-            data.frame(tidy(fit0$fit, effects = "ran_pars", conf.int = TRUE))) ) %>%
+            data.frame(tidy(fit0$fit, effects = "ran_pars", conf.int = TRUE))) ) |>
           dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) 
       )
     utils::write.csv(fit_pars, file = paste0(dir_spp, "fit_pars.csv"))
@@ -107,16 +107,16 @@ resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE, 
     if (!file.exists(paste0(dir_spp, "fit_check.csv"))) {
       fit_check <- c()
     } else {
-      fit_check <- utils::read.csv(file = paste0(dir_spp, "fit_check.csv")) %>%  
+      fit_check <- utils::read.csv(file = paste0(dir_spp, "fit_check.csv")) |>  
         dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
     }
-    fit_check <- fit_check %>%
+    fit_check <- fit_check |>
       dplyr::bind_rows(
         dplyr::bind_cols(
-          spp_info %>% 
+          spp_info |> 
             dplyr::mutate(effort = as.character(spp_files[[i]])), 
           data.frame(
-            data.frame(sdmTMB::sanity(fit0$fit))) ) %>%
+            data.frame(sdmTMB::sanity(fit0$fit))) ) |>
           dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) 
       )
     utils::write.csv(fit_check, file = paste0(dir_spp, "fit_check.csv"))
@@ -124,16 +124,16 @@ resample_tests <- function (spp_dfs, spp_info, grid_yrs, dir_out, test = FALSE, 
     if (!file.exists(paste0(dir_spp, "index.csv"))) {
       index <- c()
     } else {
-      index <- utils::read.csv(file = paste0(dir_spp, "index.csv")) %>%  
+      index <- utils::read.csv(file = paste0(dir_spp, "index.csv")) |>  
         dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
     }
-    index <- index %>%
+    index <- index |>
       dplyr::bind_rows(
         dplyr::bind_cols(
-          spp_info %>% 
+          spp_info |> 
             dplyr::mutate(effort = as.character(spp_files[[i]])), 
           data.frame(
-            data.frame(fit0$index)) ) %>%
+            data.frame(fit0$index)) ) |>
           dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) 
       )
     utils::write.csv(index, file = paste0(dir_spp, "index.csv"))
