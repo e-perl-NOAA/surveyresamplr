@@ -7,6 +7,7 @@
 clean_and_resample(
   spp_info,
   catch,
+  bio,
   seq_from,
   seq_to,
   seq_by,
@@ -23,6 +24,8 @@ clean_and_resample(
 \item{spp_info}{A data frame row containing information about the species.}
 
 \item{catch}{A data frame containing the catch data.}
+
+\item{bio}{A data frame containing the biological data, if applicable.}
 
 \item{seq_from}{A numeric value specifying the start of the sequence for data frames.}
 

@@ -15,18 +15,21 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
+# set CRAN mirror
+options(repos = c(CRAN = "https://cran.rstudio.com"))
+
 #get rid of memory limits
 options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
 ```
 
-## Install libraries
-
+## Install and load libraries
 ```{r comment = FALSE, warning = FALSE, message = FALSE, error = FALSE, results='hide'}
+
+library(surveyresamplr)
 
 # Here we list all the packages we will need for this whole process
 # We'll also use this in our works cited page. 
 PKG <- c(
-  "surveyresamplr",
   "here",
   "flextable",
   
@@ -61,9 +64,11 @@ PKG <- c(
   "INLA" 
 )
 
-for (p in 1:length(PKG)) {
-  require(PKG[p], character.only = TRUE)
-}
+pkg_install <- function(p){
+  install.packages(p)
+  require(p, character.only = TRUE)
+  }
+base::lapply(PKG, pkg_install)
 ```
 
 ## Test Species List
@@ -164,7 +169,7 @@ catch <- surveyresamplr::noaa_afsc_catch %>%
 
 ### Load grid data -------------------------------------------------------------
 
-grid_yrs <- replicate_df(dat = surveyresamplr::noaa_afsc_ebs_pred_grid_depth, 
+grid_yrs <- sdmTMB::replicate_df(dat = surveyresamplr::noaa_afsc_ebs_pred_grid_depth, 
                          time_name = "year", 
                          time_values = unique(catch$year))
 ```
