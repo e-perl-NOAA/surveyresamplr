@@ -93,7 +93,8 @@
 
 
 
-      </header><div class="row">
+      </header><link href="afsc-ebs_files/tabwid-1.1.3/tabwid.css" rel="stylesheet">
+<script src="afsc-ebs_files/tabwid-1.1.3/tabwid.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>AFSC Eastern Bering Sea</h1>
@@ -107,16 +108,16 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#get rid of memory limits</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>future.globals.maxSize <span class="op">=</span> <span class="fl">1</span> <span class="op">*</span> <span class="fl">1024</span><span class="op">^</span><span class="fl">4</span><span class="op">)</span>  <span class="co"># Allow up to 1 TB for globals</span></span>
-<span></span>
-<span><span class="co"># Set directories --------------------------------------------------------------</span></span>
+<code class="sourceCode R"><span><span class="co"># Set directories --------------------------------------------------------------</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://here.r-lib.org/" class="external-link">here</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; here() starts at Z:/Projects/surveyresamplr_general/surveyresamplr</span></span>
 <span></span>
 <span><span class="va">wd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>,<span class="st">"/vignettes/"</span><span class="op">)</span></span>
 <span><span class="va">dir_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wd</span>, <span class="st">"output/"</span><span class="op">)</span></span>
-<span><span class="va">crs_latlon</span> <span class="op">&lt;-</span> <span class="st">"+proj=longlat +datum=WGS84"</span> <span class="co"># decimal degrees</span></span>
+<span><span class="va">dir_final</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir_out</span>, <span class="st">"EBS_0results/"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#get rid of memory limits</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>future.globals.maxSize <span class="op">=</span> <span class="fl">1</span> <span class="op">*</span> <span class="fl">1024</span><span class="op">^</span><span class="fl">4</span><span class="op">)</span>  <span class="co"># Allow up to 1 TB for globals</span></span>
 <span></span>
 <span><span class="co"># Install Libraries ------------------------------------------------------------</span></span>
 <span></span>
@@ -163,167 +164,7 @@
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va">p</span>, character.only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">PKG</span><span class="op">)</span>, <span class="va">pkg_install</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: surveyresamplr</span></span>
-<span><span class="co">#&gt; Loading required package: dplyr</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     filter, lag</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
-<span><span class="co">#&gt; Loading required package: magrittr</span></span>
-<span><span class="co">#&gt; Loading required package: tidyr</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'tidyr'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:magrittr':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     extract</span></span>
-<span><span class="co">#&gt; Loading required package: viridis</span></span>
-<span><span class="co">#&gt; Loading required package: viridisLite</span></span>
-<span><span class="co">#&gt; Loading required package: ggplot2</span></span>
-<span><span class="co">#&gt; Loading required package: tibble</span></span>
-<span><span class="co">#&gt; Loading required package: janitor</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'janitor'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     chisq.test, fisher.test</span></span>
-<span><span class="co">#&gt; Loading required package: data.table</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'data.table'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:dplyr':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     between, first, last</span></span>
-<span><span class="co">#&gt; Loading required package: forcats</span></span>
-<span><span class="co">#&gt; Loading required package: purrr</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'purrr'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:data.table':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     transpose</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:magrittr':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     set_names</span></span>
-<span><span class="co">#&gt; Loading required package: furrr</span></span>
-<span><span class="co">#&gt; Loading required package: future</span></span>
-<span><span class="co">#&gt; Loading required package: doParallel</span></span>
-<span><span class="co">#&gt; Loading required package: foreach</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'foreach'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:purrr':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     accumulate, when</span></span>
-<span><span class="co">#&gt; Loading required package: iterators</span></span>
-<span><span class="co">#&gt; Loading required package: parallel</span></span>
-<span><span class="co">#&gt; Loading required package: sampling</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'sampling'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:future':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     cluster</span></span>
-<span><span class="co">#&gt; Loading required package: arrow</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'arrow'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:magrittr':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     is_in</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:utils':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     timestamp</span></span>
-<span><span class="co">#&gt; Loading required package: future.apply</span></span>
-<span><span class="co">#&gt; Loading required package: future.callr</span></span>
-<span><span class="co">#&gt; Loading required package: sdmTMB</span></span>
-<span><span class="co">#&gt; Loading required package: Matrix</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'Matrix'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:tidyr':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     expand, pack, unpack</span></span>
-<span><span class="co">#&gt; Loading required package: MASS</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'MASS'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     select</span></span>
-<span><span class="co">#&gt; Loading required package: cluster</span></span>
-<span><span class="co">#&gt; Loading required package: TMB</span></span>
-<span><span class="co">#&gt; Loading required package: INLA</span></span>
-<span><span class="co">#&gt; This is INLA_24.12.11 built 2024-12-11 19:58:26 UTC.</span></span>
-<span><span class="co">#&gt;  - See www.r-inla.org/contact-us for how to get help.</span></span>
-<span><span class="co">#&gt;  - List available models/likelihoods/etc with inla.list.models()</span></span>
-<span><span class="co">#&gt;  - Use inla.doc(&lt;NAME&gt;) to access documentation</span></span>
-<span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[3]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[4]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[5]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[6]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[7]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[8]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[9]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[10]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[11]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[12]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[13]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[14]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[15]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[16]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[17]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[18]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[19]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[20]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[21]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[22]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[23]]</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span></span>
 <span><span class="co">### Define study species -------------------------------------------------------</span></span>
 <span></span>
 <span><span class="va">spp_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
@@ -362,6 +203,7 @@
 <span><span class="co"># Data that varies over space and time (bottom temperature)</span></span>
 <span><span class="co"># Here, bottom temperature, and thereby the cold pool extent, have been show to drive the distribution of many species. This is especially true for walleye pollock.</span></span>
 <span><span class="co"># For this we are going to lean on our in-house prepared validated and pre-prepared [{coldpool} R package](https://github.com/afsc-gap-products/coldpool) (S. Rohan, L. Barnett, and N. Charriere). This data interpolates over the whole area of the survey so there are no missing data.</span></span>
+<span><span class="va">crs_latlon</span> <span class="op">&lt;-</span> <span class="st">"+proj=longlat +datum=WGS84"</span> <span class="co"># decimal degrees</span></span>
 <span><span class="va">grid_yrs</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_cols.html" class="external-link">bind_cols</a></span><span class="op">(</span></span>
 <span>    <span class="va">pred_grid_depth</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"longitude_dd"</span>, <span class="st">"latitude_dd"</span>, <span class="st">"depth_m"</span><span class="op">)</span><span class="op">]</span>, </span>
@@ -399,695 +241,817 @@
 <span>  <span class="op">~</span> <span class="fu"><a href="../reference/clean_and_resample.html">clean_and_resample</a></span><span class="op">(</span><span class="va">spp_list</span><span class="op">[</span><span class="va">.x</span>,<span class="op">]</span>, </span>
 <span>                       <span class="va">catch</span>, <span class="va">seq_from</span>, <span class="va">seq_to</span>, <span class="va">seq_by</span>, </span>
 <span>                       <span class="va">tot_dataframes</span>, <span class="va">replicate_num</span>, <span class="va">grid_yrs</span>, <span class="va">dir_out</span>, test <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/sink.html" class="external-link">sink</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sink.html" class="external-link">sink</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_results.html">plot_results</a></span><span class="op">(</span>srvy <span class="op">=</span> <span class="va">srvy</span>, dir_out <span class="op">=</span> <span class="va">dir_out</span>, dir_final <span class="op">=</span> <span class="va">dir_final</span><span class="op">)</span> </span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co">### Plot indices ---------------------------------------------------------------</span></span>
-<span><span class="va">srvy</span> <span class="op">&lt;-</span> <span class="st">"EBS"</span></span>
-<span><span class="fu"><a href="../reference/plot_results.html">plot_results</a></span><span class="op">(</span>srvy <span class="op">=</span> <span class="va">srvy</span>, dir_out <span class="op">=</span> <span class="va">dir_out</span><span class="op">)</span> </span>
-<span><span class="co">#&gt; $plots</span></span>
-<span><span class="co">#&gt; $plots$index_boxplot_log_biomass</span></span></code></pre></div>
-<p><img src="afsc-ebs_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
+<code class="sourceCode R"><span><span class="va">out</span><span class="op">$</span><span class="va">plots</span></span>
+<span><span class="co">#&gt; $index_boxplot_log_biomass</span></span></code></pre></div>
+<p><img src="afsc-ebs_files/figure-html/results-plots-1.png" width="700"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $plots$index_boxplot_log_biomass_SE</span></span></code></pre>
-<p><img src="afsc-ebs_files/figure-html/unnamed-chunk-4-2.png" width="700"></p>
+<span><span class="co">#&gt; $index_boxplot_log_biomass_SE</span></span></code></pre>
+<p><img src="afsc-ebs_files/figure-html/results-plots-2.png" width="700"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $plots$index_boxplot_biomass</span></span></code></pre>
-<p><img src="afsc-ebs_files/figure-html/unnamed-chunk-4-3.png" width="700"></p>
+<span><span class="co">#&gt; $index_boxplot_biomass</span></span></code></pre>
+<p><img src="afsc-ebs_files/figure-html/results-plots-3.png" width="700"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $plots$index_timeseries_biomass</span></span></code></pre>
-<p><img src="afsc-ebs_files/figure-html/unnamed-chunk-4-4.png" width="700"></p>
-<pre><code><span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $tables</span></span>
-<span><span class="co">#&gt; $tables$fit_df</span></span>
-<span><span class="co">#&gt;    X.5 X.4 X.3 X.2 X.1  X srvy     common_name              file_name</span></span>
-<span><span class="co">#&gt; 1    1   1   1   1   1  1  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 2    2   2   2   2   2  2  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 3    3   3   3   3   3  3  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 4    4   4   4   4   4  4  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 5    5   5   5   5   5  5  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 6    6   6   6   6   6  6  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 7    7   7   7   7   7  7  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 8    8   8   8   8   8  8  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 9    9   9   9   9   9  9  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 10  10  10  10  10  10 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 11  11  11  11  11  11 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 12  12  12  12  12  12 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 13  13  13  13  13  13 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 14  14  14  14  14  14 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 15  15  15  15  15  15 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 16  16  16  16  16  16 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 17  17  17  17  17  17 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 18  18  18  18  18  18 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 19  19  19  19  19  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 20  20  20  20  20  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 21  21  21  21  21  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 22  22  22  22  22  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 23  23  23  23  23  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 24  24  24  24  24  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 25  25  25  25  25  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 26  26  26  26  26  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 27  27  27  27  27  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 28  28  28  28  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 29  29  29  29  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 30  30  30  30  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 31  31  31  31  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 32  32  32  32  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 33  33  33  33  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 34  34  34  34  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 35  35  35  35  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 36  36  36  36  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 37  37  37  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 38  38  38  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 39  39  39  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 40  40  40  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 41  41  41  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 42  42  42  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 43  43  43  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 44  44  44  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 45  45  45  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 46  46  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 47  47  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 48  48  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 49  49  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 50  50  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 51  51  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 52  52  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 53  53  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 54  54  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt;    species_code filter_lat_lt filter_lat_gt filter_depth</span></span>
-<span><span class="co">#&gt; 1         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 2         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 3         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 4         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 5         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 6         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 7         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 8         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 9         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 10        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 11        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 12        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 13        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 14        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 15        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 16        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 17        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 18        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 19        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 20        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 21        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 22        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 23        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 24        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 25        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 26        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 27        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 28        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 29        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 30        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 31        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 32        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 33        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 34        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 35        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 36        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 37        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 38        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 39        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 40        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 41        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 42        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 43        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 44        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 45        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 46        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 47        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 48        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 49        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 50        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 51        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 52        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 53        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 54        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt;                                model_fn model_family model_anisotropy</span></span>
-<span><span class="co">#&gt; 1  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 2  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 3  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 4  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 5  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 6  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 7  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 8  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 9  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 10 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 11 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 12 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 13 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 14 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 15 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 16 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 17 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 18 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 19 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 20 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 21 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 22 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 23 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 24 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 25 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 26 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 27 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 28 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 29 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 30 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 31 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 32 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 33 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 34 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 35 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 36 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 37 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 38 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 39 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 40 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 41 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 42 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 43 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 44 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 45 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 46 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 47 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 48 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 49 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 50 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 51 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 52 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 53 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 54 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt;    model_spatiotemporal effort             term estimate std.error   conf.low</span></span>
-<span><span class="co">#&gt; 1              iid, iid   05_1 factor(year)2015 19.77117 1391.1234 -2706.7805</span></span>
-<span><span class="co">#&gt; 2              iid, iid   05_1 factor(year)2016 19.90634 1384.9903 -2694.6247</span></span>
-<span><span class="co">#&gt; 3              iid, iid   05_1 factor(year)2017 19.86007 1340.3207 -2607.1202</span></span>
-<span><span class="co">#&gt; 4              iid, iid   05_1 factor(year)2018 19.80071 1454.1672 -2830.3147</span></span>
-<span><span class="co">#&gt; 5              iid, iid   05_1 factor(year)2019 20.11844 1272.4660 -2473.8691</span></span>
-<span><span class="co">#&gt; 6              iid, iid   05_1 factor(year)2021 19.71943 1278.2534 -2485.6112</span></span>
-<span><span class="co">#&gt; 7              iid, iid   05_1 factor(year)2022 19.73432  774.5355 -1498.3273</span></span>
-<span><span class="co">#&gt; 8              iid, iid   05_1 factor(year)2023 19.82571 1362.2159 -2650.0683</span></span>
-<span><span class="co">#&gt; 9              iid, iid   05_1 factor(year)2024 19.46264 1249.7802 -2430.0615</span></span>
-<span><span class="co">#&gt; 10             iid, iid   05_2 factor(year)2015 19.07575  312.9058  -594.2084</span></span>
-<span><span class="co">#&gt; 11             iid, iid   05_2 factor(year)2016 19.07575       NaN        NaN</span></span>
-<span><span class="co">#&gt; 12             iid, iid   05_2 factor(year)2017 19.07858       NaN        NaN</span></span>
-<span><span class="co">#&gt; 13             iid, iid   05_2 factor(year)2018 19.08351       NaN        NaN</span></span>
-<span><span class="co">#&gt; 14             iid, iid   05_2 factor(year)2019 19.08117  839.2988 -1625.9142</span></span>
-<span><span class="co">#&gt; 15             iid, iid   05_2 factor(year)2021 19.08117  756.6909 -1464.0057</span></span>
-<span><span class="co">#&gt; 16             iid, iid   05_2 factor(year)2022 19.07575  904.6763 -1754.0573</span></span>
-<span><span class="co">#&gt; 17             iid, iid   05_2 factor(year)2023 19.08117  971.2195 -1884.4740</span></span>
-<span><span class="co">#&gt; 18             iid, iid   05_2 factor(year)2024 19.09158  632.0313 -1219.6671</span></span>
-<span><span class="co">#&gt; 19             iid, iid   05_3 factor(year)2015 19.19664  988.8261 -1918.8668</span></span>
-<span><span class="co">#&gt; 20             iid, iid   05_3 factor(year)2016 19.19323  868.0186 -1682.0919</span></span>
-<span><span class="co">#&gt; 21             iid, iid   05_3 factor(year)2017 19.19323  960.7723 -1863.8859</span></span>
-<span><span class="co">#&gt; 22             iid, iid   05_3 factor(year)2018 19.19664  952.9160 -1848.4845</span></span>
-<span><span class="co">#&gt; 23             iid, iid   05_3 factor(year)2019 19.19323  690.2552 -1333.6820</span></span>
-<span><span class="co">#&gt; 24             iid, iid   05_3 factor(year)2021 19.19323  679.4069 -1312.4197</span></span>
-<span><span class="co">#&gt; 25             iid, iid   05_3 factor(year)2022 19.19664  894.0415 -1733.0926</span></span>
-<span><span class="co">#&gt; 26             iid, iid   05_3 factor(year)2023 19.19323       NaN        NaN</span></span>
-<span><span class="co">#&gt; 27             iid, iid   05_3 factor(year)2024 19.15037  984.2265 -1909.8981</span></span>
-<span><span class="co">#&gt; 28             iid, iid   05_1 factor(year)2015 19.77117 1391.1234 -2706.7805</span></span>
-<span><span class="co">#&gt; 29             iid, iid   05_1 factor(year)2016 19.90634 1384.9903 -2694.6247</span></span>
-<span><span class="co">#&gt; 30             iid, iid   05_1 factor(year)2017 19.86007 1340.3207 -2607.1202</span></span>
-<span><span class="co">#&gt; 31             iid, iid   05_1 factor(year)2018 19.80071 1454.1672 -2830.3147</span></span>
-<span><span class="co">#&gt; 32             iid, iid   05_1 factor(year)2019 20.11844 1272.4660 -2473.8691</span></span>
-<span><span class="co">#&gt; 33             iid, iid   05_1 factor(year)2021 19.71943 1278.2534 -2485.6112</span></span>
-<span><span class="co">#&gt; 34             iid, iid   05_1 factor(year)2022 19.73432  774.5355 -1498.3273</span></span>
-<span><span class="co">#&gt; 35             iid, iid   05_1 factor(year)2023 19.82571 1362.2159 -2650.0683</span></span>
-<span><span class="co">#&gt; 36             iid, iid   05_1 factor(year)2024 19.46264 1249.7802 -2430.0615</span></span>
-<span><span class="co">#&gt; 37             iid, iid   05_2 factor(year)2015 19.07575  312.9058  -594.2084</span></span>
-<span><span class="co">#&gt; 38             iid, iid   05_2 factor(year)2016 19.07575       NaN        NaN</span></span>
-<span><span class="co">#&gt; 39             iid, iid   05_2 factor(year)2017 19.07858       NaN        NaN</span></span>
-<span><span class="co">#&gt; 40             iid, iid   05_2 factor(year)2018 19.08351       NaN        NaN</span></span>
-<span><span class="co">#&gt; 41             iid, iid   05_2 factor(year)2019 19.08117  839.2988 -1625.9142</span></span>
-<span><span class="co">#&gt; 42             iid, iid   05_2 factor(year)2021 19.08117  756.6909 -1464.0057</span></span>
-<span><span class="co">#&gt; 43             iid, iid   05_2 factor(year)2022 19.07575  904.6763 -1754.0573</span></span>
-<span><span class="co">#&gt; 44             iid, iid   05_2 factor(year)2023 19.08117  971.2195 -1884.4740</span></span>
-<span><span class="co">#&gt; 45             iid, iid   05_2 factor(year)2024 19.09158  632.0313 -1219.6671</span></span>
-<span><span class="co">#&gt; 46             iid, iid   05_3 factor(year)2015 19.19664  988.8261 -1918.8668</span></span>
-<span><span class="co">#&gt; 47             iid, iid   05_3 factor(year)2016 19.19323  868.0186 -1682.0919</span></span>
-<span><span class="co">#&gt; 48             iid, iid   05_3 factor(year)2017 19.19323  960.7723 -1863.8859</span></span>
-<span><span class="co">#&gt; 49             iid, iid   05_3 factor(year)2018 19.19664  952.9160 -1848.4845</span></span>
-<span><span class="co">#&gt; 50             iid, iid   05_3 factor(year)2019 19.19323  690.2552 -1333.6820</span></span>
-<span><span class="co">#&gt; 51             iid, iid   05_3 factor(year)2021 19.19323  679.4069 -1312.4197</span></span>
-<span><span class="co">#&gt; 52             iid, iid   05_3 factor(year)2022 19.19664  894.0415 -1733.0926</span></span>
-<span><span class="co">#&gt; 53             iid, iid   05_3 factor(year)2023 19.19323       NaN        NaN</span></span>
-<span><span class="co">#&gt; 54             iid, iid   05_3 factor(year)2024 19.15037  984.2265 -1909.8981</span></span>
-<span><span class="co">#&gt;    conf.high</span></span>
-<span><span class="co">#&gt; 1  2746.3229</span></span>
-<span><span class="co">#&gt; 2  2734.4374</span></span>
-<span><span class="co">#&gt; 3  2646.8403</span></span>
-<span><span class="co">#&gt; 4  2869.9161</span></span>
-<span><span class="co">#&gt; 5  2514.1060</span></span>
-<span><span class="co">#&gt; 6  2525.0501</span></span>
-<span><span class="co">#&gt; 7  1537.7960</span></span>
-<span><span class="co">#&gt; 8  2689.7197</span></span>
-<span><span class="co">#&gt; 9  2468.9868</span></span>
-<span><span class="co">#&gt; 10  632.3599</span></span>
-<span><span class="co">#&gt; 11       NaN</span></span>
-<span><span class="co">#&gt; 12       NaN</span></span>
-<span><span class="co">#&gt; 13       NaN</span></span>
-<span><span class="co">#&gt; 14 1664.0766</span></span>
-<span><span class="co">#&gt; 15 1502.1680</span></span>
-<span><span class="co">#&gt; 16 1792.2088</span></span>
-<span><span class="co">#&gt; 17 1922.6364</span></span>
-<span><span class="co">#&gt; 18 1257.8502</span></span>
-<span><span class="co">#&gt; 19 1957.2601</span></span>
-<span><span class="co">#&gt; 20 1720.4784</span></span>
-<span><span class="co">#&gt; 21 1902.2724</span></span>
-<span><span class="co">#&gt; 22 1886.8777</span></span>
-<span><span class="co">#&gt; 23 1372.0685</span></span>
-<span><span class="co">#&gt; 24 1350.8062</span></span>
-<span><span class="co">#&gt; 25 1771.4859</span></span>
-<span><span class="co">#&gt; 26       NaN</span></span>
-<span><span class="co">#&gt; 27 1948.1989</span></span>
-<span><span class="co">#&gt; 28 2746.3229</span></span>
-<span><span class="co">#&gt; 29 2734.4374</span></span>
-<span><span class="co">#&gt; 30 2646.8403</span></span>
-<span><span class="co">#&gt; 31 2869.9161</span></span>
-<span><span class="co">#&gt; 32 2514.1060</span></span>
-<span><span class="co">#&gt; 33 2525.0501</span></span>
-<span><span class="co">#&gt; 34 1537.7960</span></span>
-<span><span class="co">#&gt; 35 2689.7197</span></span>
-<span><span class="co">#&gt; 36 2468.9868</span></span>
-<span><span class="co">#&gt; 37  632.3599</span></span>
-<span><span class="co">#&gt; 38       NaN</span></span>
-<span><span class="co">#&gt; 39       NaN</span></span>
-<span><span class="co">#&gt; 40       NaN</span></span>
-<span><span class="co">#&gt; 41 1664.0766</span></span>
-<span><span class="co">#&gt; 42 1502.1680</span></span>
-<span><span class="co">#&gt; 43 1792.2088</span></span>
-<span><span class="co">#&gt; 44 1922.6364</span></span>
-<span><span class="co">#&gt; 45 1257.8502</span></span>
-<span><span class="co">#&gt; 46 1957.2601</span></span>
-<span><span class="co">#&gt; 47 1720.4784</span></span>
-<span><span class="co">#&gt; 48 1902.2724</span></span>
-<span><span class="co">#&gt; 49 1886.8777</span></span>
-<span><span class="co">#&gt; 50 1372.0685</span></span>
-<span><span class="co">#&gt; 51 1350.8062</span></span>
-<span><span class="co">#&gt; 52 1771.4859</span></span>
-<span><span class="co">#&gt; 53       NaN</span></span>
-<span><span class="co">#&gt; 54 1948.1989</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $tables$fit_pars</span></span>
-<span><span class="co">#&gt;    X.5 X.4 X.3 X.2 X.1  X srvy     common_name              file_name</span></span>
-<span><span class="co">#&gt; 1    1   1   1   1   1  1  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 2    2   2   2   2   2  2  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 3    3   3   3   3   3  3  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 4    4   4   4   4   4 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 5    5   5   5   5   5 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 6    6   6   6   6   6 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 7    7   7   7   7  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 8    8   8   8   8  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 9    9   9   9   9  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 10  10  10  10  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 11  11  11  11  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 12  12  12  12  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 13  13  13  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 14  14  14  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 15  15  15  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 16  16  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 17  17  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 18  18  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt;    species_code filter_lat_lt filter_lat_gt filter_depth</span></span>
-<span><span class="co">#&gt; 1         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 2         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 3         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 4         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 5         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 6         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 7         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 8         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 9         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 10        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 11        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 12        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 13        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 14        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 15        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 16        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 17        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 18        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt;                                model_fn model_family model_anisotropy</span></span>
-<span><span class="co">#&gt; 1  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 2  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 3  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 4  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 5  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 6  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 7  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 8  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 9  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 10 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 11 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 12 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 13 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 14 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 15 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 16 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 17 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 18 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt;    model_spatiotemporal effort    term  estimate std.error conf.low conf.high</span></span>
-<span><span class="co">#&gt; 1              iid, iid   05_1   range 3.7298099 3393.6903        0       Inf</span></span>
-<span><span class="co">#&gt; 2              iid, iid   05_1 sigma_O 0.1812892  140.5073        0       Inf</span></span>
-<span><span class="co">#&gt; 3              iid, iid   05_1 sigma_E 0.3717503  336.2267        0       Inf</span></span>
-<span><span class="co">#&gt; 4              iid, iid   05_2   range 2.8284007       NaN      NaN       NaN</span></span>
-<span><span class="co">#&gt; 5              iid, iid   05_2 sigma_O 0.2820909       NaN      NaN       NaN</span></span>
-<span><span class="co">#&gt; 6              iid, iid   05_2 sigma_E 0.2820909       NaN      NaN       NaN</span></span>
-<span><span class="co">#&gt; 7              iid, iid   05_3   range 2.8284103       NaN      NaN       NaN</span></span>
-<span><span class="co">#&gt; 8              iid, iid   05_3 sigma_O 0.2820923  177.6077        0       Inf</span></span>
-<span><span class="co">#&gt; 9              iid, iid   05_3 sigma_E 0.2820923       NaN      NaN       NaN</span></span>
-<span><span class="co">#&gt; 10             iid, iid   05_1   range 3.7298099 3393.6903        0       Inf</span></span>
-<span><span class="co">#&gt; 11             iid, iid   05_1 sigma_O 0.1812892  140.5073        0       Inf</span></span>
-<span><span class="co">#&gt; 12             iid, iid   05_1 sigma_E 0.3717503  336.2267        0       Inf</span></span>
-<span><span class="co">#&gt; 13             iid, iid   05_2   range 2.8284007       NaN      NaN       NaN</span></span>
-<span><span class="co">#&gt; 14             iid, iid   05_2 sigma_O 0.2820909       NaN      NaN       NaN</span></span>
-<span><span class="co">#&gt; 15             iid, iid   05_2 sigma_E 0.2820909       NaN      NaN       NaN</span></span>
-<span><span class="co">#&gt; 16             iid, iid   05_3   range 2.8284103       NaN      NaN       NaN</span></span>
-<span><span class="co">#&gt; 17             iid, iid   05_3 sigma_O 0.2820923  177.6077        0       Inf</span></span>
-<span><span class="co">#&gt; 18             iid, iid   05_3 sigma_E 0.2820923       NaN      NaN       NaN</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $tables$fit_check</span></span>
-<span><span class="co">#&gt;   X.5 X.4 X.3 X.2 X.1  X srvy     common_name              file_name</span></span>
-<span><span class="co">#&gt; 1   1   1   1   1   1  1  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 2   2   2   2   2   2 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 3   3   3   3   3  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 4   4   4   4  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 5   5   5  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 6   6  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt;   species_code filter_lat_lt filter_lat_gt filter_depth</span></span>
-<span><span class="co">#&gt; 1        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 2        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 3        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 4        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 5        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 6        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt;                               model_fn model_family model_anisotropy</span></span>
-<span><span class="co">#&gt; 1 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 2 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 3 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 4 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 5 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 6 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt;   model_spatiotemporal effort hessian_ok eigen_values_ok nlminb_ok range_ok</span></span>
-<span><span class="co">#&gt; 1             iid, iid   05_1      FALSE            TRUE      TRUE     TRUE</span></span>
-<span><span class="co">#&gt; 2             iid, iid   05_2      FALSE            TRUE      TRUE     TRUE</span></span>
-<span><span class="co">#&gt; 3             iid, iid   05_3      FALSE            TRUE      TRUE     TRUE</span></span>
-<span><span class="co">#&gt; 4             iid, iid   05_1      FALSE            TRUE      TRUE     TRUE</span></span>
-<span><span class="co">#&gt; 5             iid, iid   05_2      FALSE            TRUE      TRUE     TRUE</span></span>
-<span><span class="co">#&gt; 6             iid, iid   05_3      FALSE            TRUE      TRUE     TRUE</span></span>
-<span><span class="co">#&gt;   gradients_ok se_magnitude_ok se_na_ok sigmas_ok all_ok</span></span>
-<span><span class="co">#&gt; 1         TRUE           FALSE     TRUE      TRUE  FALSE</span></span>
-<span><span class="co">#&gt; 2        FALSE           FALSE     TRUE      TRUE  FALSE</span></span>
-<span><span class="co">#&gt; 3        FALSE           FALSE     TRUE      TRUE  FALSE</span></span>
-<span><span class="co">#&gt; 4         TRUE           FALSE     TRUE      TRUE  FALSE</span></span>
-<span><span class="co">#&gt; 5        FALSE           FALSE     TRUE      TRUE  FALSE</span></span>
-<span><span class="co">#&gt; 6        FALSE           FALSE     TRUE      TRUE  FALSE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $tables$index</span></span>
-<span><span class="co">#&gt;    X.5 X.4 X.3 X.2 X.1  X srvy     common_name              file_name</span></span>
-<span><span class="co">#&gt; 1    1   1   1   1   1  1  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 2    2   2   2   2   2  2  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 3    3   3   3   3   3  3  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 4    4   4   4   4   4  4  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 5    5   5   5   5   5  5  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 6    6   6   6   6   6  6  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 7    7   7   7   7   7  7  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 8    8   8   8   8   8  8  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 9    9   9   9   9   9  9  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 10  10  10  10  10  10 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 11  11  11  11  11  11 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 12  12  12  12  12  12 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 13  13  13  13  13  13 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 14  14  14  14  14  14 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 15  15  15  15  15  15 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 16  16  16  16  16  16 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 17  17  17  17  17  17 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 18  18  18  18  18  18 NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 19  19  19  19  19  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 20  20  20  20  20  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 21  21  21  21  21  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 22  22  22  22  22  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 23  23  23  23  23  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 24  24  24  24  24  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 25  25  25  25  25  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 26  26  26  26  26  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 27  27  27  27  27  NA NA  EBS walleye pollock   walleye_pollock_test</span></span>
-<span><span class="co">#&gt; 28  28  28  28  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 29  29  29  29  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 30  30  30  30  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 31  31  31  31  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 32  32  32  32  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 33  33  33  33  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 34  34  34  34  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 35  35  35  35  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 36  36  36  36  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 37  37  37  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 38  38  38  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 39  39  39  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 40  40  40  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 41  41  41  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 42  42  42  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 43  43  43  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 44  44  44  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 45  45  45  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 46  46  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 47  47  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 48  48  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 49  49  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 50  50  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 51  51  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 52  52  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 53  53  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt; 54  54  NA  NA  NA  NA NA  EBS walleye pollock simple_walleye_pollock</span></span>
-<span><span class="co">#&gt;    species_code filter_lat_lt filter_lat_gt filter_depth</span></span>
-<span><span class="co">#&gt; 1         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 2         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 3         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 4         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 5         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 6         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 7         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 8         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 9         21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 10        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 11        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 12        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 13        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 14        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 15        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 16        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 17        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 18        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 19        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 20        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 21        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 22        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 23        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 24        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 25        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 26        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 27        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 28        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 29        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 30        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 31        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 32        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 33        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 34        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 35        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 36        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 37        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 38        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 39        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 40        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 41        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 42        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 43        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 44        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 45        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 46        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 47        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 48        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 49        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 50        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 51        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 52        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 53        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt; 54        21740            NA            NA           NA</span></span>
-<span><span class="co">#&gt;                                model_fn model_family model_anisotropy</span></span>
-<span><span class="co">#&gt; 1  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 2  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 3  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 4  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 5  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 6  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 7  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 8  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 9  total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 10 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 11 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 12 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 13 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 14 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 15 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 16 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 17 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 18 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 19 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 20 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 21 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 22 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 23 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 24 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 25 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 26 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 27 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 28 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 29 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 30 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 31 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 32 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 33 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 34 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 35 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 36 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 37 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 38 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 39 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 40 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 41 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 42 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 43 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 44 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 45 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 46 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 47 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 48 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 49 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 50 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 51 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 52 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 53 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt; 54 total_catch_wt_kg ~ 0 + factor(year)  delta_gamma             TRUE</span></span>
-<span><span class="co">#&gt;    model_spatiotemporal effort year       est       lwr       upr  log_est</span></span>
-<span><span class="co">#&gt; 1              iid, iid   05_1 2015 311329658 254290109 381163688 19.55636</span></span>
-<span><span class="co">#&gt; 2              iid, iid   05_1 2016 245697312 201795592 299150087 19.31961</span></span>
-<span><span class="co">#&gt; 3              iid, iid   05_1 2017 241587105 198504083 294020799 19.30274</span></span>
-<span><span class="co">#&gt; 4              iid, iid   05_1 2018 127954658 101264147 161680073 18.66719</span></span>
-<span><span class="co">#&gt; 5              iid, iid   05_1 2019 206496853 166663257 255850936 19.14580</span></span>
-<span><span class="co">#&gt; 6              iid, iid   05_1 2021 142822421 115820004 176120214 18.77711</span></span>
-<span><span class="co">#&gt; 7              iid, iid   05_1 2022 216484018 177040721 264714974 19.19303</span></span>
-<span><span class="co">#&gt; 8              iid, iid   05_1 2023 168205043 134684558 210068155 18.94069</span></span>
-<span><span class="co">#&gt; 9              iid, iid   05_1 2024 185178674 148349911 231150400 19.03683</span></span>
-<span><span class="co">#&gt; 10             iid, iid   05_2 2015 309124708 257670715 370853495 19.54926</span></span>
-<span><span class="co">#&gt; 11             iid, iid   05_2 2016 209926147 174341324 252774192 19.16227</span></span>
-<span><span class="co">#&gt; 12             iid, iid   05_2 2017 269509955 225672238 321863321 19.41212</span></span>
-<span><span class="co">#&gt; 13             iid, iid   05_2 2018 127879825 104874239 155931996 18.66660</span></span>
-<span><span class="co">#&gt; 14             iid, iid   05_2 2019 251639583 208337954 303941162 19.34351</span></span>
-<span><span class="co">#&gt; 15             iid, iid   05_2 2021 142876180 116585453 175095626 18.77749</span></span>
-<span><span class="co">#&gt; 16             iid, iid   05_2 2022 220165898 180885172 267976760 19.20989</span></span>
-<span><span class="co">#&gt; 17             iid, iid   05_2 2023 153086823 125975647 186032587 18.84652</span></span>
-<span><span class="co">#&gt; 18             iid, iid   05_2 2024 168748409 136227800 209032411 18.94392</span></span>
-<span><span class="co">#&gt; 19             iid, iid   05_3 2015 279323841 230953166 337825236 19.44788</span></span>
-<span><span class="co">#&gt; 20             iid, iid   05_3 2016 208430628 172524556 251809527 19.15512</span></span>
-<span><span class="co">#&gt; 21             iid, iid   05_3 2017 215020885 177427385 260579734 19.18625</span></span>
-<span><span class="co">#&gt; 22             iid, iid   05_3 2018 116636339  94631487 143758023 18.57457</span></span>
-<span><span class="co">#&gt; 23             iid, iid   05_3 2019 289472448 234829730 356830024 19.48357</span></span>
-<span><span class="co">#&gt; 24             iid, iid   05_3 2021 150176401 123661773 182376097 18.82732</span></span>
-<span><span class="co">#&gt; 25             iid, iid   05_3 2022 177554637 145196896 217123437 18.99479</span></span>
-<span><span class="co">#&gt; 26             iid, iid   05_3 2023 200158352 158131522 253354709 19.11462</span></span>
-<span><span class="co">#&gt; 27             iid, iid   05_3 2024 150538001 121447250 186596978 18.82973</span></span>
-<span><span class="co">#&gt; 28             iid, iid   05_1 2015 311329658 254290109 381163688 19.55636</span></span>
-<span><span class="co">#&gt; 29             iid, iid   05_1 2016 245697312 201795592 299150087 19.31961</span></span>
-<span><span class="co">#&gt; 30             iid, iid   05_1 2017 241587105 198504083 294020799 19.30274</span></span>
-<span><span class="co">#&gt; 31             iid, iid   05_1 2018 127954658 101264147 161680073 18.66719</span></span>
-<span><span class="co">#&gt; 32             iid, iid   05_1 2019 206496853 166663257 255850936 19.14580</span></span>
-<span><span class="co">#&gt; 33             iid, iid   05_1 2021 142822421 115820004 176120214 18.77711</span></span>
-<span><span class="co">#&gt; 34             iid, iid   05_1 2022 216484018 177040721 264714974 19.19303</span></span>
-<span><span class="co">#&gt; 35             iid, iid   05_1 2023 168205043 134684558 210068155 18.94069</span></span>
-<span><span class="co">#&gt; 36             iid, iid   05_1 2024 185178674 148349911 231150400 19.03683</span></span>
-<span><span class="co">#&gt; 37             iid, iid   05_2 2015 309124708 257670715 370853495 19.54926</span></span>
-<span><span class="co">#&gt; 38             iid, iid   05_2 2016 209926147 174341324 252774192 19.16227</span></span>
-<span><span class="co">#&gt; 39             iid, iid   05_2 2017 269509955 225672238 321863321 19.41212</span></span>
-<span><span class="co">#&gt; 40             iid, iid   05_2 2018 127879825 104874239 155931996 18.66660</span></span>
-<span><span class="co">#&gt; 41             iid, iid   05_2 2019 251639583 208337954 303941162 19.34351</span></span>
-<span><span class="co">#&gt; 42             iid, iid   05_2 2021 142876180 116585453 175095626 18.77749</span></span>
-<span><span class="co">#&gt; 43             iid, iid   05_2 2022 220165898 180885172 267976760 19.20989</span></span>
-<span><span class="co">#&gt; 44             iid, iid   05_2 2023 153086823 125975647 186032587 18.84652</span></span>
-<span><span class="co">#&gt; 45             iid, iid   05_2 2024 168748409 136227800 209032411 18.94392</span></span>
-<span><span class="co">#&gt; 46             iid, iid   05_3 2015 279323841 230953166 337825236 19.44788</span></span>
-<span><span class="co">#&gt; 47             iid, iid   05_3 2016 208430628 172524556 251809527 19.15512</span></span>
-<span><span class="co">#&gt; 48             iid, iid   05_3 2017 215020885 177427385 260579734 19.18625</span></span>
-<span><span class="co">#&gt; 49             iid, iid   05_3 2018 116636339  94631487 143758023 18.57457</span></span>
-<span><span class="co">#&gt; 50             iid, iid   05_3 2019 289472448 234829730 356830024 19.48357</span></span>
-<span><span class="co">#&gt; 51             iid, iid   05_3 2021 150176401 123661773 182376097 18.82732</span></span>
-<span><span class="co">#&gt; 52             iid, iid   05_3 2022 177554637 145196896 217123437 18.99479</span></span>
-<span><span class="co">#&gt; 53             iid, iid   05_3 2023 200158352 158131522 253354709 19.11462</span></span>
-<span><span class="co">#&gt; 54             iid, iid   05_3 2024 150538001 121447250 186596978 18.82973</span></span>
-<span><span class="co">#&gt;            se  type</span></span>
-<span><span class="co">#&gt; 1  0.10325525 index</span></span>
-<span><span class="co">#&gt; 2  0.10043301 index</span></span>
-<span><span class="co">#&gt; 3  0.10021634 index</span></span>
-<span><span class="co">#&gt; 4  0.11936115 index</span></span>
-<span><span class="co">#&gt; 5  0.10934376 index</span></span>
-<span><span class="co">#&gt; 6  0.10692275 index</span></span>
-<span><span class="co">#&gt; 7  0.10262278 index</span></span>
-<span><span class="co">#&gt; 8  0.11339407 index</span></span>
-<span><span class="co">#&gt; 9  0.11313852 index</span></span>
-<span><span class="co">#&gt; 10 0.09289064 index</span></span>
-<span><span class="co">#&gt; 11 0.09476745 index</span></span>
-<span><span class="co">#&gt; 12 0.09057394 index</span></span>
-<span><span class="co">#&gt; 13 0.10119015 index</span></span>
-<span><span class="co">#&gt; 14 0.09634682 index</span></span>
-<span><span class="co">#&gt; 15 0.10375388 index</span></span>
-<span><span class="co">#&gt; 16 0.10026660 index</span></span>
-<span><span class="co">#&gt; 17 0.09944909 index</span></span>
-<span><span class="co">#&gt; 18 0.10922671 index</span></span>
-<span><span class="co">#&gt; 19 0.09702060 index</span></span>
-<span><span class="co">#&gt; 20 0.09646437 index</span></span>
-<span><span class="co">#&gt; 21 0.09804963 index</span></span>
-<span><span class="co">#&gt; 22 0.10667064 index</span></span>
-<span><span class="co">#&gt; 23 0.10673636 index</span></span>
-<span><span class="co">#&gt; 24 0.09911427 index</span></span>
-<span><span class="co">#&gt; 25 0.10264865 index</span></span>
-<span><span class="co">#&gt; 26 0.12024798 index</span></span>
-<span><span class="co">#&gt; 27 0.10956096 index</span></span>
-<span><span class="co">#&gt; 28 0.10325525 index</span></span>
-<span><span class="co">#&gt; 29 0.10043301 index</span></span>
-<span><span class="co">#&gt; 30 0.10021634 index</span></span>
-<span><span class="co">#&gt; 31 0.11936115 index</span></span>
-<span><span class="co">#&gt; 32 0.10934376 index</span></span>
-<span><span class="co">#&gt; 33 0.10692275 index</span></span>
-<span><span class="co">#&gt; 34 0.10262278 index</span></span>
-<span><span class="co">#&gt; 35 0.11339407 index</span></span>
-<span><span class="co">#&gt; 36 0.11313852 index</span></span>
-<span><span class="co">#&gt; 37 0.09289064 index</span></span>
-<span><span class="co">#&gt; 38 0.09476745 index</span></span>
-<span><span class="co">#&gt; 39 0.09057394 index</span></span>
-<span><span class="co">#&gt; 40 0.10119015 index</span></span>
-<span><span class="co">#&gt; 41 0.09634682 index</span></span>
-<span><span class="co">#&gt; 42 0.10375388 index</span></span>
-<span><span class="co">#&gt; 43 0.10026660 index</span></span>
-<span><span class="co">#&gt; 44 0.09944909 index</span></span>
-<span><span class="co">#&gt; 45 0.10922671 index</span></span>
-<span><span class="co">#&gt; 46 0.09702060 index</span></span>
-<span><span class="co">#&gt; 47 0.09646437 index</span></span>
-<span><span class="co">#&gt; 48 0.09804963 index</span></span>
-<span><span class="co">#&gt; 49 0.10667064 index</span></span>
-<span><span class="co">#&gt; 50 0.10673636 index</span></span>
-<span><span class="co">#&gt; 51 0.09911427 index</span></span>
-<span><span class="co">#&gt; 52 0.10264865 index</span></span>
-<span><span class="co">#&gt; 53 0.12024798 index</span></span>
-<span><span class="co">#&gt; 54 0.10956096 index</span></span></code></pre>
+<span><span class="co">#&gt; $index_timeseries_biomass</span></span></code></pre>
+<p><img src="afsc-ebs_files/figure-html/results-plots-4.png" width="700"></p>
+<p>Parameter output:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">i</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tables</span><span class="op">)</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "fit_df"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tables</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/flextable.html" class="external-link">flextable</a></span><span class="op">(</span><span class="op">)</span> </span></code></pre></div>
+<div class="tabwid">
+<style>.cl-960ed52c{}.cl-95f49f86{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-95ff6ab0{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-95ff6ac4{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-95ffb5c4{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-95ffb5ce{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-95ffb5d8{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-95ffb5e2{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-95ffb5ec{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-95ffb5ed{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-960ed52c">
+<thead><tr style="overflow-wrap:break-word;">
+<th class="cl-95ffb5c4"><p class="cl-95ff6ab0"><span class="cl-95f49f86">X.5</span></p></th>
+<th class="cl-95ffb5c4"><p class="cl-95ff6ab0"><span class="cl-95f49f86">X.4</span></p></th>
+<th class="cl-95ffb5c4"><p class="cl-95ff6ab0"><span class="cl-95f49f86">X.3</span></p></th>
+<th class="cl-95ffb5c4"><p class="cl-95ff6ab0"><span class="cl-95f49f86">X.2</span></p></th>
+<th class="cl-95ffb5c4"><p class="cl-95ff6ab0"><span class="cl-95f49f86">X.1</span></p></th>
+<th class="cl-95ffb5c4"><p class="cl-95ff6ab0"><span class="cl-95f49f86">X</span></p></th>
+<th class="cl-95ffb5ce"><p class="cl-95ff6ac4"><span class="cl-95f49f86">srvy</span></p></th>
+<th class="cl-95ffb5ce"><p class="cl-95ff6ac4"><span class="cl-95f49f86">common_name</span></p></th>
+<th class="cl-95ffb5ce"><p class="cl-95ff6ac4"><span class="cl-95f49f86">file_name</span></p></th>
+<th class="cl-95ffb5c4"><p class="cl-95ff6ab0"><span class="cl-95f49f86">species_code</span></p></th>
+<th class="cl-95ffb5c4"><p class="cl-95ff6ab0"><span class="cl-95f49f86">filter_lat_lt</span></p></th>
+<th class="cl-95ffb5c4"><p class="cl-95ff6ab0"><span class="cl-95f49f86">filter_lat_gt</span></p></th>
+<th class="cl-95ffb5c4"><p class="cl-95ff6ab0"><span class="cl-95f49f86">filter_depth</span></p></th>
+<th class="cl-95ffb5ce"><p class="cl-95ff6ac4"><span class="cl-95f49f86">model_fn</span></p></th>
+<th class="cl-95ffb5ce"><p class="cl-95ff6ac4"><span class="cl-95f49f86">model_family</span></p></th>
+<th class="cl-95ffb5c4"><p class="cl-95ff6ab0"><span class="cl-95f49f86">model_anisotropy</span></p></th>
+<th class="cl-95ffb5ce"><p class="cl-95ff6ac4"><span class="cl-95f49f86">model_spatiotemporal</span></p></th>
+<th class="cl-95ffb5ce"><p class="cl-95ff6ac4"><span class="cl-95f49f86">effort</span></p></th>
+<th class="cl-95ffb5ce"><p class="cl-95ff6ac4"><span class="cl-95f49f86">term</span></p></th>
+<th class="cl-95ffb5c4"><p class="cl-95ff6ab0"><span class="cl-95f49f86">estimate</span></p></th>
+<th class="cl-95ffb5c4"><p class="cl-95ff6ab0"><span class="cl-95f49f86">std.error</span></p></th>
+<th class="cl-95ffb5c4"><p class="cl-95ff6ab0"><span class="cl-95f49f86">conf.low</span></p></th>
+<th class="cl-95ffb5c4"><p class="cl-95ff6ab0"><span class="cl-95f49f86">conf.high</span></p></th>
+</tr></thead>
+<tbody>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">1</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">1</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">1</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">1</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">1</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">1</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">EBS</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">walleye pollock</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">walleye_pollock_test</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">21,740</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86"></span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86"></span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86"></span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">delta_gamma</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">TRUE</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">iid, iid</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">05_1</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">factor(year)2015</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">19.77117</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">1,391.123</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">-2,706.781</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">2,746.323</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">2</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">2</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">2</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">2</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">2</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">2</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">EBS</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">walleye pollock</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">walleye_pollock_test</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">21,740</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86"></span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86"></span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86"></span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">delta_gamma</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">TRUE</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">iid, iid</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">05_1</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">factor(year)2016</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">19.90634</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">1,384.990</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">-2,694.625</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">2,734.437</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">3</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">3</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">3</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">3</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">3</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">3</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">EBS</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">walleye pollock</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">walleye_pollock_test</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">21,740</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86"></span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86"></span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86"></span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">delta_gamma</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">TRUE</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">iid, iid</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">05_1</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">factor(year)2017</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">19.86007</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">1,340.321</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">-2,607.120</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">2,646.840</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">4</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">4</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">4</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">4</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">4</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">4</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">EBS</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">walleye pollock</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">walleye_pollock_test</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">21,740</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86"></span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86"></span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86"></span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">delta_gamma</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">TRUE</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">iid, iid</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">05_1</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">factor(year)2018</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">19.80071</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">1,454.167</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">-2,830.315</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">2,869.916</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">5</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">5</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">5</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">5</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">5</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">5</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">EBS</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">walleye pollock</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">walleye_pollock_test</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">21,740</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86"></span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86"></span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86"></span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">delta_gamma</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">TRUE</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">iid, iid</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">05_1</span></p></td>
+<td class="cl-95ffb5e2"><p class="cl-95ff6ac4"><span class="cl-95f49f86">factor(year)2019</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">20.11844</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">1,272.466</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">-2,473.869</span></p></td>
+<td class="cl-95ffb5d8"><p class="cl-95ff6ab0"><span class="cl-95f49f86">2,514.106</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-95ffb5ec"><p class="cl-95ff6ab0"><span class="cl-95f49f86">6</span></p></td>
+<td class="cl-95ffb5ec"><p class="cl-95ff6ab0"><span class="cl-95f49f86">6</span></p></td>
+<td class="cl-95ffb5ec"><p class="cl-95ff6ab0"><span class="cl-95f49f86">6</span></p></td>
+<td class="cl-95ffb5ec"><p class="cl-95ff6ab0"><span class="cl-95f49f86">6</span></p></td>
+<td class="cl-95ffb5ec"><p class="cl-95ff6ab0"><span class="cl-95f49f86">6</span></p></td>
+<td class="cl-95ffb5ec"><p class="cl-95ff6ab0"><span class="cl-95f49f86">6</span></p></td>
+<td class="cl-95ffb5ed"><p class="cl-95ff6ac4"><span class="cl-95f49f86">EBS</span></p></td>
+<td class="cl-95ffb5ed"><p class="cl-95ff6ac4"><span class="cl-95f49f86">walleye pollock</span></p></td>
+<td class="cl-95ffb5ed"><p class="cl-95ff6ac4"><span class="cl-95f49f86">walleye_pollock_test</span></p></td>
+<td class="cl-95ffb5ec"><p class="cl-95ff6ab0"><span class="cl-95f49f86">21,740</span></p></td>
+<td class="cl-95ffb5ec"><p class="cl-95ff6ab0"><span class="cl-95f49f86"></span></p></td>
+<td class="cl-95ffb5ec"><p class="cl-95ff6ab0"><span class="cl-95f49f86"></span></p></td>
+<td class="cl-95ffb5ec"><p class="cl-95ff6ab0"><span class="cl-95f49f86"></span></p></td>
+<td class="cl-95ffb5ed"><p class="cl-95ff6ac4"><span class="cl-95f49f86">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-95ffb5ed"><p class="cl-95ff6ac4"><span class="cl-95f49f86">delta_gamma</span></p></td>
+<td class="cl-95ffb5ec"><p class="cl-95ff6ab0"><span class="cl-95f49f86">TRUE</span></p></td>
+<td class="cl-95ffb5ed"><p class="cl-95ff6ac4"><span class="cl-95f49f86">iid, iid</span></p></td>
+<td class="cl-95ffb5ed"><p class="cl-95ff6ac4"><span class="cl-95f49f86">05_1</span></p></td>
+<td class="cl-95ffb5ed"><p class="cl-95ff6ac4"><span class="cl-95f49f86">factor(year)2021</span></p></td>
+<td class="cl-95ffb5ec"><p class="cl-95ff6ab0"><span class="cl-95f49f86">19.71943</span></p></td>
+<td class="cl-95ffb5ec"><p class="cl-95ff6ab0"><span class="cl-95f49f86">1,278.253</span></p></td>
+<td class="cl-95ffb5ec"><p class="cl-95ff6ab0"><span class="cl-95f49f86">-2,485.611</span></p></td>
+<td class="cl-95ffb5ec"><p class="cl-95ff6ab0"><span class="cl-95f49f86">2,525.050</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">i</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">+</span> <span class="va">i</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tables</span><span class="op">)</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "fit_pars"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tables</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/flextable.html" class="external-link">flextable</a></span><span class="op">(</span><span class="op">)</span> </span></code></pre></div>
+<div class="tabwid">
+<style>.cl-96708f10{}.cl-9658dfc8{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-9660c850{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-9660c864{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-966105ae{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-966105b8{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-966105c2{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-966105c3{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-966105cc{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-966105cd{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-96708f10">
+<thead><tr style="overflow-wrap:break-word;">
+<th class="cl-966105ae"><p class="cl-9660c850"><span class="cl-9658dfc8">X.5</span></p></th>
+<th class="cl-966105ae"><p class="cl-9660c850"><span class="cl-9658dfc8">X.4</span></p></th>
+<th class="cl-966105ae"><p class="cl-9660c850"><span class="cl-9658dfc8">X.3</span></p></th>
+<th class="cl-966105ae"><p class="cl-9660c850"><span class="cl-9658dfc8">X.2</span></p></th>
+<th class="cl-966105ae"><p class="cl-9660c850"><span class="cl-9658dfc8">X.1</span></p></th>
+<th class="cl-966105ae"><p class="cl-9660c850"><span class="cl-9658dfc8">X</span></p></th>
+<th class="cl-966105b8"><p class="cl-9660c864"><span class="cl-9658dfc8">srvy</span></p></th>
+<th class="cl-966105b8"><p class="cl-9660c864"><span class="cl-9658dfc8">common_name</span></p></th>
+<th class="cl-966105b8"><p class="cl-9660c864"><span class="cl-9658dfc8">file_name</span></p></th>
+<th class="cl-966105ae"><p class="cl-9660c850"><span class="cl-9658dfc8">species_code</span></p></th>
+<th class="cl-966105ae"><p class="cl-9660c850"><span class="cl-9658dfc8">filter_lat_lt</span></p></th>
+<th class="cl-966105ae"><p class="cl-9660c850"><span class="cl-9658dfc8">filter_lat_gt</span></p></th>
+<th class="cl-966105ae"><p class="cl-9660c850"><span class="cl-9658dfc8">filter_depth</span></p></th>
+<th class="cl-966105b8"><p class="cl-9660c864"><span class="cl-9658dfc8">model_fn</span></p></th>
+<th class="cl-966105b8"><p class="cl-9660c864"><span class="cl-9658dfc8">model_family</span></p></th>
+<th class="cl-966105ae"><p class="cl-9660c850"><span class="cl-9658dfc8">model_anisotropy</span></p></th>
+<th class="cl-966105b8"><p class="cl-9660c864"><span class="cl-9658dfc8">model_spatiotemporal</span></p></th>
+<th class="cl-966105b8"><p class="cl-9660c864"><span class="cl-9658dfc8">effort</span></p></th>
+<th class="cl-966105b8"><p class="cl-9660c864"><span class="cl-9658dfc8">term</span></p></th>
+<th class="cl-966105ae"><p class="cl-9660c850"><span class="cl-9658dfc8">estimate</span></p></th>
+<th class="cl-966105ae"><p class="cl-9660c850"><span class="cl-9658dfc8">std.error</span></p></th>
+<th class="cl-966105ae"><p class="cl-9660c850"><span class="cl-9658dfc8">conf.low</span></p></th>
+<th class="cl-966105ae"><p class="cl-9660c850"><span class="cl-9658dfc8">conf.high</span></p></th>
+</tr></thead>
+<tbody>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">1</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">1</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">1</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">1</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">1</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">1</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">EBS</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">walleye pollock</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">walleye_pollock_test</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">21,740</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">delta_gamma</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">TRUE</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">iid, iid</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">05_1</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">range</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">3.7298099</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">3,393.6903</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">0</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">Inf</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">2</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">2</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">2</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">2</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">2</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">2</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">EBS</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">walleye pollock</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">walleye_pollock_test</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">21,740</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">delta_gamma</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">TRUE</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">iid, iid</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">05_1</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">sigma_O</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">0.1812892</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">140.5073</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">0</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">Inf</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">3</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">3</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">3</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">3</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">3</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">3</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">EBS</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">walleye pollock</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">walleye_pollock_test</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">21,740</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">delta_gamma</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">TRUE</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">iid, iid</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">05_1</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">sigma_E</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">0.3717503</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">336.2267</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">0</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">Inf</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">4</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">4</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">4</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">4</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">4</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">EBS</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">walleye pollock</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">walleye_pollock_test</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">21,740</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">delta_gamma</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">TRUE</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">iid, iid</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">05_2</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">range</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">2.8284007</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">5</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">5</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">5</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">5</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">5</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">EBS</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">walleye pollock</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">walleye_pollock_test</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">21,740</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">delta_gamma</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">TRUE</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">iid, iid</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">05_2</span></p></td>
+<td class="cl-966105c3"><p class="cl-9660c864"><span class="cl-9658dfc8">sigma_O</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8">0.2820909</span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105c2"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-966105cc"><p class="cl-9660c850"><span class="cl-9658dfc8">6</span></p></td>
+<td class="cl-966105cc"><p class="cl-9660c850"><span class="cl-9658dfc8">6</span></p></td>
+<td class="cl-966105cc"><p class="cl-9660c850"><span class="cl-9658dfc8">6</span></p></td>
+<td class="cl-966105cc"><p class="cl-9660c850"><span class="cl-9658dfc8">6</span></p></td>
+<td class="cl-966105cc"><p class="cl-9660c850"><span class="cl-9658dfc8">6</span></p></td>
+<td class="cl-966105cc"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105cd"><p class="cl-9660c864"><span class="cl-9658dfc8">EBS</span></p></td>
+<td class="cl-966105cd"><p class="cl-9660c864"><span class="cl-9658dfc8">walleye pollock</span></p></td>
+<td class="cl-966105cd"><p class="cl-9660c864"><span class="cl-9658dfc8">walleye_pollock_test</span></p></td>
+<td class="cl-966105cc"><p class="cl-9660c850"><span class="cl-9658dfc8">21,740</span></p></td>
+<td class="cl-966105cc"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105cc"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105cc"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105cd"><p class="cl-9660c864"><span class="cl-9658dfc8">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-966105cd"><p class="cl-9660c864"><span class="cl-9658dfc8">delta_gamma</span></p></td>
+<td class="cl-966105cc"><p class="cl-9660c850"><span class="cl-9658dfc8">TRUE</span></p></td>
+<td class="cl-966105cd"><p class="cl-9660c864"><span class="cl-9658dfc8">iid, iid</span></p></td>
+<td class="cl-966105cd"><p class="cl-9660c864"><span class="cl-9658dfc8">05_2</span></p></td>
+<td class="cl-966105cd"><p class="cl-9660c864"><span class="cl-9658dfc8">sigma_E</span></p></td>
+<td class="cl-966105cc"><p class="cl-9660c850"><span class="cl-9658dfc8">0.2820909</span></p></td>
+<td class="cl-966105cc"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105cc"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+<td class="cl-966105cc"><p class="cl-9660c850"><span class="cl-9658dfc8"></span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">i</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">+</span> <span class="va">i</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tables</span><span class="op">)</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "fit_check"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tables</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/flextable.html" class="external-link">flextable</a></span><span class="op">(</span><span class="op">)</span> </span></code></pre></div>
+<div class="tabwid">
+<style>.cl-96d35bc2{}.cl-96bd1e48{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-96c3a006{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-96c3a01a{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-96c3db2a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-96c3db34{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-96c3db3e{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-96c3db3f{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-96c3db48{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-96c3db49{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-96d35bc2">
+<thead><tr style="overflow-wrap:break-word;">
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">X.5</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">X.4</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">X.3</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">X.2</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">X.1</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">X</span></p></th>
+<th class="cl-96c3db34"><p class="cl-96c3a01a"><span class="cl-96bd1e48">srvy</span></p></th>
+<th class="cl-96c3db34"><p class="cl-96c3a01a"><span class="cl-96bd1e48">common_name</span></p></th>
+<th class="cl-96c3db34"><p class="cl-96c3a01a"><span class="cl-96bd1e48">file_name</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">species_code</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">filter_lat_lt</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">filter_lat_gt</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">filter_depth</span></p></th>
+<th class="cl-96c3db34"><p class="cl-96c3a01a"><span class="cl-96bd1e48">model_fn</span></p></th>
+<th class="cl-96c3db34"><p class="cl-96c3a01a"><span class="cl-96bd1e48">model_family</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">model_anisotropy</span></p></th>
+<th class="cl-96c3db34"><p class="cl-96c3a01a"><span class="cl-96bd1e48">model_spatiotemporal</span></p></th>
+<th class="cl-96c3db34"><p class="cl-96c3a01a"><span class="cl-96bd1e48">effort</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">hessian_ok</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">eigen_values_ok</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">nlminb_ok</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">range_ok</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">gradients_ok</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">se_magnitude_ok</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">se_na_ok</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">sigmas_ok</span></p></th>
+<th class="cl-96c3db2a"><p class="cl-96c3a006"><span class="cl-96bd1e48">all_ok</span></p></th>
+</tr></thead>
+<tbody>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">1</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">1</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">1</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">1</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">1</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">1</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">EBS</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">walleye pollock</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">walleye_pollock_test</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">21,740</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">delta_gamma</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">iid, iid</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">05_1</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">2</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">2</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">2</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">2</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">2</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">EBS</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">walleye pollock</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">walleye_pollock_test</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">21,740</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">delta_gamma</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">iid, iid</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">05_2</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">3</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">3</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">3</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">3</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">EBS</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">walleye pollock</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">walleye_pollock_test</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">21,740</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">delta_gamma</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">iid, iid</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">05_3</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">4</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">4</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">4</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">EBS</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">walleye pollock</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">simple_walleye_pollock</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">21,740</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">delta_gamma</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">iid, iid</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">05_1</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">5</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">5</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">EBS</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">walleye pollock</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">simple_walleye_pollock</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">21,740</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">delta_gamma</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">iid, iid</span></p></td>
+<td class="cl-96c3db3f"><p class="cl-96c3a01a"><span class="cl-96bd1e48">05_2</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db3e"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48">6</span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db49"><p class="cl-96c3a01a"><span class="cl-96bd1e48">EBS</span></p></td>
+<td class="cl-96c3db49"><p class="cl-96c3a01a"><span class="cl-96bd1e48">walleye pollock</span></p></td>
+<td class="cl-96c3db49"><p class="cl-96c3a01a"><span class="cl-96bd1e48">simple_walleye_pollock</span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48">21,740</span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48"></span></p></td>
+<td class="cl-96c3db49"><p class="cl-96c3a01a"><span class="cl-96bd1e48">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-96c3db49"><p class="cl-96c3a01a"><span class="cl-96bd1e48">delta_gamma</span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db49"><p class="cl-96c3a01a"><span class="cl-96bd1e48">iid, iid</span></p></td>
+<td class="cl-96c3db49"><p class="cl-96c3a01a"><span class="cl-96bd1e48">05_3</span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48">TRUE</span></p></td>
+<td class="cl-96c3db48"><p class="cl-96c3a006"><span class="cl-96bd1e48">FALSE</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">i</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">+</span> <span class="va">i</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tables</span><span class="op">)</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "index"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tables</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/flextable.html" class="external-link">flextable</a></span><span class="op">(</span><span class="op">)</span> </span></code></pre></div>
+<div class="tabwid">
+<style>.cl-97356aa6{}.cl-971d77ca{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-97255a94{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-97255aa8{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-972596b2{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-972596bc{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-972596c6{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-972596c7{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-972596d0{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-972596d1{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-97356aa6">
+<thead><tr style="overflow-wrap:break-word;">
+<th class="cl-972596b2"><p class="cl-97255a94"><span class="cl-971d77ca">X.5</span></p></th>
+<th class="cl-972596b2"><p class="cl-97255a94"><span class="cl-971d77ca">X.4</span></p></th>
+<th class="cl-972596b2"><p class="cl-97255a94"><span class="cl-971d77ca">X.3</span></p></th>
+<th class="cl-972596b2"><p class="cl-97255a94"><span class="cl-971d77ca">X.2</span></p></th>
+<th class="cl-972596b2"><p class="cl-97255a94"><span class="cl-971d77ca">X.1</span></p></th>
+<th class="cl-972596b2"><p class="cl-97255a94"><span class="cl-971d77ca">X</span></p></th>
+<th class="cl-972596bc"><p class="cl-97255aa8"><span class="cl-971d77ca">srvy</span></p></th>
+<th class="cl-972596bc"><p class="cl-97255aa8"><span class="cl-971d77ca">common_name</span></p></th>
+<th class="cl-972596bc"><p class="cl-97255aa8"><span class="cl-971d77ca">file_name</span></p></th>
+<th class="cl-972596b2"><p class="cl-97255a94"><span class="cl-971d77ca">species_code</span></p></th>
+<th class="cl-972596b2"><p class="cl-97255a94"><span class="cl-971d77ca">filter_lat_lt</span></p></th>
+<th class="cl-972596b2"><p class="cl-97255a94"><span class="cl-971d77ca">filter_lat_gt</span></p></th>
+<th class="cl-972596b2"><p class="cl-97255a94"><span class="cl-971d77ca">filter_depth</span></p></th>
+<th class="cl-972596bc"><p class="cl-97255aa8"><span class="cl-971d77ca">model_fn</span></p></th>
+<th class="cl-972596bc"><p class="cl-97255aa8"><span class="cl-971d77ca">model_family</span></p></th>
+<th class="cl-972596b2"><p class="cl-97255a94"><span class="cl-971d77ca">model_anisotropy</span></p></th>
+<th class="cl-972596bc"><p class="cl-97255aa8"><span class="cl-971d77ca">model_spatiotemporal</span></p></th>
+<th class="cl-972596bc"><p class="cl-97255aa8"><span class="cl-971d77ca">effort</span></p></th>
+<th class="cl-972596b2"><p class="cl-97255a94"><span class="cl-971d77ca">year</span></p></th>
+<th class="cl-972596b2"><p class="cl-97255a94"><span class="cl-971d77ca">est</span></p></th>
+<th class="cl-972596b2"><p class="cl-97255a94"><span class="cl-971d77ca">lwr</span></p></th>
+<th class="cl-972596b2"><p class="cl-97255a94"><span class="cl-971d77ca">upr</span></p></th>
+<th class="cl-972596b2"><p class="cl-97255a94"><span class="cl-971d77ca">log_est</span></p></th>
+<th class="cl-972596b2"><p class="cl-97255a94"><span class="cl-971d77ca">se</span></p></th>
+<th class="cl-972596bc"><p class="cl-97255aa8"><span class="cl-971d77ca">type</span></p></th>
+</tr></thead>
+<tbody>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">1</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">1</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">1</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">1</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">1</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">1</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">EBS</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">walleye pollock</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">walleye_pollock_test</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">21,740</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca"></span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca"></span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca"></span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">delta_gamma</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">TRUE</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">iid, iid</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">05_1</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">2,015</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">311,329,658</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">254,290,109</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">381,163,688</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">19.55636</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">0.1032552</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">index</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">2</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">2</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">2</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">2</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">2</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">2</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">EBS</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">walleye pollock</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">walleye_pollock_test</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">21,740</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca"></span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca"></span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca"></span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">delta_gamma</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">TRUE</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">iid, iid</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">05_1</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">2,016</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">245,697,312</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">201,795,592</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">299,150,087</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">19.31961</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">0.1004330</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">index</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">3</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">3</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">3</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">3</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">3</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">3</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">EBS</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">walleye pollock</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">walleye_pollock_test</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">21,740</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca"></span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca"></span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca"></span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">delta_gamma</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">TRUE</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">iid, iid</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">05_1</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">2,017</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">241,587,105</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">198,504,083</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">294,020,799</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">19.30274</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">0.1002163</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">index</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">4</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">4</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">4</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">4</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">4</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">4</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">EBS</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">walleye pollock</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">walleye_pollock_test</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">21,740</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca"></span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca"></span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca"></span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">delta_gamma</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">TRUE</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">iid, iid</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">05_1</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">2,018</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">127,954,658</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">101,264,147</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">161,680,073</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">18.66719</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">0.1193611</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">index</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">5</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">5</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">5</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">5</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">5</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">5</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">EBS</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">walleye pollock</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">walleye_pollock_test</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">21,740</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca"></span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca"></span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca"></span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">delta_gamma</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">TRUE</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">iid, iid</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">05_1</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">2,019</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">206,496,853</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">166,663,257</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">255,850,936</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">19.14580</span></p></td>
+<td class="cl-972596c6"><p class="cl-97255a94"><span class="cl-971d77ca">0.1093438</span></p></td>
+<td class="cl-972596c7"><p class="cl-97255aa8"><span class="cl-971d77ca">index</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-972596d0"><p class="cl-97255a94"><span class="cl-971d77ca">6</span></p></td>
+<td class="cl-972596d0"><p class="cl-97255a94"><span class="cl-971d77ca">6</span></p></td>
+<td class="cl-972596d0"><p class="cl-97255a94"><span class="cl-971d77ca">6</span></p></td>
+<td class="cl-972596d0"><p class="cl-97255a94"><span class="cl-971d77ca">6</span></p></td>
+<td class="cl-972596d0"><p class="cl-97255a94"><span class="cl-971d77ca">6</span></p></td>
+<td class="cl-972596d0"><p class="cl-97255a94"><span class="cl-971d77ca">6</span></p></td>
+<td class="cl-972596d1"><p class="cl-97255aa8"><span class="cl-971d77ca">EBS</span></p></td>
+<td class="cl-972596d1"><p class="cl-97255aa8"><span class="cl-971d77ca">walleye pollock</span></p></td>
+<td class="cl-972596d1"><p class="cl-97255aa8"><span class="cl-971d77ca">walleye_pollock_test</span></p></td>
+<td class="cl-972596d0"><p class="cl-97255a94"><span class="cl-971d77ca">21,740</span></p></td>
+<td class="cl-972596d0"><p class="cl-97255a94"><span class="cl-971d77ca"></span></p></td>
+<td class="cl-972596d0"><p class="cl-97255a94"><span class="cl-971d77ca"></span></p></td>
+<td class="cl-972596d0"><p class="cl-97255a94"><span class="cl-971d77ca"></span></p></td>
+<td class="cl-972596d1"><p class="cl-97255aa8"><span class="cl-971d77ca">total_catch_wt_kg ~ 0 + factor(year)</span></p></td>
+<td class="cl-972596d1"><p class="cl-97255aa8"><span class="cl-971d77ca">delta_gamma</span></p></td>
+<td class="cl-972596d0"><p class="cl-97255a94"><span class="cl-971d77ca">TRUE</span></p></td>
+<td class="cl-972596d1"><p class="cl-97255aa8"><span class="cl-971d77ca">iid, iid</span></p></td>
+<td class="cl-972596d1"><p class="cl-97255aa8"><span class="cl-971d77ca">05_1</span></p></td>
+<td class="cl-972596d0"><p class="cl-97255a94"><span class="cl-971d77ca">2,021</span></p></td>
+<td class="cl-972596d0"><p class="cl-97255a94"><span class="cl-971d77ca">142,822,421</span></p></td>
+<td class="cl-972596d0"><p class="cl-97255a94"><span class="cl-971d77ca">115,820,004</span></p></td>
+<td class="cl-972596d0"><p class="cl-97255a94"><span class="cl-971d77ca">176,120,214</span></p></td>
+<td class="cl-972596d0"><p class="cl-97255a94"><span class="cl-971d77ca">18.77711</span></p></td>
+<td class="cl-972596d0"><p class="cl-97255a94"><span class="cl-971d77ca">0.1069228</span></p></td>
+<td class="cl-972596d1"><p class="cl-97255aa8"><span class="cl-971d77ca">index</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

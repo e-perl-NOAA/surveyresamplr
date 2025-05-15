@@ -1,0 +1,4 @@
+"","srvy","common_name","species_code","filter_lat_lt","filter_lat_gt","filter_depth","model_fn","model_family","model_anisotropy","model_spatiotemporal","file_name","effort","term","estimate","std.error","conf.low","conf.high"
+"1","AI","Pacific cod","21720",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","pacific_cod","08_3","range","4.36201200733305","NaN","NaN","NaN"
+"2","AI","Pacific cod","21720",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","pacific_cod","08_3","sigma_O","0.297303743740809","NaN","NaN","NaN"
+"3","AI","Pacific cod","21720",NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma","TRUE","iid, iid","pacific_cod","08_3","sigma_E","0.253064412154901","NaN","NaN","NaN"
