@@ -13,7 +13,10 @@
 #' @param spp_info information about the species test run. 
 #' @param n_knots Numeric. 
 #' names(speciesname_df)
+#' 
 #' @import sdmTMB
+#' @importFrom stats predict
+#' 
 #' @export
 #' @examples 
 #' \dontrun{

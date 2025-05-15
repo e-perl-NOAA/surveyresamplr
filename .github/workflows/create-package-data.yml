@@ -1,0 +1,73 @@
+name: create-package-data
+on:
+  pull-request:
+    branches:
+      - main
+    paths:
+      - inst/r/data_dl_ak.R
+      - inst/r/data_dl_ne.R
+      - inst/r/data_dl_nw.R
+      - inst/r/data_documentation.R
+  push:
+    branches:
+      - main
+    paths:
+      - inst/r/data_dl_ak.R
+      - inst/r/data_dl_ne.R
+      - inst/r/data_dl_nw.R
+      - inst/r/data_documentation.R
+jobs:
+  create-package-data:
+      runs-on: ubuntu-latest
+      env:
+        R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+        GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+        R_KEEP_PKG_SOURCE: yes
+        
+      steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        
+      - name: Install libcurl and other necessary linux packages
+        run: |
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+          sudo apt-get update
+          sudo apt-get install --only-upgrade libstdc++6
+          sudo apt-get install -y libcurl4-openssl-dev
+          sudo apt-get install -y libfontconfig1-dev
+      
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+      
+      - name: Install R package dependencies
+        run: |
+          install.packages(c("devtools", "remotes")
+          PKG <- c(
+            "jsonlite","httr","sp","RODBC","roxygen2","usethis",
+            "plyr","dplyr","magrittr","tidyr","ggplot2","tibble","janitor","here",
+            "readr","akgfmaps","coldpool","nwfscSurvey","sf","ggspatial","FishStatsUtils",
+            "fontawesome","rmarkdown"
+          )
+          source("inst/r/pkg_install.R")
+          base::lapply(unique(PKG), pkg_install)
+        shell: Rscript {0}
+        
+      - name: Create data_documentation function and run scripts to create regional data
+        run: |
+          source(here::here("inst", "r", "data_documentation.R"))
+          source(here::here("inst", "r", "data_dl_nw.R"))
+          source(here::here("inst", "r", "data_dl_ne.R"))
+          source(here::here("inst", "r", "data_dl_ak.R"))
+          
+          rmarkdown::render(here::here("inst", "r", "README.Rmd"),
+                  output_dir = "./",
+                  output_file = "README.md")
+        shell: Rscript {0}
+        
+      - name: Commit changes to regional data
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'Update regional data'
+        
+      
+        

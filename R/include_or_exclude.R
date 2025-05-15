@@ -15,6 +15,7 @@
 #' names(props) <- "trawlid"
 #' props <- base::rep(props, length(tows))
 #' tows_assigned <- purrr::map2(tows, props, include_or_exclude, replicate_num = 10)
+#' 
 #' @export
 #' @return List of dataframes with random assignments of which data to include
 #'

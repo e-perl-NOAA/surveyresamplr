@@ -71,7 +71,9 @@ data_documentation <- function(dat, title, obj_name, author, source, details, de
                          "biomass_mt", "biomass_var", 
                          "population_count", "population_var", 
                          "survey_definition_id", "area_id", 
-                         "file_name", "salinity_bottom"), 
+                         "file_name", "salinity_bottom",
+                         "age", "length_cm", "sex", "area_swept_ha" ,
+                         "total_catch_numbers", "project"), 
     metadata_colname_long = c("Abbreviated survey names", "Trawl ID", "Taxon common name", "Taxon scientific name", 
                               "Taxon count", "Specimen weight (g)", "Weight CPUE (kg/km2)", 
                               "Latitude (decimal degrees)", "Longitude (decimal degrees)", 
@@ -80,7 +82,9 @@ data_documentation <- function(dat, title, obj_name, author, source, details, de
                               "Estimated biomass", "Estimated biomass variance", 
                               "Estimated population", "Estimated population variance", 
                               "Survey ID", "Area ID", 
-                              "File name", "Bottom salinity"), 
+                              "File name", "Bottom salinity",
+                              "Age", "Length (cm)", "Sex", "Area swept (ha)", 
+                              "Total catch (numbers)", "Project"), 
     metadata_colname_desc = c("Abbreviated survey names. ", 
                               "This is a unique numeric identifier assigned to each (vessel, cruise, and haul) combination.", 
                               "The common name of the marine organism associated with the scientific_name and species_code columns.", 
@@ -104,7 +108,13 @@ data_documentation <- function(dat, title, obj_name, author, source, details, de
                               "The survey definition ID key code is an integer that uniquely identifies a survey region/survey design. The column survey_definition_id is associated with the srvy and survey columns. ", 
                               "Area ID key code for each statistical area used to produce production estimates (e.g., biomass, population, age comps, length comps). Each area ID is unique within each survey.", 
                               "Name of origonal source file.  ", 
-                              "Bottom salinity (parts per million); NA indicates removed or missing values."
+                              "Bottom salinity (parts per million); NA indicates removed or missing values.",
+                              "Age of fish (years).",
+                              "Length of fish in centimeters.",
+                              "Sex of fish F = female, M = male, U = unsexed.",
+                              "Area swept for each tow in hectares.",
+                              "Total catch in numbers for each tow.",
+                              "Survey project name. This is exclusively used for NWFSC surveys."
     )
   )
   

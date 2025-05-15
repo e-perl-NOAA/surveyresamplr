@@ -24,6 +24,8 @@ pkg_install <- function(p){
       devtools::install_github("afsc-gap-products/gapctd")
     } else if (p == 'gapindex') {
       remotes::install_github("afsc-gap-products/gapindex")
+    } else if (p == "FishStatsUtils") {
+      remotes::install_github("James-Thorson/FishStatsUtils")
     } else {
       install.packages(p)
     }
