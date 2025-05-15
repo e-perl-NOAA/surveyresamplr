@@ -19,21 +19,13 @@ knitr::opts_chunk$set(
 # get rid of memory limits
 options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
 
-# Set directories --------------------------------------------------------------
-library(here)
-
-wd <- paste0(here::here(),"/vignettes/")
-dir_out <- paste0(wd, "output/")
-dir_final <- paste0(dir_out, "CA_0results/")
-crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
-
 # Install Libraries ------------------------------------------------------------
+library(surveyresamplr)
 
 # Here we list all the packages we will need for this whole process
 # We'll also use this in our works cited page. 
 PKG <- c(
-  "surveyresamplr",
-
+  "here",
   # tidyverse
   "dplyr",
   "magrittr",
@@ -42,7 +34,7 @@ PKG <- c(
   "ggplot2", 
   "tibble",
   "janitor", 
-  "data.table", 
+  # "data.table", 
   
   # parallelizing
   "forcats",
@@ -62,16 +54,22 @@ PKG <- c(
   "MASS",
   "cluster", 
   "TMB", 
-  "INLA" 
+  "INLA"
 )
 
 pkg_install <- function(p){
-  if(!require(p, character.only = TRUE)) {
-    install.packages(p)
-  }
+  install.packages(p)
   require(p, character.only = TRUE)
 }
 base::lapply(unique(PKG), pkg_install)
+
+# Set directories --------------------------------------------------------------
+wd <- paste0(here::here(),"/vignettes/")
+dir_out <- paste0(wd, "output/")
+dir.create(dir_out)
+dir_final <- paste0(dir_out, "CA_0results/")
+dir.create(dir_final)
+crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
 ```
 
 ```{r eval = FALSE}
@@ -149,10 +147,11 @@ spp_list <- spp_list[1:2,] # for testing
 
 # source(paste0(wd, "code/data_dl_nw.r"))
 catch <- surveyresamplr::noaa_nwfsc_catch #pulled data again to get 2024
+bio <- surveyresamplr::noaa_nwfsc_bio
 
 ### Load grid data -------------------------------------------------------------
 
-grid_yrs <- replicate_df(
+grid_yrs <- sdmTMB::replicate_df(
   dat = surveyresamplr::noaa_nwfsc_pred_grid_depth, 
   time_name = "year", 
   time_values = unique(catch$year))
@@ -174,13 +173,21 @@ replicate_num <- 10
 ### Run ------------------------------------------------------------------------
 
 sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
-map(
+purrr::map(
   1:nrow(spp_list), 
   ~ clean_and_resample(spp_list[.x,], 
-                       catch, seq_from, seq_to, seq_by, 
-                       tot_dataframes, replicate_num, grid_yrs, dir_out))
+                       catch,
+                       seq_from, 
+                       seq_to, 
+                       seq_by, 
+                       tot_dataframes, 
+                       replicate_num, 
+                       grid_yrs, 
+                       dir_out,
+                       n_knots = 500,
+                       bio = bio))
 sink()
-```
+``` 
 
 ```{r results-run, eval = TRUE}
 ### Plot indices ---------------------------------------------------------------
@@ -192,3 +199,6 @@ out <- plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final)
 # load(file = paste0(dir_out, paste0(srvy, "_simple_0figures/figures.rdata")), verbose = TRUE)
 out$plots
 ```
+
+
+
