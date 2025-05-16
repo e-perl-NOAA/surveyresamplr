@@ -42,16 +42,16 @@
 #'                        model_anisotropy = TRUE
 #'                        model_spatiotemporal = c("iid, iid")
 #'                       )
-#' clean_and_resample(spp_info = spp_list, 
-#'                    catch, 
-#'                    seq_from = 0.1, 
-#'                    seq_to = 1, 
-#'                    seq_by = 0.1, 
-#'                    tot_dataframes = 91, 
-#'                    replicate_num = 10, 
-#'                    grid_yrs = grid_yrs, 
+#' clean_and_resample(spp_info = spp_list,
+#'                    catch,
+#'                    seq_from = 0.1,
+#'                    seq_to = 1,
+#'                    seq_by = 0.1,
+#'                    tot_dataframes = 91,
+#'                    replicate_num = 10,
+#'                    grid_yrs = grid_yrs,
 #'                    dir_out = dir_out))
-#' 
+#'
 #'                    bio = bio))
 #'
 clean_and_resample <- function(
@@ -69,7 +69,6 @@ clean_and_resample <- function(
   model_type = "wrapper_sdmtmb",
   bio = NULL
 ) {
-  
   message(paste0(spp_info$srvy, " ", spp_info$common_name))
   # check input variables
   ## do all of the model function variables exist in grid_yrs and the catch data?
@@ -111,20 +110,21 @@ clean_and_resample <- function(
     tot_dataframes = tot_dataframes,
     replicate_num = replicate_num
   )
-  
-  try({
-    resample_tests(
-      spp_dfs = spp_dfs, 
-      spp_info = spp_info, 
-      grid_yrs = grid_yrs, 
-      dir_out = dir_out, 
-      test = test, 
-      n_knots = n_knots, 
-      model_type = model_type
-    ) 
-  }, silent = FALSE)
-}
 
+  try(
+    {
+      resample_tests(
+        spp_dfs = spp_dfs,
+        spp_info = spp_info,
+        grid_yrs = grid_yrs,
+        dir_out = dir_out,
+        test = test,
+        n_knots = n_knots,
+        model_type = model_type
+      )
+    },
+    silent = FALSE
+  )
 
   if (!is.null(bio)) {
     bio_df <- bio |>
