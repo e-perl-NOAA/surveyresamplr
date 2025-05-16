@@ -50,9 +50,8 @@
 #'                    tot_dataframes = 91,
 #'                    replicate_num = 10,
 #'                    grid_yrs = grid_yrs,
-#'                    dir_out = dir_out))
-#'
-#'                    bio = bio))
+#'                    dir_out = dir_out,
+#'                    bio = bio)
 #'
 clean_and_resample <- function(
   spp_info,
