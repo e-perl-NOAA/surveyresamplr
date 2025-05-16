@@ -17,35 +17,38 @@
 #'
 #' @examples
 #' catch <- surveyresamplr::noaa_nwfsc_catch
-#' spp_list <- data.frame(srvy = "CA",
-#'                        common_name = "arrowtooth flounder",
-#'                        file_name = "arrowtooth_flounder",
-#'                        filter_lat_gt = 34,
-#'                        filter_lat_lt = NA,
-#'                        filter_depth = NA,
-#'                        model_fn = "total_catch_wt_kg ~ 0 + factor(year) + pass",
-#'                        model_family = "delta_gamma",
-#'                        model_anisotropy = TRUE,
-#'                        model_spatiotemporal = "iid, iid")
-#' cleanup_by_species(catch = catch,
-#'                    spp_info = spp_info,
-#'                    seq_from = 0.1,
-#'                    seq_to = 1,
-#'                    seq_by = 0.1,
-#'                    tot_dataframes = 91,
-#'                    replicate_num = 10)
+#' spp_list <- data.frame(
+#'   srvy = "CA",
+#'   common_name = "arrowtooth flounder",
+#'   file_name = "arrowtooth_flounder",
+#'   filter_lat_gt = 34,
+#'   filter_lat_lt = NA,
+#'   filter_depth = NA,
+#'   model_fn = "total_catch_wt_kg ~ 0 + factor(year) + pass",
+#'   model_family = "delta_gamma",
+#'   model_anisotropy = TRUE,
+#'   model_spatiotemporal = "iid, iid"
+#' )
+#' cleanup_by_species(
+#'   catch = catch,
+#'   spp_info = spp_info,
+#'   seq_from = 0.1,
+#'   seq_to = 1,
+#'   seq_by = 0.1,
+#'   tot_dataframes = 91,
+#'   replicate_num = 10
+#' )
 #' @export
 #' @return List of resampled catch dataframes
 #'
 cleanup_by_species <- function(
-  catch,
-  spp_info,
-  seq_from = 0.1,
-  seq_to = 1.0,
-  seq_by = 0.1,
-  tot_dataframes = 91,
-  replicate_num = 10
-) {
+    catch,
+    spp_info,
+    seq_from = 0.1,
+    seq_to = 1.0,
+    seq_by = 0.1,
+    tot_dataframes = 91,
+    replicate_num = 10) {
   # Filter the catch data frame by species
   df <- catch %>%
     dplyr::filter(

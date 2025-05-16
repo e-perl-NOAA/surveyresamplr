@@ -15,11 +15,10 @@ knitr::opts_chunk$set(
 ```
 
 ```{r eval = TRUE}
-
 # Set directories --------------------------------------------------------------
 library(here)
 
-wd <- paste0(here::here(),"/vignettes/")
+wd <- paste0(here::here(), "/vignettes/")
 dir_out <- paste0(wd, "output/")
 dir_final <- paste0(dir_out, "CA_0results/")
 ```
@@ -27,13 +26,13 @@ dir_final <- paste0(dir_out, "CA_0results/")
 
 ```{r eval = FALSE}
 # get rid of memory limits
-options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
+options(future.globals.maxSize = 1 * 1024^4) # Allow up to 1 TB for globals
 
 # Install Libraries ------------------------------------------------------------
 library(surveyresamplr)
 
 # Here we list all the packages we will need for this whole process
-# We'll also use this in our works cited page. 
+# We'll also use this in our works cited page.
 PKG <- c(
   "here",
   # tidyverse
@@ -42,33 +41,33 @@ PKG <- c(
   "magrittr",
   "tidyr",
   "viridis",
-  "ggplot2", 
+  "ggplot2",
   "tibble",
-  "janitor", 
-  # "data.table", 
-  
+  "janitor",
+  # "data.table",
+
   # parallelizing
   "forcats",
   "purrr",
-  "furrr", 
+  "furrr",
   "doParallel",
-  
+
   # sampling
   "sampling",
-  
+
   # modeling
-  "arrow", 
-  "future.apply", 
-  "future.callr", 
+  "arrow",
+  "future.apply",
+  "future.callr",
   "sdmTMB", # install.packages("remotes"",; remotes::install_github("pbs-assess/sdmTMBextra", dependencies = TRUE",
-  "Matrix", 
+  "Matrix",
   "MASS",
-  "cluster", 
-  "TMB", 
+  "cluster",
+  "TMB",
   "INLA"
 )
 
-pkg_install <- function(p){
+pkg_install <- function(p) {
   install.packages(p)
   require(p, character.only = TRUE)
 }
@@ -77,17 +76,23 @@ base::lapply(unique(PKG), pkg_install)
 ### Define study species -------------------------------------------------------
 
 spp_list <- data.frame(
-  srvy = c("CA", "CA", "CA", "CA", "CA", "CA", "CA", "CA",
-           "CA", "CA", "CA", "CA", "CA", "CA", "CA", "CA"),
-  common_name = c("arrowtooth flounder", "bocaccio", "canary rockfish", "darkblotched rockfish",
-                  "Dover sole", "lingcod", "lingcod", "longnose skate",
-                  "Pacific ocean perch", "Pacific spiny dogfish",
-                  "petrale sole", "rex sole", "sablefish",
-                  "shortspine thornyhead", "yellowtail rockfish", "widow rockfish"),
-  file_name = c("arrowtooth_flounder", "bocaccio", "canary_rockfish", "darkblotched_rockfish",
-                "dover_sole", "lingcod_N", "lingcod_S", "longnose_skate",
-                "pacific_ocean_perch", "pacific_spiny_dogfish",  "petrale_sole", "rex_sole",
-                "sabefish", "shortspine_thornyhead" ,"yellowtail_rockfish", "widow_rockfish"),
+  srvy = c(
+    "CA", "CA", "CA", "CA", "CA", "CA", "CA", "CA",
+    "CA", "CA", "CA", "CA", "CA", "CA", "CA", "CA"
+  ),
+  common_name = c(
+    "arrowtooth flounder", "bocaccio", "canary rockfish", "darkblotched rockfish",
+    "Dover sole", "lingcod", "lingcod", "longnose skate",
+    "Pacific ocean perch", "Pacific spiny dogfish",
+    "petrale sole", "rex sole", "sablefish",
+    "shortspine thornyhead", "yellowtail rockfish", "widow rockfish"
+  ),
+  file_name = c(
+    "arrowtooth_flounder", "bocaccio", "canary_rockfish", "darkblotched_rockfish",
+    "dover_sole", "lingcod_N", "lingcod_S", "longnose_skate",
+    "pacific_ocean_perch", "pacific_spiny_dogfish", "petrale_sole", "rex_sole",
+    "sabefish", "shortspine_thornyhead", "yellowtail_rockfish", "widow_rockfish"
+  ),
   filter_lat_gt = c(34, NA, NA, 335, NA, 35, NA, NA, 35, NA, NA, NA, NA, NA, 35.5, 33.5),
   filter_lat_lt = c(NA, NA, NA, NA, NA, NA, 35, NA, NA, NA, NA, NA, NA, NA, NA, NA),
   filter_depth = c(NA, 500, 275, 675, NA, 450, 450, NA, 500, 700, 675, 700, NA, NA, 425, 675),
@@ -107,86 +112,96 @@ spp_list <- data.frame(
     "total_catch_wt_kg ~ 0 + factor(year) + pass",
     "total_catch_wt_kg ~ 0 + factor(year) + pass + depth_m + (depth_m^2)",
     "total_catch_wt_kg ~ 0 + factor(year) + pass",
-    "total_catch_wt_kg ~ 0 + factor(year) + pass"),
+    "total_catch_wt_kg ~ 0 + factor(year) + pass"
+  ),
   # model_fn = c( # name of funcion for sdm. Will build in specificity for this later
-    # "species_sdm_fn", "species_sdm_fn", "canary_sdm_fn", "darkblotched_sdm_fn",
+  # "species_sdm_fn", "species_sdm_fn", "canary_sdm_fn", "darkblotched_sdm_fn",
   # "species_sdm_fn", "species_sdm_fn", "species_sdm_fn", "species_sdm_fn",
   # "species_sdm_fn", "species_sdm_fn",
   # "species_sdm_lognormal_fn", "species_sdm_fn", "species_sdm_lognormal_fn"),
   # "shortspine_sdm_fn", "species_sdm_fn", "widow_sdm_fn"
-  model_family = c("delta_gamma", "delta_gamma", "delta_lognormal", "delta_lognormal",
-                   "delta_gamma", "delta_gamma", "delta_gamma", "delta_gamma",
-                   "delta_gamma", "delta_gamma",
-                   "delta_lognormal", "delta_gamma", "delta_lognormal",
-                   "delta_gamma", "delta_gamma", "delta_gamma"),
-  model_anisotropy = c(TRUE, TRUE, FALSE, TRUE, 
-                      TRUE, TRUE, TRUE, TRUE, 
-                      TRUE, TRUE, 
-                      TRUE, TRUE, TRUE, 
-                      TRUE, TRUE, TRUE),
-  model_spatiotemporal = c(c("iid, iid"), 
-                           c("iid, iid"), 
-                           c("iid, off"), 
-                           c("off, iid"), 
-                           c("iid, iid"), 
-                           c("iid, iid"), 
-                           c("iid, iid"), 
-                           c("iid, iid"), 
-                           c("iid, iid"), 
-                           c("iid, iid"), 
-                           c("iid, iid"), 
-                           c("iid, iid"), 
-                           c("iid, iid"), 
-                           c("iid, iid"), 
-                           c("iid, iid"), 
-                           c("off, off") )
+  model_family = c(
+    "delta_gamma", "delta_gamma", "delta_lognormal", "delta_lognormal",
+    "delta_gamma", "delta_gamma", "delta_gamma", "delta_gamma",
+    "delta_gamma", "delta_gamma",
+    "delta_lognormal", "delta_gamma", "delta_lognormal",
+    "delta_gamma", "delta_gamma", "delta_gamma"
+  ),
+  model_anisotropy = c(
+    TRUE, TRUE, FALSE, TRUE,
+    TRUE, TRUE, TRUE, TRUE,
+    TRUE, TRUE,
+    TRUE, TRUE, TRUE,
+    TRUE, TRUE, TRUE
+  ),
+  model_spatiotemporal = c(
+    c("iid, iid"),
+    c("iid, iid"),
+    c("iid, off"),
+    c("off, iid"),
+    c("iid, iid"),
+    c("iid, iid"),
+    c("iid, iid"),
+    c("iid, iid"),
+    c("iid, iid"),
+    c("iid, iid"),
+    c("iid, iid"),
+    c("iid, iid"),
+    c("iid, iid"),
+    c("iid, iid"),
+    c("iid, iid"),
+    c("off, off")
   )
+)
 
-spp_list <- spp_list[1:2,] # for testing
+spp_list <- spp_list[1:2, ] # for testing
 
 ### Load survey data -----------------------------------------------------------
 
 # source(paste0(wd, "code/data_dl_nw.r"))
-catch <- surveyresamplr::noaa_nwfsc_catch #pulled data again to get 2024
+catch <- surveyresamplr::noaa_nwfsc_catch # pulled data again to get 2024
 bio <- surveyresamplr::noaa_nwfsc_bio
 
 ### Load grid data -------------------------------------------------------------
 
 grid_yrs <- sdmTMB::replicate_df(
-  dat = surveyresamplr::noaa_nwfsc_pred_grid_depth, 
-  time_name = "year", 
-  time_values = unique(catch$year))
+  dat = surveyresamplr::noaa_nwfsc_pred_grid_depth,
+  time_name = "year",
+  time_values = unique(catch$year)
+)
 
 ### Variables ------------------------------------------------------------------
 
 srvy <- "CA"
-seq_from = 0.1
-seq_to = 1
-seq_by = 0.1
-tot_dataframes = 91
+seq_from <- 0.1
+seq_to <- 1
+seq_by <- 0.1
+tot_dataframes <- 91
 replicate_num <- 10
 
 ### Run ------------------------------------------------------------------------
 
-sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
+sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append = FALSE, split = TRUE) # for screen and log
 purrr::map(
-  1:nrow(spp_list), 
-  ~ clean_and_resample(spp_list[.x,], 
-                       catch,
-                       seq_from, 
-                       seq_to, 
-                       seq_by, 
-                       tot_dataframes, 
-                       replicate_num, 
-                       grid_yrs, 
-                       dir_out,
-                       n_knots = 500,
-                       bio = bio))
+  1:nrow(spp_list),
+  ~ clean_and_resample(spp_list[.x, ],
+    catch,
+    seq_from,
+    seq_to,
+    seq_by,
+    tot_dataframes,
+    replicate_num,
+    grid_yrs,
+    dir_out,
+    n_knots = 500,
+    bio = bio
+  )
+)
 sink()
 
 ### Plot indices ---------------------------------------------------------------
 
-out <- plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final) 
+out <- plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final)
 ```
 
 ```{r results-run, eval = TRUE, echo = FALSE}
@@ -204,30 +219,30 @@ Parameter output:
 ```{r results-tables-1}
 i <- 1
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>% 
-  flextable::flextable() 
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
 ```
 
 
 ```{r results-tables-2}
 i <- 1 + i
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>% 
-  flextable::flextable() 
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
 ```
 
 
 ```{r results-tables-3}
 i <- 1 + i
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>% 
-  flextable::flextable() 
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
 ```
 
 
 ```{r results-tables-4}
 i <- 1 + i
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>% 
-  flextable::flextable() 
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
 ```

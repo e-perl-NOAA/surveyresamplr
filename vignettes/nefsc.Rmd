@@ -15,20 +15,20 @@ knitr::opts_chunk$set(
 ```
 
 ```{r  eval = FALSE}
-#get rid of memory limits
-options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
+# get rid of memory limits
+options(future.globals.maxSize = 1 * 1024^4) # Allow up to 1 TB for globals
 
 # Set directories --------------------------------------------------------------
 library(here)
 
-wd <- paste0(here::here(),"/vignettes/")
+wd <- paste0(here::here(), "/vignettes/")
 dir_out <- paste0(wd, "output/")
 crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
 
 # Install Libraries ------------------------------------------------------------
 
 # Here we list all the packages we will need for this whole process
-# We'll also use this in our works cited page. 
+# We'll also use this in our works cited page.
 PKG <- c(
   "surveyresamplr",
 
@@ -37,34 +37,34 @@ PKG <- c(
   "magrittr",
   "tidyr",
   "viridis",
-  "ggplot2", 
+  "ggplot2",
   "tibble",
-  "janitor", 
-  "data.table", 
-  
+  "janitor",
+  "data.table",
+
   # parallelizing
   "forcats",
   "purrr",
-  "furrr", 
+  "furrr",
   "doParallel",
-  
+
   # sampling
   "sampling",
-  
+
   # modeling
-  "arrow", 
-  "future.apply", 
-  "future.callr", 
+  "arrow",
+  "future.apply",
+  "future.callr",
   "sdmTMB", # install.packages("remotes"",; remotes::install_github("pbs-assess/sdmTMBextra", dependencies = TRUE",
-  "Matrix", 
+  "Matrix",
   "MASS",
-  "cluster", 
-  "TMB", 
-  "INLA" 
+  "cluster",
+  "TMB",
+  "INLA"
 )
 
-pkg_install <- function(p){
-  if(!require(p, character.only = TRUE)) {
+pkg_install <- function(p) {
+  if (!require(p, character.only = TRUE)) {
     install.packages(p)
   }
   require(p, character.only = TRUE)
@@ -73,36 +73,41 @@ base::lapply(unique(PKG), pkg_install)
 
 ### Define study species -------------------------------------------------------
 
-spp_list <- 
+spp_list <-
   data.frame(
     srvy = "NWA_SPRING",
-    common_name = c("Atlantic herring", "black sea bass", "Atlantic cod", 
-                    "American lobster", "longfin squid", "mackerel", 
-                    "monkfish", "red hake", "scup", 
-                    "sea scallop", "silver hake", "summer flounder", 
-                    "winter flounder"),
-    file_name0 = c("AtlanticHerring", "BlackSeaBass", "Cod", 
-                  "Lobster", "LongfinSquid", "Mackerel", 
-                  "Monkfish", "RedHake", "Scup", 
-                  "SeaScallop", "SilverHake", "SummerFlounder", 
-                  "WinterFlounder"), 
-  filter_lat_lt = NA, 
-  filter_lat_gt = NA, 
-  filter_depth = NA, 
-  model_fn = "total_catch_wt_kg ~ 0 + factor(year)",
-  model_family = "delta_gamma",
-  model_anisotropy = TRUE,
-  model_spatiotemporal = c(c("iid, iid"))
-  ) %>% 
-  dplyr::mutate( 
-    file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
+    common_name = c(
+      "Atlantic herring", "black sea bass", "Atlantic cod",
+      "American lobster", "longfin squid", "mackerel",
+      "monkfish", "red hake", "scup",
+      "sea scallop", "silver hake", "summer flounder",
+      "winter flounder"
+    ),
+    file_name0 = c(
+      "AtlanticHerring", "BlackSeaBass", "Cod",
+      "Lobster", "LongfinSquid", "Mackerel",
+      "Monkfish", "RedHake", "Scup",
+      "SeaScallop", "SilverHake", "SummerFlounder",
+      "WinterFlounder"
+    ),
+    filter_lat_lt = NA,
+    filter_lat_gt = NA,
+    filter_depth = NA,
+    model_fn = "total_catch_wt_kg ~ 0 + factor(year)",
+    model_family = "delta_gamma",
+    model_anisotropy = TRUE,
+    model_spatiotemporal = c(c("iid, iid"))
+  ) %>%
+  dplyr::mutate(
+    file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))
+  )
 
-spp_list <- spp_list[1:3,]
+spp_list <- spp_list[1:3, ]
 
 ### Load survey data -----------------------------------------------------------
 
 # source(paste0(wd, "code/data_dl_ne.r"))
-catch <- surveyresamplr::noaa_nefsc_catch #pulled data again to get 2024
+catch <- surveyresamplr::noaa_nefsc_catch # pulled data again to get 2024
 
 ### Load grid data -------------------------------------------------------------
 
@@ -111,29 +116,31 @@ grid_yrs <- replicate_df(surveyresamplr::noaa_nefsc_pred_grid_depth, "year", uni
 ### Variables ------------------------------------------------------------------
 
 srvy <- "NWA_SPRING"
-seq_from = 0.2
-seq_to = 1.0
-seq_by = 0.2 
-tot_dataframes = 13
+seq_from <- 0.2
+seq_to <- 1.0
+seq_by <- 0.2
+tot_dataframes <- 13
 replicate_num <- 3
 
 ### Run ------------------------------------------------------------------------
 
-sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
+sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append = FALSE, split = TRUE) # for screen and log
 map(
-  1:nrow(spp_list), 
-  ~ clean_and_resample(spp_list[.x,], 
-                       catch, seq_from, seq_to, seq_by, 
-                       tot_dataframes, replicate_num, grid_yrs, dir_out, test = TRUE))
+  1:nrow(spp_list),
+  ~ clean_and_resample(spp_list[.x, ],
+    catch, seq_from, seq_to, seq_by,
+    tot_dataframes, replicate_num, grid_yrs, dir_out,
+    test = TRUE
+  )
+)
 sink()
 
 ### Plot indices --------------------------------------------------------------
 
-plot_results(srvy = srvy, dir_out = dir_out) 
+plot_results(srvy = srvy, dir_out = dir_out)
 ```
 
 ```{r, eval = FALSE}
-
 ## Fall Northwest Atlantic ---------------------------------------------------
 
 ### Load survey data -----------------------------------------------------------
@@ -150,27 +157,28 @@ grid_yrs <- replicate_df(pred_grid_depth, "year", unique(catch$year))
 ### Variables ------------------------------------------------------------------
 
 srvy <- "NWA_FALL"
-seq_from = 0.2
-seq_to = 1.0
-seq_by = 0.2 
-tot_dataframes = 13
+seq_from <- 0.2
+seq_to <- 1.0
+seq_by <- 0.2
+tot_dataframes <- 13
 replicate_num <- 3
 
 ### Run ------------------------------------------------------------------------
 
-sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append=FALSE, split=TRUE)  # for screen and log
+sink(file = paste0(dir_out, srvy, "_", Sys.Date(), "_logfile.txt"), append = FALSE, split = TRUE) # for screen and log
 map(
-  1:nrow(spp_list), 
-  ~ clean_and_resample(spp_list[.x,], 
-                       catch, seq_from, seq_to, seq_by, 
-                       tot_dataframes, replicate_num, grid_yrs, dir_out, test = TRUE))
+  1:nrow(spp_list),
+  ~ clean_and_resample(spp_list[.x, ],
+    catch, seq_from, seq_to, seq_by,
+    tot_dataframes, replicate_num, grid_yrs, dir_out,
+    test = TRUE
+  )
+)
 sink()
 
 ### Plot indices --------------------------------------------------------------
 
-plot_results(srvy = srvy, dir_out = dir_out) 
-
-
+plot_results(srvy = srvy, dir_out = dir_out)
 ```
 
 ```{r, echo = FALSE}

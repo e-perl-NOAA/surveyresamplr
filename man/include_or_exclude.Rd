@@ -19,7 +19,7 @@ of the props is "trawlid".}
 List of dataframes with random assignments of which data to include
 }
 \description{
-Specify how to downsample using output of tow_fn. For simple random sampling, 
+Specify how to downsample using output of tow_fn. For simple random sampling,
 a proportion of tows should do. Utilized in the cleanup_by_species function.
 }
 \examples{

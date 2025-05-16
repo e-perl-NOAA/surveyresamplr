@@ -19,7 +19,7 @@ of depth filters (see the smaller_function.R file for those).}
 
 \item{spp_info}{information about the species test run.}
 
-\item{n_knots}{Numeric. 
+\item{n_knots}{Numeric.
 names(speciesname_df)}
 }
 \description{
