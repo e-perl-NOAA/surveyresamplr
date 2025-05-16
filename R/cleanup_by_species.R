@@ -26,7 +26,7 @@
 #'                        model_fn = "total_catch_wt_kg ~ 0 + factor(year) + pass",
 #'                        model_family = "delta_gamma",
 #'                        model_anisotropy = TRUE,
-#'                        model_spatiotemporal = c("iid, iid") )
+#'                        model_spatiotemporal = "iid, iid")
 #' cleanup_by_species(catch = catch,
 #'                    spp_info = spp_info,
 #'                    seq_from = 0.1,
