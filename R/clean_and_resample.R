@@ -39,8 +39,8 @@
 #'                        filter_depth = NA,
 #'                        model_fn = "total_catch_wt_kg ~ 0 + factor(year) + pass",
 #'                        model_family = "delta_gamma",
-#'                        model_anisotropy = TRUE
-#'                        model_spatiotemporal = c("iid, iid")
+#'                        model_anisotropy = TRUE,
+#'                        model_spatiotemporal = "iid, iid"
 #'                       )
 #' clean_and_resample(spp_info = spp_list,
 #'                    catch,
