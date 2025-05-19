@@ -2,7 +2,7 @@
 title: "A Simple Example"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{a-simple-example}
+  %\VignetteIndexEntry{A Simple Example}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -28,7 +28,7 @@ library(surveyresamplr)
 
 # Here we list all the packages we will need for this whole process
 # We'll also use this in our works cited page.
-PKG <- c(
+p <- c(
   "here",
   "flextable",
 
@@ -67,7 +67,7 @@ pkg_install <- function(p) {
   install.packages(p)
   require(p, character.only = TRUE)
 }
-base::lapply(PKG, pkg_install)
+base::lapply(p, pkg_install)
 ```
 
 ## Test Species List

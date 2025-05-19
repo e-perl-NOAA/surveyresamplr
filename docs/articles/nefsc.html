@@ -107,20 +107,20 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#get rid of memory limits</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>future.globals.maxSize <span class="op">=</span> <span class="fl">1</span> <span class="op">*</span> <span class="fl">1024</span><span class="op">^</span><span class="fl">4</span><span class="op">)</span>  <span class="co"># Allow up to 1 TB for globals</span></span>
+<code class="sourceCode R"><span><span class="co"># get rid of memory limits</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>future.globals.maxSize <span class="op">=</span> <span class="fl">1</span> <span class="op">*</span> <span class="fl">1024</span><span class="op">^</span><span class="fl">4</span><span class="op">)</span> <span class="co"># Allow up to 1 TB for globals</span></span>
 <span></span>
 <span><span class="co"># Set directories --------------------------------------------------------------</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://here.r-lib.org/" class="external-link">here</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">wd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>,<span class="st">"/vignettes/"</span><span class="op">)</span></span>
+<span><span class="va">wd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/vignettes/"</span><span class="op">)</span></span>
 <span><span class="va">dir_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wd</span>, <span class="st">"output/"</span><span class="op">)</span></span>
 <span><span class="va">crs_latlon</span> <span class="op">&lt;-</span> <span class="st">"+proj=longlat +datum=WGS84"</span> <span class="co"># decimal degrees</span></span>
 <span></span>
 <span><span class="co"># Install Libraries ------------------------------------------------------------</span></span>
 <span></span>
 <span><span class="co"># Here we list all the packages we will need for this whole process</span></span>
-<span><span class="co"># We'll also use this in our works cited page. </span></span>
+<span><span class="co"># We'll also use this in our works cited page.</span></span>
 <span><span class="va">PKG</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"surveyresamplr"</span>,</span>
 <span></span>
@@ -129,34 +129,34 @@
 <span>  <span class="st">"magrittr"</span>,</span>
 <span>  <span class="st">"tidyr"</span>,</span>
 <span>  <span class="st">"viridis"</span>,</span>
-<span>  <span class="st">"ggplot2"</span>, </span>
+<span>  <span class="st">"ggplot2"</span>,</span>
 <span>  <span class="st">"tibble"</span>,</span>
-<span>  <span class="st">"janitor"</span>, </span>
-<span>  <span class="st">"data.table"</span>, </span>
-<span>  </span>
+<span>  <span class="st">"janitor"</span>,</span>
+<span>  <span class="st">"data.table"</span>,</span>
+<span></span>
 <span>  <span class="co"># parallelizing</span></span>
 <span>  <span class="st">"forcats"</span>,</span>
 <span>  <span class="st">"purrr"</span>,</span>
-<span>  <span class="st">"furrr"</span>, </span>
+<span>  <span class="st">"furrr"</span>,</span>
 <span>  <span class="st">"doParallel"</span>,</span>
-<span>  </span>
+<span></span>
 <span>  <span class="co"># sampling</span></span>
 <span>  <span class="st">"sampling"</span>,</span>
-<span>  </span>
+<span></span>
 <span>  <span class="co"># modeling</span></span>
-<span>  <span class="st">"arrow"</span>, </span>
-<span>  <span class="st">"future.apply"</span>, </span>
-<span>  <span class="st">"future.callr"</span>, </span>
+<span>  <span class="st">"arrow"</span>,</span>
+<span>  <span class="st">"future.apply"</span>,</span>
+<span>  <span class="st">"future.callr"</span>,</span>
 <span>  <span class="st">"sdmTMB"</span>, <span class="co"># install.packages("remotes"",; remotes::install_github("pbs-assess/sdmTMBextra", dependencies = TRUE",</span></span>
-<span>  <span class="st">"Matrix"</span>, </span>
+<span>  <span class="st">"Matrix"</span>,</span>
 <span>  <span class="st">"MASS"</span>,</span>
-<span>  <span class="st">"cluster"</span>, </span>
-<span>  <span class="st">"TMB"</span>, </span>
-<span>  <span class="st">"INLA"</span> </span>
+<span>  <span class="st">"cluster"</span>,</span>
+<span>  <span class="st">"TMB"</span>,</span>
+<span>  <span class="st">"INLA"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">pkg_install</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va">p</span>, character.only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="va">pkg_install</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">p</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va">p</span>, character.only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va">p</span>, character.only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -165,36 +165,41 @@
 <span></span>
 <span><span class="co">### Define study species -------------------------------------------------------</span></span>
 <span></span>
-<span><span class="va">spp_list</span> <span class="op">&lt;-</span> </span>
+<span><span class="va">spp_list</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>    srvy <span class="op">=</span> <span class="st">"NWA_SPRING"</span>,</span>
-<span>    common_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Atlantic herring"</span>, <span class="st">"black sea bass"</span>, <span class="st">"Atlantic cod"</span>, </span>
-<span>                    <span class="st">"American lobster"</span>, <span class="st">"longfin squid"</span>, <span class="st">"mackerel"</span>, </span>
-<span>                    <span class="st">"monkfish"</span>, <span class="st">"red hake"</span>, <span class="st">"scup"</span>, </span>
-<span>                    <span class="st">"sea scallop"</span>, <span class="st">"silver hake"</span>, <span class="st">"summer flounder"</span>, </span>
-<span>                    <span class="st">"winter flounder"</span><span class="op">)</span>,</span>
-<span>    file_name0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AtlanticHerring"</span>, <span class="st">"BlackSeaBass"</span>, <span class="st">"Cod"</span>, </span>
-<span>                  <span class="st">"Lobster"</span>, <span class="st">"LongfinSquid"</span>, <span class="st">"Mackerel"</span>, </span>
-<span>                  <span class="st">"Monkfish"</span>, <span class="st">"RedHake"</span>, <span class="st">"Scup"</span>, </span>
-<span>                  <span class="st">"SeaScallop"</span>, <span class="st">"SilverHake"</span>, <span class="st">"SummerFlounder"</span>, </span>
-<span>                  <span class="st">"WinterFlounder"</span><span class="op">)</span>, </span>
-<span>  filter_lat_lt <span class="op">=</span> <span class="cn">NA</span>, </span>
-<span>  filter_lat_gt <span class="op">=</span> <span class="cn">NA</span>, </span>
-<span>  filter_depth <span class="op">=</span> <span class="cn">NA</span>, </span>
-<span>  model_fn <span class="op">=</span> <span class="st">"total_catch_wt_kg ~ 0 + factor(year)"</span>,</span>
-<span>  model_family <span class="op">=</span> <span class="st">"delta_gamma"</span>,</span>
-<span>  model_anisotropy <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  model_spatiotemporal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"iid, iid"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span> </span>
-<span>    file_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">" "</span>, replacement <span class="op">=</span> <span class="st">"_"</span>, x <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chartr.html" class="external-link">tolower</a></span><span class="op">(</span><span class="va">common_name</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>  <span class="op">)</span></span>
+<span>    common_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Atlantic herring"</span>, <span class="st">"black sea bass"</span>, <span class="st">"Atlantic cod"</span>,</span>
+<span>      <span class="st">"American lobster"</span>, <span class="st">"longfin squid"</span>, <span class="st">"mackerel"</span>,</span>
+<span>      <span class="st">"monkfish"</span>, <span class="st">"red hake"</span>, <span class="st">"scup"</span>,</span>
+<span>      <span class="st">"sea scallop"</span>, <span class="st">"silver hake"</span>, <span class="st">"summer flounder"</span>,</span>
+<span>      <span class="st">"winter flounder"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    file_name0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"AtlanticHerring"</span>, <span class="st">"BlackSeaBass"</span>, <span class="st">"Cod"</span>,</span>
+<span>      <span class="st">"Lobster"</span>, <span class="st">"LongfinSquid"</span>, <span class="st">"Mackerel"</span>,</span>
+<span>      <span class="st">"Monkfish"</span>, <span class="st">"RedHake"</span>, <span class="st">"Scup"</span>,</span>
+<span>      <span class="st">"SeaScallop"</span>, <span class="st">"SilverHake"</span>, <span class="st">"SummerFlounder"</span>,</span>
+<span>      <span class="st">"WinterFlounder"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    filter_lat_lt <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>    filter_lat_gt <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>    filter_depth <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>    model_fn <span class="op">=</span> <span class="st">"total_catch_wt_kg ~ 0 + factor(year)"</span>,</span>
+<span>    model_family <span class="op">=</span> <span class="st">"delta_gamma"</span>,</span>
+<span>    model_anisotropy <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>    model_spatiotemporal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"iid, iid"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    file_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">" "</span>, replacement <span class="op">=</span> <span class="st">"_"</span>, x <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chartr.html" class="external-link">tolower</a></span><span class="op">(</span><span class="va">common_name</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
 <span></span>
-<span><span class="va">spp_list</span> <span class="op">&lt;-</span> <span class="va">spp_list</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,<span class="op">]</span></span>
+<span><span class="va">spp_list</span> <span class="op">&lt;-</span> <span class="va">spp_list</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="op">]</span></span>
 <span></span>
 <span><span class="co">### Load survey data -----------------------------------------------------------</span></span>
 <span></span>
 <span><span class="co"># source(paste0(wd, "code/data_dl_ne.r"))</span></span>
-<span><span class="va">catch</span> <span class="op">&lt;-</span> <span class="fu">surveyresamplr</span><span class="fu">::</span><span class="va"><a href="../reference/noaa_nefsc_catch.html">noaa_nefsc_catch</a></span> <span class="co">#pulled data again to get 2024</span></span>
+<span><span class="va">catch</span> <span class="op">&lt;-</span> <span class="fu">surveyresamplr</span><span class="fu">::</span><span class="va"><a href="../reference/noaa_nefsc_catch.html">noaa_nefsc_catch</a></span> <span class="co"># pulled data again to get 2024</span></span>
 <span></span>
 <span><span class="co">### Load grid data -------------------------------------------------------------</span></span>
 <span></span>
@@ -203,28 +208,30 @@
 <span><span class="co">### Variables ------------------------------------------------------------------</span></span>
 <span></span>
 <span><span class="va">srvy</span> <span class="op">&lt;-</span> <span class="st">"NWA_SPRING"</span></span>
-<span><span class="va">seq_from</span> <span class="op">=</span> <span class="fl">0.2</span></span>
-<span><span class="va">seq_to</span> <span class="op">=</span> <span class="fl">1.0</span></span>
-<span><span class="va">seq_by</span> <span class="op">=</span> <span class="fl">0.2</span> </span>
-<span><span class="va">tot_dataframes</span> <span class="op">=</span> <span class="fl">13</span></span>
+<span><span class="va">seq_from</span> <span class="op">&lt;-</span> <span class="fl">0.2</span></span>
+<span><span class="va">seq_to</span> <span class="op">&lt;-</span> <span class="fl">1.0</span></span>
+<span><span class="va">seq_by</span> <span class="op">&lt;-</span> <span class="fl">0.2</span></span>
+<span><span class="va">tot_dataframes</span> <span class="op">&lt;-</span> <span class="fl">13</span></span>
 <span><span class="va">replicate_num</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
 <span></span>
 <span><span class="co">### Run ------------------------------------------------------------------------</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/sink.html" class="external-link">sink</a></span><span class="op">(</span>file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir_out</span>, <span class="va">srvy</span>, <span class="st">"_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"_logfile.txt"</span><span class="op">)</span>, append<span class="op">=</span><span class="cn">FALSE</span>, split<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>  <span class="co"># for screen and log</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sink.html" class="external-link">sink</a></span><span class="op">(</span>file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir_out</span>, <span class="va">srvy</span>, <span class="st">"_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"_logfile.txt"</span><span class="op">)</span>, append <span class="op">=</span> <span class="cn">FALSE</span>, split <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># for screen and log</span></span>
 <span><span class="fu">map</span><span class="op">(</span></span>
-<span>  <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">spp_list</span><span class="op">)</span>, </span>
-<span>  <span class="op">~</span> <span class="fu"><a href="../reference/clean_and_resample.html">clean_and_resample</a></span><span class="op">(</span><span class="va">spp_list</span><span class="op">[</span><span class="va">.x</span>,<span class="op">]</span>, </span>
-<span>                       <span class="va">catch</span>, <span class="va">seq_from</span>, <span class="va">seq_to</span>, <span class="va">seq_by</span>, </span>
-<span>                       <span class="va">tot_dataframes</span>, <span class="va">replicate_num</span>, <span class="va">grid_yrs</span>, <span class="va">dir_out</span>, test <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">spp_list</span><span class="op">)</span>,</span>
+<span>  <span class="op">~</span> <span class="fu"><a href="../reference/clean_and_resample.html">clean_and_resample</a></span><span class="op">(</span><span class="va">spp_list</span><span class="op">[</span><span class="va">.x</span>, <span class="op">]</span>,</span>
+<span>    <span class="va">catch</span>, <span class="va">seq_from</span>, <span class="va">seq_to</span>, <span class="va">seq_by</span>,</span>
+<span>    <span class="va">tot_dataframes</span>, <span class="va">replicate_num</span>, <span class="va">grid_yrs</span>, <span class="va">dir_out</span>,</span>
+<span>    test <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sink.html" class="external-link">sink</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">### Plot indices --------------------------------------------------------------</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/plot_results.html">plot_results</a></span><span class="op">(</span>srvy <span class="op">=</span> <span class="va">srvy</span>, dir_out <span class="op">=</span> <span class="va">dir_out</span><span class="op">)</span> </span></code></pre></div>
+<span><span class="fu"><a href="../reference/plot_results.html">plot_results</a></span><span class="op">(</span>srvy <span class="op">=</span> <span class="va">srvy</span>, dir_out <span class="op">=</span> <span class="va">dir_out</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co">## Fall Northwest Atlantic ---------------------------------------------------</span></span>
+<code class="sourceCode R"><span><span class="co">## Fall Northwest Atlantic ---------------------------------------------------</span></span>
 <span></span>
 <span><span class="co">### Load survey data -----------------------------------------------------------</span></span>
 <span></span>
@@ -240,25 +247,28 @@
 <span><span class="co">### Variables ------------------------------------------------------------------</span></span>
 <span></span>
 <span><span class="va">srvy</span> <span class="op">&lt;-</span> <span class="st">"NWA_FALL"</span></span>
-<span><span class="va">seq_from</span> <span class="op">=</span> <span class="fl">0.2</span></span>
-<span><span class="va">seq_to</span> <span class="op">=</span> <span class="fl">1.0</span></span>
-<span><span class="va">seq_by</span> <span class="op">=</span> <span class="fl">0.2</span> </span>
-<span><span class="va">tot_dataframes</span> <span class="op">=</span> <span class="fl">13</span></span>
+<span><span class="va">seq_from</span> <span class="op">&lt;-</span> <span class="fl">0.2</span></span>
+<span><span class="va">seq_to</span> <span class="op">&lt;-</span> <span class="fl">1.0</span></span>
+<span><span class="va">seq_by</span> <span class="op">&lt;-</span> <span class="fl">0.2</span></span>
+<span><span class="va">tot_dataframes</span> <span class="op">&lt;-</span> <span class="fl">13</span></span>
 <span><span class="va">replicate_num</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
 <span></span>
 <span><span class="co">### Run ------------------------------------------------------------------------</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/sink.html" class="external-link">sink</a></span><span class="op">(</span>file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir_out</span>, <span class="va">srvy</span>, <span class="st">"_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"_logfile.txt"</span><span class="op">)</span>, append<span class="op">=</span><span class="cn">FALSE</span>, split<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>  <span class="co"># for screen and log</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sink.html" class="external-link">sink</a></span><span class="op">(</span>file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir_out</span>, <span class="va">srvy</span>, <span class="st">"_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"_logfile.txt"</span><span class="op">)</span>, append <span class="op">=</span> <span class="cn">FALSE</span>, split <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># for screen and log</span></span>
 <span><span class="fu">map</span><span class="op">(</span></span>
-<span>  <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">spp_list</span><span class="op">)</span>, </span>
-<span>  <span class="op">~</span> <span class="fu"><a href="../reference/clean_and_resample.html">clean_and_resample</a></span><span class="op">(</span><span class="va">spp_list</span><span class="op">[</span><span class="va">.x</span>,<span class="op">]</span>, </span>
-<span>                       <span class="va">catch</span>, <span class="va">seq_from</span>, <span class="va">seq_to</span>, <span class="va">seq_by</span>, </span>
-<span>                       <span class="va">tot_dataframes</span>, <span class="va">replicate_num</span>, <span class="va">grid_yrs</span>, <span class="va">dir_out</span>, test <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">spp_list</span><span class="op">)</span>,</span>
+<span>  <span class="op">~</span> <span class="fu"><a href="../reference/clean_and_resample.html">clean_and_resample</a></span><span class="op">(</span><span class="va">spp_list</span><span class="op">[</span><span class="va">.x</span>, <span class="op">]</span>,</span>
+<span>    <span class="va">catch</span>, <span class="va">seq_from</span>, <span class="va">seq_to</span>, <span class="va">seq_by</span>,</span>
+<span>    <span class="va">tot_dataframes</span>, <span class="va">replicate_num</span>, <span class="va">grid_yrs</span>, <span class="va">dir_out</span>,</span>
+<span>    test <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sink.html" class="external-link">sink</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">### Plot indices --------------------------------------------------------------</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/plot_results.html">plot_results</a></span><span class="op">(</span>srvy <span class="op">=</span> <span class="va">srvy</span>, dir_out <span class="op">=</span> <span class="va">dir_out</span><span class="op">)</span> </span></code></pre></div>
+<span><span class="fu"><a href="../reference/plot_results.html">plot_results</a></span><span class="op">(</span>srvy <span class="op">=</span> <span class="va">srvy</span>, dir_out <span class="op">=</span> <span class="va">dir_out</span><span class="op">)</span></span></code></pre></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
