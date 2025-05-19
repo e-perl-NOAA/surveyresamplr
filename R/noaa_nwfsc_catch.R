@@ -13,10 +13,10 @@
 #'   \item{\code{year}}{Survey year. Year the observation (survey) was collected.}
 #'   \item{\code{pass}}{Pass. Pass}
 #'   \item{\code{depth_m}}{Depth (m). Bottom depth (meters).}#'   }
-#' @source Northwest Fisheries Science Center. 
+#' @source Northwest Fisheries Science Center.
 #' @keywords species code data
 #' @examples
 #' data(noaa_nwfsc_catch)
 #' @details ENTER.
 
-'noaa_nwfsc_catch'
+"noaa_nwfsc_catch"

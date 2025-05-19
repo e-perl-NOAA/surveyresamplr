@@ -11,7 +11,7 @@ resample_tests(
   dir_out,
   test = FALSE,
   parallel = FALSE,
-  n_knots,
+  n_knots = 500,
   model_type = "wrapper_sdmtmb"
 )
 }

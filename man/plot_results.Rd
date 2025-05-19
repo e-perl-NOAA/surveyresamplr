@@ -17,8 +17,8 @@ plot_results(srvy, dir_out, dir_final = NULL)
 A list of plots and tables generated during the function execution.
 }
 \description{
-This function compiles results from species distribution models (SDMs) output 
-of the clean_and_resample function for which it generates plots, and saves the 
+This function compiles results from species distribution models (SDMs) output
+of the clean_and_resample function for which it generates plots, and saves the
 figures.
 }
 \details{
@@ -37,5 +37,5 @@ This function performs the following steps:
 \examples{
 dir_out <- here::here("vignettes", "output")
 srvy <- "CA"
-plot_results(srvy = srvy, dir_out = dir_out) 
+plot_results(srvy = srvy, dir_out = dir_out)
 }

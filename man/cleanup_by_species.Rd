@@ -25,7 +25,7 @@ cleanup_by_species(
 
 \item{seq_by}{A numeric value specifying the step size of the sequence for data frames.}
 
-\item{tot_dataframes}{the number of data frames you want to output. effort x 
+\item{tot_dataframes}{the number of data frames you want to output. effort x
 replicates - (replicates - 1). 5x3-2}
 
 \item{replicate_num}{An integer specifying the number of replicates.}
@@ -39,21 +39,25 @@ assignment to be resampled,
 }
 \examples{
 catch <- surveyresamplr::noaa_nwfsc_catch
-spp_list <- data.frame(srvy = "CA",
-                       common_name = "arrowtooth flounder", 
-                       file_name = "arrowtooth_flounder", 
-                       filter_lat_gt = 34,
-                       filter_lat_lt = NA,
-                       filter_depth = NA,
-                       model_fn = "total_catch_wt_kg ~ 0 + factor(year) + pass",
-                       model_family = "delta_gamma",
-                       model_anisotropy = TRUE
-                       model_spatiotemporal = c("iid, iid") )
-cleanup_by_species(catch = catch,
-                   spp_info = spp_info,
-                   seq_from = 0.1, 
-                   seq_to = 1, 
-                   seq_by = 0.1, 
-                   tot_dataframes = 91, 
-                   replicate_num = 10)
+spp_list <- data.frame(
+  srvy = "CA",
+  common_name = "arrowtooth flounder",
+  file_name = "arrowtooth_flounder",
+  filter_lat_gt = 34,
+  filter_lat_lt = NA,
+  filter_depth = NA,
+  model_fn = "total_catch_wt_kg ~ 0 + factor(year) + pass",
+  model_family = "delta_gamma",
+  model_anisotropy = TRUE,
+  model_spatiotemporal = "iid, iid"
+)
+cleanup_by_species(
+  catch = catch,
+  spp_info = spp_info,
+  seq_from = 0.1,
+  seq_to = 1,
+  seq_by = 0.1,
+  tot_dataframes = 91,
+  replicate_num = 10
+)
 }
