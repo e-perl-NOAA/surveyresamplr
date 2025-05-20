@@ -40,7 +40,7 @@
 #'                        model_fn = "total_catch_wt_kg ~ 0 + factor(year) + pass",
 #'                        model_family = "delta_gamma",
 #'                        model_anisotropy = TRUE
-#'                        model_spatiotemporal = c("iid, iid")
+#'                        model_spatiotemporal = "iid, iid"
 #'                       )
 #' clean_and_resample(spp_info = spp_list, 
 #'                    catch, 
@@ -50,9 +50,8 @@
 #'                    tot_dataframes = 91, 
 #'                    replicate_num = 10, 
 #'                    grid_yrs = grid_yrs, 
-#'                    dir_out = dir_out))
-#' 
-#'                    bio = bio))
+#'                    dir_out = dir_out,
+#'                    bio = bio)
 #'
 clean_and_resample <- function(
   spp_info,
@@ -102,6 +101,7 @@ clean_and_resample <- function(
   }
 
   message("Starting cleanup of catch data")
+  
   spp_dfs <- cleanup_by_species(
     catch = catch,
     spp_info = spp_info,
@@ -111,20 +111,6 @@ clean_and_resample <- function(
     tot_dataframes = tot_dataframes,
     replicate_num = replicate_num
   )
-  
-  try({
-    resample_tests(
-      spp_dfs = spp_dfs, 
-      spp_info = spp_info, 
-      grid_yrs = grid_yrs, 
-      dir_out = dir_out, 
-      test = test, 
-      n_knots = n_knots, 
-      model_type = model_type
-    ) 
-  }, silent = FALSE)
-}
-
 
   if (!is.null(bio)) {
     bio_df <- bio |>
