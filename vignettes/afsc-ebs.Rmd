@@ -36,13 +36,13 @@ PKG <- c(
 
   # tidyverse
   "dplyr",
-  "magrittr",
   "tidyr",
   "viridis",
   "ggplot2",
   "tibble",
   "janitor",
   "data.table",
+  "flextable",
 
   # parallelizing
   "forcats",
@@ -95,8 +95,8 @@ spp_list <- data.frame(
   model_fn = "total_catch_wt_kg ~ 0 + factor(year) + bottom_temperature_c",
   model_family = "delta_gamma",
   model_anisotropy = TRUE,
-  model_spatiotemporal = c(c("iid, iid"))
-) %>%
+  model_spatiotemporal = "iid, iid"
+) |>
   dplyr::mutate(
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))
   )
@@ -106,7 +106,7 @@ spp_list <- data.frame(
 # source(paste0(wd, "code/data_dl_ak.r"))
 
 load(file = paste0(wd, "/data/noaa_afsc_catch.rda"))
-catch <- noaa_afsc_catch %>% dplyr::filter(srvy == "EBS")
+catch <- noaa_afsc_catch |> dplyr::filter(srvy == "EBS")
 
 ### Load grid data -------------------------------------------------------------
 
@@ -120,11 +120,11 @@ crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
 grid_yrs <-
   dplyr::bind_cols(
     pred_grid_depth[, c("longitude_dd", "latitude_dd", "depth_m")],
-    terra::unwrap(coldpool::ebs_bottom_temperature) %>%
-      terra::project(crs_latlon) %>%
+    terra::unwrap(coldpool::ebs_bottom_temperature) |>
+      terra::project(crs_latlon) |>
       terra::extract(pred_grid_depth[, c("longitude_dd", "latitude_dd")])
   )
-grid_yrs <- grid_yrs %>%
+grid_yrs <- grid_yrs |>
   tidyr::pivot_longer(
     names_to = "year",
     values_to = "bottom_temperature_c",
@@ -133,7 +133,7 @@ grid_yrs <- grid_yrs %>%
 save(grid_yrs_depth_temperature, file = paste0("grids/grid_yr_temperature/noaa_afsc_ebs_pred_grid_depth_temperature.rdata"))
 
 # # test you extracted correctkt
-# ggplot(data = grid_yrs %>%
+# ggplot(data = grid_yrs |>
 #          dplyr::filter(year %in% c(2022:2024)),
 #        mapping = ggplot2::aes(x = longitude_dd, y = latitude_dd, color = bottom_temperature_c)) +
 #   geom_point() +
@@ -166,8 +166,6 @@ out <- plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final)
 
 ```{r results-run, eval = TRUE, echo = FALSE}
 load(file = paste0(dir_final, "analysisoutput.rdata"))
-library(flextable)
-library(magrittr)
 ```
 
 ```{r results-plots}
@@ -179,7 +177,7 @@ Parameter output:
 ```{r results-tables-1}
 i <- 1
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>%
+head(out$tables[i][[1]]) |>
   flextable::flextable()
 ```
 
@@ -187,7 +185,7 @@ head(out$tables[i][[1]]) %>%
 ```{r results-tables-2}
 i <- 1 + i
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>%
+head(out$tables[i][[1]]) |>
   flextable::flextable()
 ```
 
@@ -195,7 +193,7 @@ head(out$tables[i][[1]]) %>%
 ```{r results-tables-3}
 i <- 1 + i
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>%
+head(out$tables[i][[1]]) |>
   flextable::flextable()
 ```
 
@@ -203,7 +201,7 @@ head(out$tables[i][[1]]) %>%
 ```{r results-tables-4}
 i <- 1 + i
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>%
+head(out$tables[i][[1]]) |>
   flextable::flextable()
 ```
 

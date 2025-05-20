@@ -34,7 +34,6 @@ PKG <- c(
 
   # tidyverse
   "dplyr",
-  "magrittr",
   "tidyr",
   "viridis",
   "ggplot2",
@@ -96,8 +95,8 @@ spp_list <-
     model_fn = "total_catch_wt_kg ~ 0 + factor(year)",
     model_family = "delta_gamma",
     model_anisotropy = TRUE,
-    model_spatiotemporal = c(c("iid, iid"))
-  ) %>%
+    model_spatiotemporal = "iid, iid"
+  ) |>
   dplyr::mutate(
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))
   )
@@ -147,7 +146,7 @@ plot_results(srvy = srvy, dir_out = dir_out)
 
 # source(paste0(wd, "code/data_dl_ne.r"))
 
-catch <- noaa_nefsc_catch %>% dplyr::filter(srvy == "FALL")
+catch <- noaa_nefsc_catch |> dplyr::filter(srvy == "FALL")
 
 ### Load grid data -------------------------------------------------------------
 

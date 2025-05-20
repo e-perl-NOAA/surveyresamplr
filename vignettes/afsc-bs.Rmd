@@ -34,7 +34,6 @@ PKG <- c(
 
   # tidyverse
   "dplyr",
-  "magrittr",
   "tidyr",
   "viridis",
   "ggplot2",
@@ -94,8 +93,8 @@ spp_list <- data.frame(
   model_fn = "total_catch_wt_kg ~ 0 + factor(year) + bottom_temperature_c + depth_m",
   model_family = "delta_gamma",
   model_anisotropy = TRUE,
-  model_spatiotemporal = c(c("iid, iid"))
-) %>%
+  model_spatiotemporal = "iid, iid"
+) |>
   dplyr::mutate(
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))
   )
@@ -103,7 +102,7 @@ spp_list <- data.frame(
 ### Load survey data -----------------------------------------------------------
 
 # source(paste0(wd, "code/data_dl_ak.r"))
-catch <- surveyresamplr::noaa_afsc_catch %>%
+catch <- surveyresamplr::noaa_afsc_catch |>
   dplyr::filter(srvy %in% c("NBS", "EBS"))
 
 ### Load grid data -------------------------------------------------------------
@@ -119,30 +118,30 @@ ebs_only <- setdiff(names(terra::unwrap(coldpool::ebs_bottom_temperature)), name
 grid_yrs_temperature <- dplyr::full_join(
   dplyr::bind_cols(
     pred_grid_depth[, c("longitude_dd", "latitude_dd", "depth_m", "area_km2")],
-    terra::unwrap(coldpool::ebs_bottom_temperature) %>% # TOLEDO
-      terra::subset(ebs_only) %>%
-      terra::project(crs_latlon) %>%
+    terra::unwrap(coldpool::ebs_bottom_temperature) |> # TOLEDO
+      terra::subset(ebs_only) |>
+      terra::project(crs_latlon) |>
       terra::extract(pred_grid_depth[, c("longitude_dd", "latitude_dd")])
   ),
   dplyr::bind_cols(
     pred_grid_depth[, c("longitude_dd", "latitude_dd", "depth_m")],
-    terra::unwrap(coldpool::nbs_ebs_bottom_temperature) %>%
-      terra::project(crs_latlon) %>%
+    terra::unwrap(coldpool::nbs_ebs_bottom_temperature) |>
+      terra::project(crs_latlon) |>
       terra::extract(pred_grid_depth[, c("longitude_dd", "latitude_dd")])
   )
 )
 
-grid_yrs_depth_temperature <- grid_yrs <- grid_yrs_temperature %>%
+grid_yrs_depth_temperature <- grid_yrs <- grid_yrs_temperature |>
   tidyr::pivot_longer(
     names_to = "year",
     values_to = "bottom_temperature_c",
     cols = names(grid_yrs_temperature)[6:ncol(grid_yrs_temperature)]
-  ) %>%
+  ) |>
   dplyr::mutate(year = as.numeric(year))
 # save(grid_yrs_depth_temperature, file = paste0("grids/grid_yr_temperature/noaa_afsc_bs_pred_grid_depth_temperature.rdata"))
 
 # # test you extracted correct
-# ggplot(data = grid_yrs %>%
+# ggplot(data = grid_yrs |>
 #          dplyr::filter(year %in% c(2022:2024)),
 #        mapping = ggplot2::aes(x = longitude_dd, y = latitude_dd, color = bottom_temperature_c)) +
 #   geom_point() +

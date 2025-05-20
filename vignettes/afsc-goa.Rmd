@@ -37,13 +37,13 @@ PKG <- c(
 
   # tidyverse
   "dplyr",
-  "magrittr",
   "tidyr",
   "viridis",
   "ggplot2",
   "tibble",
   "janitor",
   "data.table",
+  "flextable",
 
   # parallelizing
   "forcats",
@@ -94,8 +94,8 @@ spp_list <- data.frame(
   model_fn = "total_catch_wt_kg ~ 0 + factor(year)",
   model_family = "delta_gamma",
   model_anisotropy = TRUE,
-  model_spatiotemporal = c(c("iid, iid"))
-) %>%
+  model_spatiotemporal = "iid, iid"
+) |>
   dplyr::mutate(
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))
   )
@@ -103,7 +103,7 @@ spp_list <- data.frame(
 ### Load survey data -----------------------------------------------------------
 
 # source(paste0(wd, "code/data_dl_ak.r"))
-catch <- surveyresamplr::noaa_afsc_catch %>%
+catch <- surveyresamplr::noaa_afsc_catch |>
   dplyr::filter(srvy == "GOA")
 
 ### Load grid data -------------------------------------------------------------
@@ -139,8 +139,6 @@ out <- plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final)
 
 ```{r results-run, eval = TRUE, echo = FALSE}
 load(file = paste0(dir_final, "analysisoutput.rdata"))
-library(flextable)
-library(magrittr)
 ```
 
 ```{r results-plots}
@@ -152,7 +150,7 @@ Parameter output:
 ```{r results-tables-1}
 i <- 1
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>%
+head(out$tables[i][[1]]) |>
   flextable::flextable()
 ```
 
@@ -160,7 +158,7 @@ head(out$tables[i][[1]]) %>%
 ```{r results-tables-2}
 i <- 1 + i
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>%
+head(out$tables[i][[1]]) |>
   flextable::flextable()
 ```
 
@@ -168,7 +166,7 @@ head(out$tables[i][[1]]) %>%
 ```{r results-tables-3}
 i <- 1 + i
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>%
+head(out$tables[i][[1]]) |>
   flextable::flextable()
 ```
 
@@ -176,6 +174,6 @@ head(out$tables[i][[1]]) %>%
 ```{r results-tables-4}
 i <- 1 + i
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>%
+head(out$tables[i][[1]]) |>
   flextable::flextable()
 ```
