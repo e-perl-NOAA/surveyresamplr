@@ -7,25 +7,23 @@
 clean_and_resample(
   spp_info,
   catch,
-  bio,
-  seq_from,
-  seq_to,
-  seq_by,
-  tot_dataframes,
-  replicate_num,
+  seq_from = 0.1,
+  seq_to = 1,
+  seq_by = 0.1,
+  tot_dataframes = 91,
+  replicate_num = 10,
   grid_yrs,
   dir_out,
   test = FALSE,
-  n_knots = 300,
-  model_type = "wrapper_sdmtmb"
+  n_knots = 500,
+  model_type = "wrapper_sdmtmb",
+  bio = NULL
 )
 }
 \arguments{
 \item{spp_info}{A data frame row containing information about the species.}
 
 \item{catch}{A data frame containing the catch data.}
-
-\item{bio}{A data frame containing the biological data, if applicable.}
 
 \item{seq_from}{A numeric value specifying the start of the sequence for data frames.}
 
@@ -46,12 +44,14 @@ clean_and_resample(
 \item{n_knots}{Numeric. Default  = 500.}
 
 \item{model_type}{String. Default = "wrapper_sdmtmb", but can be any preset wrapper_*() function or a premade home built function.}
+
+\item{bio}{A data frame containing the biological data, if applicable. NULL is default.}
 }
 \value{
 A list of data frames containing the cleaned and resampled catch data.
 }
 \description{
-This function cleans up the catch data for a specific species and then performs 
+This function cleans up the catch data for a specific species and then performs
 resampling tests,
 }
 \details{
@@ -64,27 +64,34 @@ This function performs the following steps:
 \examples{
 dir_out <- here::here("vignettes", "output")
 catch <- surveyresamplr::noaa_nwfsc_catch
-grid_yrs <- replicate_df(dat = surveyresamplr::noaa_nwfsc_catch, time_name = "year", 
-                         time_values = unique(catch$year))
-spp_list <- data.frame(srvy = "CA",
-                       common_name = "arrowtooth flounder", 
-                       file_name = "arrowtooth_flounder", 
-                       filter_lat_gt = 34,
-                       filter_lat_lt = NA,
-                       filter_depth = NA,
-                       model_fn = "total_catch_wt_kg ~ 0 + factor(year) + pass",
-                       model_family = "delta_gamma",
-                       model_anisotropy = TRUE
-                       model_spatiotemporal = c("iid, iid")
-                      )
-clean_and_resample(spp_info = spp_list, 
-                   catch, 
-                   seq_from = 0.1, 
-                   seq_to = 1, 
-                   seq_by = 0.1, 
-                   tot_dataframes = 91, 
-                   replicate_num = 10, 
-                   grid_yrs = grid_yrs, 
-                   dir_out = dir_out))
+bio <- surveyresamplr::noaa_nwfsc_bio
+grid_yrs <- replicate_df(
+  dat = surveyresamplr::noaa_nwfsc_catch, time_name = "year",
+  time_values = unique(catch$year)
+)
+spp_list <- data.frame(
+  srvy = "CA",
+  common_name = "arrowtooth flounder",
+  file_name = "arrowtooth_flounder",
+  filter_lat_gt = 34,
+  filter_lat_lt = NA,
+  filter_depth = NA,
+  model_fn = "total_catch_wt_kg ~ 0 + factor(year) + pass",
+  model_family = "delta_gamma",
+  model_anisotropy = TRUE,
+  model_spatiotemporal = "iid, iid"
+)
+clean_and_resample(
+  spp_info = spp_list,
+  catch,
+  seq_from = 0.1,
+  seq_to = 1,
+  seq_by = 0.1,
+  tot_dataframes = 91,
+  replicate_num = 10,
+  grid_yrs = grid_yrs,
+  dir_out = dir_out,
+  bio = bio
+)
 
 }

@@ -29,46 +29,49 @@
 #' dir_out <- here::here("vignettes", "output")
 #' catch <- surveyresamplr::noaa_nwfsc_catch
 #' bio <- surveyresamplr::noaa_nwfsc_bio
-#' grid_yrs <- replicate_df(dat = surveyresamplr::noaa_nwfsc_catch, time_name = "year",
-#'                          time_values = unique(catch$year))
-#' spp_list <- data.frame(srvy = "CA",
-#'                        common_name = "arrowtooth flounder",
-#'                        file_name = "arrowtooth_flounder",
-#'                        filter_lat_gt = 34,
-#'                        filter_lat_lt = NA,
-#'                        filter_depth = NA,
-#'                        model_fn = "total_catch_wt_kg ~ 0 + factor(year) + pass",
-#'                        model_family = "delta_gamma",
-#'                        model_anisotropy = TRUE
-#'                        model_spatiotemporal = "iid, iid"
-#'                       )
-#' clean_and_resample(spp_info = spp_list, 
-#'                    catch, 
-#'                    seq_from = 0.1, 
-#'                    seq_to = 1, 
-#'                    seq_by = 0.1, 
-#'                    tot_dataframes = 91, 
-#'                    replicate_num = 10, 
-#'                    grid_yrs = grid_yrs, 
-#'                    dir_out = dir_out,
-#'                    bio = bio)
+#' grid_yrs <- replicate_df(
+#'   dat = surveyresamplr::noaa_nwfsc_catch, time_name = "year",
+#'   time_values = unique(catch$year)
+#' )
+#' spp_list <- data.frame(
+#'   srvy = "CA",
+#'   common_name = "arrowtooth flounder",
+#'   file_name = "arrowtooth_flounder",
+#'   filter_lat_gt = 34,
+#'   filter_lat_lt = NA,
+#'   filter_depth = NA,
+#'   model_fn = "total_catch_wt_kg ~ 0 + factor(year) + pass",
+#'   model_family = "delta_gamma",
+#'   model_anisotropy = TRUE,
+#'   model_spatiotemporal = "iid, iid"
+#' )
+#' clean_and_resample(
+#'   spp_info = spp_list,
+#'   catch,
+#'   seq_from = 0.1,
+#'   seq_to = 1,
+#'   seq_by = 0.1,
+#'   tot_dataframes = 91,
+#'   replicate_num = 10,
+#'   grid_yrs = grid_yrs,
+#'   dir_out = dir_out,
+#'   bio = bio
+#' )
 #'
 clean_and_resample <- function(
-  spp_info,
-  catch,
-  seq_from = 0.1,
-  seq_to = 1,
-  seq_by = 0.1,
-  tot_dataframes = 91,
-  replicate_num = 10,
-  grid_yrs,
-  dir_out,
-  test = FALSE,
-  n_knots = 500,
-  model_type = "wrapper_sdmtmb",
-  bio = NULL
-) {
-  
+    spp_info,
+    catch,
+    seq_from = 0.1,
+    seq_to = 1,
+    seq_by = 0.1,
+    tot_dataframes = 91,
+    replicate_num = 10,
+    grid_yrs,
+    dir_out,
+    test = FALSE,
+    n_knots = 500,
+    model_type = "wrapper_sdmtmb",
+    bio = NULL) {
   message(paste0(spp_info$srvy, " ", spp_info$common_name))
   # check input variables
   ## do all of the model function variables exist in grid_yrs and the catch data?

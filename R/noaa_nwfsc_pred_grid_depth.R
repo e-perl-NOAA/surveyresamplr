@@ -10,10 +10,10 @@
 #'   \item{\code{pass}}{Pass. Pass}
 #'   \item{\code{depth_m}}{Depth (m). Bottom depth (meters).}
 #'   \item{\code{area_km2}}{Area (km2). Area in square kilometers.}#'   }
-#' @source Northwest Fisheries Science Center; https://raw.githubusercontent.com/pfmc-assessments/indexwc/main/data/california_current_grid.rda. 
+#' @source Northwest Fisheries Science Center; https://raw.githubusercontent.com/pfmc-assessments/indexwc/main/data/california_current_grid.rda.
 #' @keywords species code data
 #' @examples
 #' data(noaa_nwfsc_pred_grid_depth)
 #' @details ENTER.
 
-'noaa_nwfsc_pred_grid_depth'
+"noaa_nwfsc_pred_grid_depth"

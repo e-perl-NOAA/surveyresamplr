@@ -15,4 +15,4 @@
 #' data(noaa_afsc_age)
 #' @details The Resource Assessment and Conservation Engineering (RACE) Division Groundfish Assessment Program (GAP) of the Alaska Fisheries Science Center (AFSC) conducts fisheries-independent bottom trawl surveys to assess the populations of demersal fish and crab stocks of Alaska.
 
-'noaa_afsc_age'
+"noaa_afsc_age"

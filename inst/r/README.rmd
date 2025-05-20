@@ -64,10 +64,16 @@ toc_list <- toc
 toc_list <- gsub(pattern = "### ", replacement = ">      - [*", x = toc_list, fixed = TRUE)
 toc_list <- gsub(pattern = "## ", replacement = ">    - [*", x = toc_list, fixed = TRUE)
 toc_list <- gsub(pattern = "# ", replacement = ">  - [*", x = toc_list, fixed = TRUE)
-toc_link <- tolower(gsub(pattern = " ", replacement = "-", 
-                          x = gsub(pattern = "#", replacement = "", 
-                                   x = gsub(pattern = "# ", replacement = "", 
-                                            x = toc, fixed = TRUE), fixed = TRUE)))
+toc_link <- tolower(gsub(
+  pattern = " ", replacement = "-",
+  x = gsub(
+    pattern = "#", replacement = "",
+    x = gsub(
+      pattern = "# ", replacement = "",
+      x = toc, fixed = TRUE
+    ), fixed = TRUE
+  )
+))
 toc <- paste0(toc_list, "*](#", toc_link, ")", collapse = "\n")
 ```
 
@@ -96,15 +102,16 @@ devtools::install_github("nmfs-ost/surveyresamplr", build_vignettes = TRUE)
 Windows will not update a package already loaded, so then you have to remove the package and install it from scratch. There are two suggested packages, ‘graph’ and ‘Rgraphviz’, that are on Bioconductor, and you can install those with:
 
 ```{r also-install, eval = FALSE, echo = TRUE}
-install.packages("INLA",repos=c(getOption("repos"), INLA="https://inla.r-inla-download.org/R/stable"), dep=TRUE)
+install.packages("INLA", repos = c(getOption("repos"), INLA = "https://inla.r-inla-download.org/R/stable"), dep = TRUE)
 inla.upgrade() # for the stable version
 
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-BiocManager::install(c("graph", "Rgraphviz"), dep=TRUE)
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager")
+}
+BiocManager::install(c("graph", "Rgraphviz"), dep = TRUE)
 
 
-options(repos=c( inlabruorg = "https://inlabru-org.r-universe.dev", INLA = "https://inla.r-inla-download.org/R/testing", CRAN = "https://cran.rstudio.com") )
+options(repos = c(inlabruorg = "https://inlabru-org.r-universe.dev", INLA = "https://inla.r-inla-download.org/R/testing", CRAN = "https://cran.rstudio.com"))
 install.packages("fmesher")
 ```
 

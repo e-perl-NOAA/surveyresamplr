@@ -17,19 +17,19 @@ knitr::opts_chunk$set(
 ```{r}
 # Set directories --------------------------------------------------------------
 library(here)
-wd <- paste0(here::here(),"/vignettes/")
+wd <- paste0(here::here(), "/vignettes/")
 dir_out <- paste0(wd, "output/")
 dir_final <- paste0(dir_out, "NBS_0results/")
 ```
 
 ```{r eval = FALSE}
-#get rid of memory limits
-options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
+# get rid of memory limits
+options(future.globals.maxSize = 1 * 1024^4) # Allow up to 1 TB for globals
 
 # Install Libraries ------------------------------------------------------------
 
 # Here we list all the packages we will need for this whole process
-# We'll also use this in our works cited page. 
+# We'll also use this in our works cited page.
 PKG <- c(
   "surveyresamplr",
 
@@ -39,34 +39,34 @@ PKG <- c(
   "magrittr",
   "tidyr",
   "viridis",
-  "ggplot2", 
+  "ggplot2",
   "tibble",
-  "janitor", 
-  "data.table", 
-  
+  "janitor",
+  "data.table",
+
   # parallelizing
   "forcats",
   "purrr",
-  "furrr", 
+  "furrr",
   "doParallel",
-  
+
   # sampling
   "sampling",
-  
+
   # modeling
-  "arrow", 
-  "future.apply", 
-  "future.callr", 
+  "arrow",
+  "future.apply",
+  "future.callr",
   "sdmTMB", # install.packages("remotes"",; remotes::install_github("pbs-assess/sdmTMBextra", dependencies = TRUE",
-  "Matrix", 
+  "Matrix",
   "MASS",
-  "cluster", 
-  "TMB", 
-  "INLA" 
+  "cluster",
+  "TMB",
+  "INLA"
 )
 
-pkg_install <- function(p){
-  if(!require(p, character.only = TRUE)) {
+pkg_install <- function(p) {
+  if (!require(p, character.only = TRUE)) {
     install.packages(p)
   }
   require(p, character.only = TRUE)
@@ -77,29 +77,34 @@ base::lapply(unique(PKG), pkg_install)
 
 spp_list <- data.frame(
   srvy = "NBS",
-  common_name = c("walleye pollock", "snow crab", "Pacific cod", 
-                  "red king crab", "blue king crab", 
-                  "yellowfin sole", "Pacific halibut", 
-                  "Alaska plaice", "flathead sole", "northern rock sole", "arrowtooth flounder"), 
-  species_code = as.character(c(21740, 68580, 21720, 
-                                69322, 69323, 
-                                10210, 10120, 
-                                10285, 10130, 10261, 10110)), 
-  filter_lat_lt = NA, 
-  filter_lat_gt = NA, 
-  filter_depth = NA, 
+  common_name = c(
+    "walleye pollock", "snow crab", "Pacific cod",
+    "red king crab", "blue king crab",
+    "yellowfin sole", "Pacific halibut",
+    "Alaska plaice", "flathead sole", "northern rock sole", "arrowtooth flounder"
+  ),
+  species_code = as.character(c(
+    21740, 68580, 21720,
+    69322, 69323,
+    10210, 10120,
+    10285, 10130, 10261, 10110
+  )),
+  filter_lat_lt = NA,
+  filter_lat_gt = NA,
+  filter_depth = NA,
   model_fn = "total_catch_wt_kg ~ 0 + factor(year)",
   model_family = "delta_gamma",
   model_anisotropy = TRUE,
   model_spatiotemporal = c(c("iid, iid"))
-  ) %>% 
-  dplyr::mutate( 
-    file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))  )
+) %>%
+  dplyr::mutate(
+    file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))
+  )
 
 ### Load survey data -----------------------------------------------------------
 
 # source(paste0(wd, "code/data_dl_ak.r"))
-catch <- surveyresamplr::noaa_afsc_catch %>% 
+catch <- surveyresamplr::noaa_afsc_catch %>%
   dplyr::filter(srvy == "NBS")
 
 ### Load grid data -------------------------------------------------------------
@@ -109,28 +114,30 @@ grid_yrs <- replicate_df(surveyresamplr::noaa_afsc_nbs_pred_grid_depth, "year", 
 ### Variables ------------------------------------------------------------------
 
 srvy <- "NBS"
-seq_from = 0.2
-seq_to = 1.0
-seq_by = 0.2 
-tot_dataframes = 13
+seq_from <- 0.2
+seq_to <- 1.0
+seq_by <- 0.2
+tot_dataframes <- 13
 replicate_num <- 3
 
 ### Run ------------------------------------------------------------------------
 
 start.time <- Sys.time()
-sink(file = paste0(dir_final, srvy, Sys.Date(), "_logfile.txt"), append = FALSE, split = TRUE)  
+sink(file = paste0(dir_final, srvy, Sys.Date(), "_logfile.txt"), append = FALSE, split = TRUE)
 purrr::map(
-  1:nrow(spp_list), 
-  ~ clean_and_resample(spp_list[.x,], 
-                       catch, seq_from, seq_to, seq_by, 
-                       tot_dataframes, replicate_num, grid_yrs, dir_out, 
-                       n_knots = 150, 
-                       test = FALSE))
+  1:nrow(spp_list),
+  ~ clean_and_resample(spp_list[.x, ],
+    catch, seq_from, seq_to, seq_by,
+    tot_dataframes, replicate_num, grid_yrs, dir_out,
+    n_knots = 150,
+    test = FALSE
+  )
+)
 sink()
 write.csv(x = data.frame(time = as.numeric(Sys.time() - start.time), units = units(Sys.time() - start.time)), file = paste0(dir_final, srvy, "_time.csv"))
 
 ### Plot indices ---------------------------------------------------------------
-out <- plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final) 
+out <- plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final)
 ```
 
 ```{r results-run, eval = TRUE, echo = FALSE}
@@ -148,31 +155,31 @@ Parameter output:
 ```{r results-tables-1}
 i <- 1
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>% 
-  flextable::flextable() 
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
 ```
 
 
 ```{r results-tables-2}
 i <- 1 + i
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>% 
-  flextable::flextable() 
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
 ```
 
 
 ```{r results-tables-3}
 i <- 1 + i
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>% 
-  flextable::flextable() 
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
 ```
 
 
 ```{r results-tables-4}
 i <- 1 + i
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>% 
-  flextable::flextable() 
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
 ```
 

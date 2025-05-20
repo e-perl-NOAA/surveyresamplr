@@ -18,56 +18,55 @@ knitr::opts_chunk$set(
 # set CRAN mirror
 options(repos = c(CRAN = "https://cran.rstudio.com"))
 
-#get rid of memory limits
-options(future.globals.maxSize = 1 * 1024^4)  # Allow up to 1 TB for globals
+# get rid of memory limits
+options(future.globals.maxSize = 1 * 1024^4) # Allow up to 1 TB for globals
 ```
 
 ## Install and load libraries
 ```{r comment = FALSE, warning = FALSE, message = FALSE, error = FALSE, results='hide'}
-
 library(surveyresamplr)
 
 # Here we list all the packages we will need for this whole process
-# We'll also use this in our works cited page. 
+# We'll also use this in our works cited page.
 PKG <- c(
   "here",
   "flextable",
-  
+
   # tidyverse
   "dplyr",
   "magrittr",
   "tidyr",
   "viridis",
-  "ggplot2", 
+  "ggplot2",
   "tibble",
-  "janitor", 
-  "data.table", 
-  
+  "janitor",
+  "data.table",
+
   # parallelizing
   "forcats",
   "purrr",
-  "furrr", 
+  "furrr",
   "doParallel",
-  
+
   # sampling
   "sampling",
-  
+
   # modeling
-  "arrow", 
-  "future.apply", 
-  "future.callr", 
+  "arrow",
+  "future.apply",
+  "future.callr",
   "sdmTMB", # install.packages("remotes"",; remotes::install_github("pbs-assess/sdmTMBextra", dependencies = TRUE",
-  "Matrix", 
+  "Matrix",
   "MASS",
-  "cluster", 
-  "TMB", 
-  "INLA" 
+  "cluster",
+  "TMB",
+  "INLA"
 )
 
-pkg_install <- function(p){
+pkg_install <- function(p) {
   install.packages(p)
   require(p, character.only = TRUE)
-  }
+}
 base::lapply(PKG, pkg_install)
 ```
 
@@ -80,12 +79,12 @@ Walleye pollock are fairly well distributed across the area, very common in the 
 ```{r define-spp-list}
 spp_list <- data.frame(
   srvy = "EBS",
-  common_name = c("walleye pollock"), 
-  file_name = c("simple_walleye_pollock"), 
+  common_name = c("walleye pollock"),
+  file_name = c("simple_walleye_pollock"),
   species_code = as.character(c(21740)),
-  filter_lat_lt = NA, 
-  filter_lat_gt = NA, 
-  filter_depth = NA, 
+  filter_lat_lt = NA,
+  filter_lat_gt = NA,
+  filter_depth = NA,
   model_fn = "total_catch_wt_kg ~ 0 + factor(year)",
   model_family = "delta_gamma",
   model_anisotropy = TRUE,
@@ -128,10 +127,12 @@ ggplot2::ggplot(data = dat |> dplyr::filter(cpue_kgkm2 != 0),
                       size = 3) +
   ggplot2::xlab("Longitude °W") +
   ggplot2::ylab("Latitude °N") +
-  ggplot2::ggtitle(label = "CPUE (kg/km^2) of walleye pollock (Weight CPUE; kg/km2)", 
-                   subtitle = "AFSC Eastern Bering Sea bottom trawl survey") +
-  ggplot2::scale_size_continuous(name = "Weight (kg)") + 
-  ggplot2::facet_wrap(facets = vars(year)) + 
+  ggplot2::ggtitle(
+    label = "CPUE (kg/km^2) of walleye pollock (Weight CPUE; kg/km2)",
+    subtitle = "AFSC Eastern Bering Sea bottom trawl survey"
+  ) +
+  ggplot2::scale_size_continuous(name = "Weight (kg)") +
+  ggplot2::facet_wrap(facets = vars(year)) +
   ggplot2::theme_bw()
 ```
 
@@ -144,18 +145,26 @@ head(surveyresamplr::noaa_afsc_ebs_pred_grid_depth) |>
 ```
 
 ```{r explore-grid-plot, fig.width=6, fig.height=6, fig.cap= "Prediction grid for the EBS survey. "}
-ggplot2::ggplot(data = surveyresamplr::noaa_afsc_ebs_pred_grid_depth, 
-                mapping = aes(x = longitude_dd, 
-                              y = latitude_dd, 
-                              color = depth_m)) + 
-  ggplot2::geom_point(alpha = .5, 
-                      size = .5)  +
+ggplot2::ggplot(
+  data = surveyresamplr::noaa_afsc_ebs_pred_grid_depth,
+  mapping = aes(
+    x = longitude_dd,
+    y = latitude_dd,
+    color = depth_m
+  )
+) +
+  ggplot2::geom_point(
+    alpha = .5,
+    size = .5
+  ) +
   ggplot2::xlab("Longitude °W") +
   ggplot2::ylab("Latitude °N") +
-  ggplot2::ggtitle(label = "Prediction Grid", 
-                   subtitle = "AFSC Eastern Bering Sea bottom trawl survey") +
-  ggplot2::scale_color_gradient(name = "Depth (m)") + 
-  ggplot2::theme_bw() 
+  ggplot2::ggtitle(
+    label = "Prediction Grid",
+    subtitle = "AFSC Eastern Bering Sea bottom trawl survey"
+  ) +
+  ggplot2::scale_color_gradient(name = "Depth (m)") +
+  ggplot2::theme_bw()
 ```   
 
 Here we load the data for the model run, cropping it to the data we would like to include (the EBS survey and years greater than 2010) and replicating the the prediction grid across the years in the catch data. 
@@ -169,9 +178,11 @@ catch <- surveyresamplr::noaa_afsc_catch |>
 
 ### Load grid data -------------------------------------------------------------
 
-grid_yrs <- sdmTMB::replicate_df(dat = surveyresamplr::noaa_afsc_ebs_pred_grid_depth, 
-                         time_name = "year", 
-                         time_values = unique(catch$year))
+grid_yrs <- sdmTMB::replicate_df(
+  dat = surveyresamplr::noaa_afsc_ebs_pred_grid_depth,
+  time_name = "year",
+  time_values = unique(catch$year)
+)
 ```
 
 Now you'll notice the year column has been added, repeated with all of the years in the catch data. 
@@ -189,7 +200,7 @@ tot_dataframes = effort x replicates - (replicates - 1). TOLEDO: is this hard an
 srvy <- "EBS"
 seq_from <- 0.50
 seq_to <- 1.0
-seq_by <- 0.25 
+seq_by <- 0.25
 tot_dataframes <- 3
 replicate_num <- 7
 ```
@@ -197,7 +208,7 @@ replicate_num <- 7
 # Set directories
 
 ```{r set-directories}
-wd <- paste0(here::here(),"/vignettes/")
+wd <- paste0(here::here(), "/vignettes/")
 dir_out <- paste0(wd, "output/")
 dir_final <- paste0(dir_out, "EBS_simple_0results/")
 dir.create(dir_final, showWarnings = FALSE)
@@ -210,103 +221,106 @@ explain why `purrr::map` is important, what the sink files are for.
 
 ```{r run-models, eval = FALSE}
 start.time <- Sys.time()
-sink(file = paste0(dir_final, srvy, "_simple_logfile.txt"), append = FALSE, split = TRUE)  
+sink(file = paste0(dir_final, srvy, "_simple_logfile.txt"), append = FALSE, split = TRUE)
 purrr::map(
-  1:nrow(spp_list), 
-  ~ clean_and_resample(spp_list[.x,], 
-                       catch, seq_from, seq_to, seq_by, 
-                       tot_dataframes, replicate_num, grid_yrs, dir_out))
+  1:nrow(spp_list),
+  ~ clean_and_resample(
+    spp_list[.x, ],
+    catch, seq_from, seq_to, seq_by,
+    tot_dataframes, replicate_num, grid_yrs, dir_out
+  )
+)
 sink()
 write.csv(x = data.frame(time = as.numeric(Sys.time() - start.time), units = units(Sys.time() - start.time)), file = paste0(dir_final, srvy, "_simple_time.csv"))
 ```
 
 ```{r time}
-a <- read.csv(file = paste0(dir_final, srvy, "_simple_time.csv") )
+a <- read.csv(file = paste0(dir_final, srvy, "_simple_time.csv"))
 print(paste0("Time difference of ", round(a$time, 2), " ", a$units))
 ```
 
 ```{r sink-results, eval = FALSE}
-cat(readLines(con = paste0(dir_final, srvy, "_simple_logfile.txt") ))  
+cat(readLines(con = paste0(dir_final, srvy, "_simple_logfile.txt")))
 ```
 
 ```{r sink-results-backup}
 # EBS walleye pollock
 # ...Starting parallel SDM processing
-# 
+#
 # ...05_1
-# 
+#
 # This mesh has > 1000 vertices. Mesh complexity has the single largest influence on fitting speed. Consider whether you require a mesh this complex, especially for initial model exploration.
 # Check `your_mesh$mesh$n` to view the number of vertices.Warning: The model may not have converged: non-positive-definite Hessian matrix.Warning: The model may not have converged: non-positive-definite Hessian matrix.Warning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs produced✔ Non-linear minimizer suggests successful convergence
 # ✖ Non-positive-definite Hessian matrix: model may not have converged
 # ℹ Try simplifying the model, adjusting the mesh, or adding priors
-# 
+#
 # ✔ No extreme or very small eigenvalues detected
 # ✔ No gradients with respect to fixed effects are >= 0.001
 # Warning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs produced✔ No fixed-effect standard errors are NA
 # Warning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs produced✖ `b_j` standard error may be large
 # ℹ Try simplifying the model, adjusting the mesh, or adding priors
-# 
+#
 # ✖ `ln_kappa` standard error may be large
 # ℹ `ln_kappa` is an internal parameter affecting `range`
 # ℹ `range` is the distance at which data are effectively independent
 # ℹ Try simplifying the model, adjusting the mesh, or adding priors
-# 
+#
 # Warning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs produced✔ No sigma parameters are < 0.01
 # ✔ No sigma parameters are > 100
 # ✔ Range parameters don't look unreasonably large
-# 
+#
 # ...05_2
-# 
+#
 # This mesh has > 1000 vertices. Mesh complexity has the single largest influence on fitting speed. Consider whether you require a mesh this complex, especially for initial model exploration.
 # Check `your_mesh$mesh$n` to view the number of vertices.Warning: NaNs producedWarning: The model may not have converged: non-positive-definite Hessian matrix.Warning: NaNs producedWarning: The model may not have converged: non-positive-definite Hessian matrix.Warning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs produced✔ Non-linear minimizer suggests successful convergence
 # ✖ Non-positive-definite Hessian matrix: model may not have converged
 # ℹ Try simplifying the model, adjusting the mesh, or adding priors
-# 
+#
 # ✔ No extreme or very small eigenvalues detected
 # ✖ `b_j2` gradient > 0.001
 # ℹ See ?run_extra_optimization(), standardize covariates, and/or simplify the model
-# 
+#
 # ✖ `ln_tau_E` gradient > 0.001
 # ℹ See ?run_extra_optimization(), standardize covariates, and/or simplify the model
-# 
+#
 # ✖ `ln_kappa` gradient > 0.001
 # ℹ See ?run_extra_optimization(), standardize covariates, and/or simplify the model
-# 
+#
 # ✖ `ln_phi` gradient > 0.001
 # ℹ See ?run_extra_optimization(), standardize covariates, and/or simplify the model
-# 
+#
 # Warning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs produced✔ No fixed-effect standard errors are NA
 # Warning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs produced✖ `b_j` standard error may be large
 # ℹ Try simplifying the model, adjusting the mesh, or adding priors
-# 
+#
 # Warning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs produced✔ No sigma parameters are < 0.01
 # ✔ No sigma parameters are > 100
 # ✔ Range parameters don't look unreasonably large
-# 
+#
 # ...05_3
-# 
+#
 # This mesh has > 1000 vertices. Mesh complexity has the single largest influence on fitting speed. Consider whether you require a mesh this complex, especially for initial model exploration.
 # Check `your_mesh$mesh$n` to view the number of vertices.Warning: NaNs producedWarning: The model may not have converged: non-positive-definite Hessian matrix.Warning: NaNs producedWarning: The model may not have converged: non-positive-definite Hessian matrix.Warning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs produced✔ Non-linear minimizer suggests successful convergence
 # ✖ Non-positive-definite Hessian matrix: model may not have converged
 # ℹ Try simplifying the model, adjusting the mesh, or adding priors
-# 
+#
 # ✔ No extreme or very small eigenvalues detected
 # ✖ `b_j2` gradient > 0.001
 # ℹ See ?run_extra_optimization(), standardize covariates, and/or simplify the model
-# 
+#
 # ✖ `b_j2` gradient > 0.001
 # ℹ See ?run_extra_optimization(), standardize covariates, and/or simplify the model
-# 
+#
 # ✖ `ln_tau_E` gradient > 0.001
 # ℹ See ?run_extra_optimization(), standardize covariates, and/or simplify the model
-# 
+#
 # ✖ `ln_kappa` gradient > 0.001
 # ℹ See ?run_extra_optimization(), standardize covariates, and/or simplify the model
-# 
+#
 # Warning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs produced✔ No fixed-effect standard errors are NA
 # Warning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs produced✖ `b_j` standard error may be large
 # ℹ Try simplifying the model, adjusting the mesh, or adding priors
-# 
+#
 # Warning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs producedWarning: NaNs produced✔ No sigma parameters are < 0.01
 # ✔ No sigma parameters are > 100
 # ✔ Range parameters don't look unreasonably large
@@ -314,7 +328,7 @@ cat(readLines(con = paste0(dir_final, srvy, "_simple_logfile.txt") ))
 ```
 
 ```{r results-run1, eval = TRUE}
-out <- plot_results(srvy = paste0(srvy, "_simple"), dir_out = dir_out, dir_final = dir_final) 
+out <- plot_results(srvy = paste0(srvy, "_simple"), dir_out = dir_out, dir_final = dir_final)
 ```
 
 ```{r results-run, eval = TRUE, echo = FALSE}
@@ -333,30 +347,30 @@ Parameter output:
 ```{r results-tables-1}
 i <- 1
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>% 
-  flextable::flextable() 
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
 ```
 
 
 ```{r results-tables-2}
 i <- 1 + i
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>% 
-  flextable::flextable() 
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
 ```
 
 
 ```{r results-tables-3}
 i <- 1 + i
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>% 
-  flextable::flextable() 
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
 ```
 
 
 ```{r results-tables-4}
 i <- 1 + i
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>% 
-  flextable::flextable() 
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
 ```
