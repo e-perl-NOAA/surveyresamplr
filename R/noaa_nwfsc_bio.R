@@ -16,10 +16,10 @@
 #'   \item{\code{length_cm}}{Length (cm). Length of fish in centimeters.}
 #'   \item{\code{sex}}{Sex. Sex of fish F = female, M = male, U = unsexed.}
 #'   \item{\code{project}}{Project. Survey project name. This is exclusively used for NWFSC surveys.}#'   }
-#' @source Northwest Fisheries Science Center. 
+#' @source Northwest Fisheries Science Center.
 #' @keywords species code data
 #' @examples
 #' data(noaa_nwfsc_bio)
 #' @details ENTER.
 
-'noaa_nwfsc_bio'
+"noaa_nwfsc_bio"

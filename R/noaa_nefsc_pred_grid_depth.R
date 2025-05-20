@@ -10,10 +10,10 @@
 #'   \item{\code{pass}}{Pass. Pass}
 #'   \item{\code{depth_m}}{Depth (m). Bottom depth (meters).}
 #'   \item{\code{area_km2}}{Area (km2). Area in square kilometers.}#'   }
-#' @source Data request to the NEFSC. 
+#' @source Data request to the NEFSC.
 #' @keywords species code data
 #' @examples
 #' data(noaa_nefsc_pred_grid_depth)
 #' @details ENTER.
 
-'noaa_nefsc_pred_grid_depth'
+"noaa_nefsc_pred_grid_depth"
