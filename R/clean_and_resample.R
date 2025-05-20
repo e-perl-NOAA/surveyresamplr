@@ -104,6 +104,7 @@ clean_and_resample <- function(
   }
 
   message("Starting cleanup of catch data")
+  
   spp_dfs <- cleanup_by_species(
     catch = catch,
     spp_info = spp_info,
@@ -112,21 +113,6 @@ clean_and_resample <- function(
     seq_by = seq_by,
     tot_dataframes = tot_dataframes,
     replicate_num = replicate_num
-  )
-
-  try(
-    {
-      resample_tests(
-        spp_dfs = spp_dfs,
-        spp_info = spp_info,
-        grid_yrs = grid_yrs,
-        dir_out = dir_out,
-        test = test,
-        n_knots = n_knots,
-        model_type = model_type
-      )
-    },
-    silent = FALSE
   )
 
   if (!is.null(bio)) {
