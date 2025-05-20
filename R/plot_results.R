@@ -95,7 +95,7 @@ plot_results <- function(srvy, dir_out, dir_final = NULL) {
     )
   ) +
     ggplot2::geom_boxplot() +
-    ggplot2::facet_wrap(~common_name) +
+    ggplot2::facet_wrap(~common_name, scales = "free_y") +
     ggplot2::labs(
       x = "Proprotion of effort",
       y = "Log biomass estimate"
@@ -120,7 +120,7 @@ plot_results <- function(srvy, dir_out, dir_final = NULL) {
     )
   ) +
     ggplot2::geom_boxplot() +
-    ggplot2::facet_wrap(~common_name) +
+    ggplot2::facet_wrap(~common_name, scales = "free_y") +
     ggplot2::labs(
       x = "Proprotion of effort",
       y = "Standard error of log biomass estimate"
@@ -145,7 +145,7 @@ plot_results <- function(srvy, dir_out, dir_final = NULL) {
     )
   ) +
     ggplot2::geom_boxplot() +
-    ggplot2::facet_wrap(~common_name) +
+    ggplot2::facet_wrap(~common_name, scales = "free_y") +
     ggplot2::labs(
       x = "Proprotion of effort",
       y = "Biomass estimate"
@@ -170,7 +170,7 @@ plot_results <- function(srvy, dir_out, dir_final = NULL) {
     )
   ) +
     ggplot2::geom_line() +
-    ggplot2::facet_wrap(~common_name) +
+    ggplot2::facet_wrap(~common_name, scales = "free_y") +
     ggplot2::labs(
       x = "years",
       y = "Biomass estimate"
