@@ -10,7 +10,7 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>", 
+  comment = "#>",
   eval = FALSE
 )
 ```
@@ -108,7 +108,6 @@ seq_to <- 1.0
 seq_by <- 0.2
 tot_dataframes <- 13
 replicate_num <- 3
-
 ```
 
 # Spring

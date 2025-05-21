@@ -50,7 +50,7 @@ cleanup_by_species <- function(
     tot_dataframes = 91,
     replicate_num = 10) {
   # Filter the catch data frame by species
-  df <- catch |> 
+  df <- catch |>
     dplyr::filter(
       common_name == spp_info$common_name
     )

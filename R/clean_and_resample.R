@@ -104,7 +104,7 @@ clean_and_resample <- function(
   }
 
   message("Starting cleanup of catch data")
-  
+
   spp_dfs <- cleanup_by_species(
     catch = catch,
     spp_info = spp_info,

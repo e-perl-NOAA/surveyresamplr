@@ -45,19 +45,19 @@ plot_results <- function(srvy, dir_out, dir_final = NULL) {
   fit_df <- fit_pars <- fit_check <- index <- data.frame()
   for (i in 1:length(aaa)) {
     if (file.exists(paste0(aaa[i], "/fit_df.csv"))) {
-      fit_df <- fit_df |> 
+      fit_df <- fit_df |>
         dplyr::bind_rows(utils::read.csv(paste0(aaa[i], "/fit_df.csv")))
     }
     if (file.exists(paste0(aaa[i], "/fit_pars.csv"))) {
-      fit_pars <- fit_pars |> 
+      fit_pars <- fit_pars |>
         dplyr::bind_rows(utils::read.csv(paste0(aaa[i], "/fit_pars.csv")))
     }
     if (file.exists(paste0(aaa[i], "/fit_check.csv"))) {
-      fit_check <- fit_check |> 
+      fit_check <- fit_check |>
         dplyr::bind_rows(utils::read.csv(paste0(aaa[i], "/fit_check.csv")))
     }
     if (file.exists(paste0(aaa[i], "/index.csv"))) {
-      index <- index |> 
+      index <- index |>
         dplyr::bind_rows(utils::read.csv(paste0(aaa[i], "/index.csv")))
     }
   }

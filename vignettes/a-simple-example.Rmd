@@ -100,27 +100,33 @@ Use `?surveyresamplr::noaa_afsc_catch` and `?surveyresamplr::noaa_afsc_ebs_pred_
 ```{r explore-catch}
 # ?surveyresamplr::noaa_afsc_catch
 
-head(surveyresamplr::noaa_afsc_catch) |> 
+head(surveyresamplr::noaa_afsc_catch) |>
   flextable::flextable()
 ```
 
 
 ```{r explore-catch-plot, fig.width=6, fig.height=4, fig.cap= "CPUE (kg/km^2) of walleye pollock (Weight CPUE; kg/km2) from 2023 and 2024 in the EBS survey. "}
-dat <- surveyresamplr::noaa_afsc_catch |> 
-  dplyr::filter(year %in% 2023:2024 & 
-                  srvy %in% c("EBS") & 
-                  species_code == 21740)
+dat <- surveyresamplr::noaa_afsc_catch |>
+  dplyr::filter(year %in% 2023:2024 &
+    srvy %in% c("EBS") &
+    species_code == 21740)
 
-ggplot2::ggplot(data = dat |> dplyr::filter(cpue_kgkm2 != 0), 
-                mapping = aes(x = longitude_dd, 
-                              y = latitude_dd, 
-                              size = cpue_kgkm2)) + 
+ggplot2::ggplot(
+  data = dat |> dplyr::filter(cpue_kgkm2 != 0),
+  mapping = aes(
+    x = longitude_dd,
+    y = latitude_dd,
+    size = cpue_kgkm2
+  )
+) +
   ggplot2::geom_point(alpha = .75) +
-  ggplot2::geom_point(data = dat |> dplyr::filter(cpue_kgkm2 %in% c(0, NA)), 
-                      color = "red", 
-                      shape = 17,
-                      alpha = .75,
-                      size = 3) +
+  ggplot2::geom_point(
+    data = dat |> dplyr::filter(cpue_kgkm2 %in% c(0, NA)),
+    color = "red",
+    shape = 17,
+    alpha = .75,
+    size = 3
+  ) +
   ggplot2::xlab("Longitude °W") +
   ggplot2::ylab("Latitude °N") +
   ggplot2::ggtitle(
@@ -136,7 +142,7 @@ ggplot2::ggplot(data = dat |> dplyr::filter(cpue_kgkm2 != 0),
 ```{r explore-grid}
 # ?surveyresamplr::noaa_afsc_ebs_pred_grid_depth
 
-head(surveyresamplr::noaa_afsc_ebs_pred_grid_depth) |> 
+head(surveyresamplr::noaa_afsc_ebs_pred_grid_depth) |>
   flextable::flextable()
 ```
 
@@ -168,8 +174,8 @@ Here we load the data for the model run, cropping it to the data we would like t
 ```{r load-data}
 ### Load survey data -----------------------------------------------------------
 
-catch <- surveyresamplr::noaa_afsc_catch |> 
-  dplyr::filter(srvy == "EBS") |> 
+catch <- surveyresamplr::noaa_afsc_catch |>
+  dplyr::filter(srvy == "EBS") |>
   dplyr::filter(year >= 2015)
 
 ### Load grid data -------------------------------------------------------------
@@ -184,8 +190,8 @@ grid_yrs <- sdmTMB::replicate_df(
 Now you'll notice the year column has been added, repeated with all of the years in the catch data. 
 
 ```{r grid-yrs}
-head(grid_yrs) |> 
-  flextable::flextable() 
+head(grid_yrs) |>
+  flextable::flextable()
 ```
 
 Set variables. This... requires more description. `seq(from = seq_from, to = seq_to, by = seq_by)`
