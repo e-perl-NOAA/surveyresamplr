@@ -131,7 +131,7 @@ map(
   ~ clean_and_resample(spp_list[.x, ],
     catch, seq_from, seq_to, seq_by,
     tot_dataframes, replicate_num, grid_yrs, dir_out,
-    test = TRUE
+    test = FALSE
   )
 )
 sink()

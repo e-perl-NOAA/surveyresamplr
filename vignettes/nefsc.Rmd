@@ -10,20 +10,14 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>", 
+  eval = FALSE
 )
 ```
 
-```{r  eval = FALSE}
+```{r eval = FALSE}
 # get rid of memory limits
 options(future.globals.maxSize = 1 * 1024^4) # Allow up to 1 TB for globals
-
-# Set directories --------------------------------------------------------------
-library(here)
-
-wd <- paste0(here::here(), "/vignettes/")
-dir_out <- paste0(wd, "output/")
-crs_latlon <- "+proj=longlat +datum=WGS84" # decimal degrees
 
 # Install Libraries ------------------------------------------------------------
 
@@ -103,23 +97,39 @@ spp_list <-
 
 spp_list <- spp_list[1:3, ]
 
-### Load survey data -----------------------------------------------------------
-
-# source(paste0(wd, "code/data_dl_ne.r"))
-catch <- surveyresamplr::noaa_nefsc_catch # pulled data again to get 2024
-
 ### Load grid data -------------------------------------------------------------
 
 grid_yrs <- replicate_df(surveyresamplr::noaa_nefsc_pred_grid_depth, "year", unique(catch$year))
 
 ### Variables ------------------------------------------------------------------
 
-srvy <- "NWA_SPRING"
 seq_from <- 0.2
 seq_to <- 1.0
 seq_by <- 0.2
 tot_dataframes <- 13
 replicate_num <- 3
+
+```
+
+# Spring
+
+```{r}
+# Set directories --------------------------------------------------------------
+library(here)
+
+wd <- paste0(here::here(), "/vignettes/")
+dir_out <- paste0(wd, "output/")
+dir_final <- paste0(dir_out, "NWA_SPRING_0results/")
+```
+
+```{r eval = FALSE}
+### Load survey data -----------------------------------------------------------
+
+catch <- surveyresamplr::noaa_nefsc_catch |> dplyr::filter(srvy == "FALL")
+
+### Variables ------------------------------------------------------------------
+
+srvy <- "NWA_SPRING"
 
 ### Run ------------------------------------------------------------------------
 
@@ -136,31 +146,70 @@ sink()
 
 ### Plot indices --------------------------------------------------------------
 
-plot_results(srvy = srvy, dir_out = dir_out)
+out <- plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final)
 ```
 
-```{r, eval = FALSE}
-## Fall Northwest Atlantic ---------------------------------------------------
+```{r results-run, eval, echo = FALSE}
+load(file = paste0(dir_final, "analysisoutput.rdata"))
+library(flextable)
+library(magrittr)
+```
 
+```{r results-plots}
+out$plots
+```
+
+Parameter output: 
+
+```{r results-tables-1}
+i <- 1
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
+```
+
+```{r results-tables-2}
+i <- 1 + i
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
+```
+
+
+```{r results-tables-3}
+i <- 1 + i
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
+```
+
+
+```{r results-tables-4}
+i <- 1 + i
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
+```
+
+# Fall
+
+```{r}
+# Set directories --------------------------------------------------------------
+library(here)
+
+wd <- paste0(here::here(), "/vignettes/")
+dir_out <- paste0(wd, "output/")
+dir_final <- paste0(dir_out, "NWA_FALL_0results/")
+```
+
+```{r eval = FALSE}
 ### Load survey data -----------------------------------------------------------
 
-# source(paste0(wd, "code/data_dl_ne.r"))
-
-catch <- noaa_nefsc_catch |> dplyr::filter(srvy == "FALL")
-
-### Load grid data -------------------------------------------------------------
-
-load(paste0(wd, "grids/noaa_nefsc_nwa_pred_grid_depth.rdata"), verbose = TRUE)
-grid_yrs <- replicate_df(pred_grid_depth, "year", unique(catch$year))
+catch <- surveyresamplr::noaa_nefsc_catch %>% dplyr::filter(srvy == "FALL") # pulled data again to get 2024
 
 ### Variables ------------------------------------------------------------------
 
 srvy <- "NWA_FALL"
-seq_from <- 0.2
-seq_to <- 1.0
-seq_by <- 0.2
-tot_dataframes <- 13
-replicate_num <- 3
 
 ### Run ------------------------------------------------------------------------
 
@@ -177,16 +226,48 @@ sink()
 
 ### Plot indices --------------------------------------------------------------
 
-plot_results(srvy = srvy, dir_out = dir_out)
+out <- plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final)
 ```
 
-```{r, echo = FALSE}
-# for (i in 1:nrow(spp_list)) {
-#   file0 <- paste0(dir_out, "/", srvy, "_", spp_list$file_name[i])
-#   if (dir.exists(file0)) {
-#     aaa <- list.files(paste0(dir_out, "/", srvy, "_", spp_list$file_name[i]), full.names = TRUE)
-#     aaa <- aaa[!grepl(pattern = ".csv", x = aaa)]
-#     file.remove(aaa)
-#   }
-# }
+```{r results-run, eval, echo = FALSE}
+load(file = paste0(dir_final, "analysisoutput.rdata"))
+library(flextable)
+library(magrittr)
+```
+
+```{r results-plots}
+out$plots
+```
+
+Parameter output: 
+
+```{r results-tables-1}
+i <- 1
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
+```
+
+
+```{r results-tables-2}
+i <- 1 + i
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
+```
+
+
+```{r results-tables-3}
+i <- 1 + i
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
+```
+
+
+```{r results-tables-4}
+i <- 1 + i
+print(names(out$tables)[i])
+head(out$tables[i][[1]]) %>%
+  flextable::flextable()
 ```

@@ -1,0 +1,61 @@
+"","X.3","X.2","X.1","X","srvy","common_name","species_code","filter_lat_lt","filter_lat_gt","filter_depth","model_fn","model_family","model_anisotropy","model_spatiotemporal","file_name","effort","term","estimate","std.error","conf.low","conf.high"
+"1",1,1,1,1,"AI","flathead sole",10130,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","flathead_sole","08_3","range",0.501200119088302,NA,NA,NA
+"2",2,2,2,2,"AI","flathead sole",10130,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","flathead_sole","08_3","sigma_O",0.481116858500426,NA,NA,NA
+"3",3,3,3,3,"AI","flathead sole",10130,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","flathead_sole","08_3","sigma_E",0.223746316743324,187.621609922193,0,Inf
+"4",4,4,4,NA,"AI","flathead sole",10130,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","flathead_sole","1_1","range",2.82606511972872,NA,NA,NA
+"5",5,5,5,NA,"AI","flathead sole",10130,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","flathead_sole","1_1","sigma_O",0.281743653618377,NA,NA,NA
+"6",6,6,6,NA,"AI","flathead sole",10130,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","flathead_sole","1_1","sigma_E",0.281744144512887,NA,NA,NA
+"7",7,7,NA,NA,"AI","flathead sole",10130,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","flathead_sole","08_3","range",0.501200119088302,NA,NA,NA
+"8",8,8,NA,NA,"AI","flathead sole",10130,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","flathead_sole","08_3","sigma_O",0.481116858500426,NA,NA,NA
+"9",9,9,NA,NA,"AI","flathead sole",10130,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","flathead_sole","08_3","sigma_E",0.223746316743324,187.621609922193,0,Inf
+"10",10,NA,NA,NA,"AI","flathead sole",10130,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","flathead_sole","1_1","range",2.82606511972872,NA,NA,NA
+"11",11,NA,NA,NA,"AI","flathead sole",10130,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","flathead_sole","1_1","sigma_O",0.281743653618377,NA,NA,NA
+"12",12,NA,NA,NA,"AI","flathead sole",10130,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","flathead_sole","1_1","sigma_E",0.281744144512887,NA,NA,NA
+"13",1,1,1,1,"AI","northern rockfish",30420,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rockfish","08_3","range",2.83209025005233,NA,NA,NA
+"14",2,2,2,2,"AI","northern rockfish",30420,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rockfish","08_3","sigma_O",0.281998770015652,NA,NA,NA
+"15",3,3,3,3,"AI","northern rockfish",30420,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rockfish","08_3","sigma_E",0.272745258770302,NA,NA,NA
+"16",4,4,4,NA,"AI","northern rockfish",30420,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rockfish","1_1","range",2.82841149102831,2887.20143213687,0,Inf
+"17",5,5,5,NA,"AI","northern rockfish",30420,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rockfish","1_1","sigma_O",0.28209245482982,415.903820318745,0,Inf
+"18",6,6,6,NA,"AI","northern rockfish",30420,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rockfish","1_1","sigma_E",0.282092455585595,378.160162702866,0,Inf
+"19",7,7,NA,NA,"AI","northern rockfish",30420,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rockfish","08_3","range",2.83209025005233,NA,NA,NA
+"20",8,8,NA,NA,"AI","northern rockfish",30420,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rockfish","08_3","sigma_O",0.281998770015652,NA,NA,NA
+"21",9,9,NA,NA,"AI","northern rockfish",30420,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rockfish","08_3","sigma_E",0.272745258770302,NA,NA,NA
+"22",10,NA,NA,NA,"AI","northern rockfish",30420,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rockfish","1_1","range",2.82841149102831,2887.20143213687,0,Inf
+"23",11,NA,NA,NA,"AI","northern rockfish",30420,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rockfish","1_1","sigma_O",0.28209245482982,415.903820318745,0,Inf
+"24",12,NA,NA,NA,"AI","northern rockfish",30420,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rockfish","1_1","sigma_E",0.282092455585595,378.160162702866,0,Inf
+"25",1,1,1,1,"AI","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","08_3","range",4.36201200733305,NA,NA,NA
+"26",2,2,2,2,"AI","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","08_3","sigma_O",0.297303743740809,NA,NA,NA
+"27",3,3,3,3,"AI","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","08_3","sigma_E",0.253064412154901,NA,NA,NA
+"28",4,4,4,NA,"AI","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","1_1","range",2.82830366633727,3597.50111671783,0,Inf
+"29",5,5,5,NA,"AI","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","1_1","sigma_O",0.282076346848689,433.044777142261,0,Inf
+"30",6,6,6,NA,"AI","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","1_1","sigma_E",0.282076346655336,398.904481236308,0,Inf
+"31",7,7,NA,NA,"AI","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","08_3","range",4.36201200733305,NA,NA,NA
+"32",8,8,NA,NA,"AI","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","08_3","sigma_O",0.297303743740809,NA,NA,NA
+"33",9,9,NA,NA,"AI","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","08_3","sigma_E",0.253064412154901,NA,NA,NA
+"34",10,NA,NA,NA,"AI","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","1_1","range",2.82830366633727,3597.50111671783,0,Inf
+"35",11,NA,NA,NA,"AI","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","1_1","sigma_O",0.282076346848689,433.044777142261,0,Inf
+"36",12,NA,NA,NA,"AI","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","1_1","sigma_E",0.282076346655336,398.904481236308,0,Inf
+"37",1,1,1,1,"AI","Pacific ocean perch",30060,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_ocean_perch","08_3","range",2.80402607771196,3474.50293189363,0,Inf
+"38",2,2,2,2,"AI","Pacific ocean perch",30060,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_ocean_perch","08_3","sigma_O",0.278447166438472,345.410316695525,0,Inf
+"39",3,3,3,3,"AI","Pacific ocean perch",30060,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_ocean_perch","08_3","sigma_E",0.278414897233383,345.469044951283,0,Inf
+"40",4,4,4,NA,"AI","Pacific ocean perch",30060,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_ocean_perch","1_1","range",0.815861036451548,NA,NA,NA
+"41",5,5,5,NA,"AI","Pacific ocean perch",30060,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_ocean_perch","1_1","sigma_O",0.387742374605981,431.667857190495,0,Inf
+"42",6,6,6,NA,"AI","Pacific ocean perch",30060,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_ocean_perch","1_1","sigma_E",0.100221368800755,NA,NA,NA
+"43",7,7,NA,NA,"AI","Pacific ocean perch",30060,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_ocean_perch","08_3","range",2.80402607771196,3474.50293189363,0,Inf
+"44",8,8,NA,NA,"AI","Pacific ocean perch",30060,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_ocean_perch","08_3","sigma_O",0.278447166438472,345.410316695525,0,Inf
+"45",9,9,NA,NA,"AI","Pacific ocean perch",30060,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_ocean_perch","08_3","sigma_E",0.278414897233383,345.469044951283,0,Inf
+"46",10,NA,NA,NA,"AI","Pacific ocean perch",30060,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_ocean_perch","1_1","range",0.815861036451548,NA,NA,NA
+"47",11,NA,NA,NA,"AI","Pacific ocean perch",30060,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_ocean_perch","1_1","sigma_O",0.387742374605981,431.667857190495,0,Inf
+"48",12,NA,NA,NA,"AI","Pacific ocean perch",30060,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_ocean_perch","1_1","sigma_E",0.100221368800755,NA,NA,NA
+"49",1,1,1,1,"AI","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","08_3","range",2.87869313332355,33195.558377979,0,Inf
+"50",2,2,2,2,"AI","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","08_3","sigma_O",0.227163786447047,474.206958516173,0,Inf
+"51",3,3,3,3,"AI","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","08_3","sigma_E",0.0552935757186448,639.046230979366,0,Inf
+"52",4,4,4,NA,"AI","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","1_1","range",0.49999855079999,NA,NA,NA
+"53",5,5,5,NA,"AI","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","1_1","sigma_O",0.850283665360468,572.175689088779,0,Inf
+"54",6,6,6,NA,"AI","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","1_1","sigma_E",0.0439128171353843,NA,NA,NA
+"55",7,7,NA,NA,"AI","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","08_3","range",2.87869313332355,33195.558377979,0,Inf
+"56",8,8,NA,NA,"AI","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","08_3","sigma_O",0.227163786447047,474.206958516173,0,Inf
+"57",9,9,NA,NA,"AI","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","08_3","sigma_E",0.0552935757186448,639.046230979366,0,Inf
+"58",10,NA,NA,NA,"AI","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","1_1","range",0.49999855079999,NA,NA,NA
+"59",11,NA,NA,NA,"AI","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","1_1","sigma_O",0.850283665360468,572.175689088779,0,Inf
+"60",12,NA,NA,NA,"AI","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","1_1","sigma_E",0.0439128171353843,NA,NA,NA

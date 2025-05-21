@@ -1,0 +1,21 @@
+"","X.3","X.2","X.1","X","srvy","common_name","species_code","filter_lat_lt","filter_lat_gt","filter_depth","model_fn","model_family","model_anisotropy","model_spatiotemporal","file_name","effort","hessian_ok","eigen_values_ok","nlminb_ok","range_ok","gradients_ok","se_magnitude_ok","se_na_ok","sigmas_ok","all_ok"
+"1",1,1,1,1,"AI","flathead sole",10130,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","flathead_sole","08_3",FALSE,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE
+"2",2,2,2,NA,"AI","flathead sole",10130,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","flathead_sole","1_1",FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE
+"3",3,3,NA,NA,"AI","flathead sole",10130,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","flathead_sole","08_3",FALSE,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE
+"4",4,NA,NA,NA,"AI","flathead sole",10130,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","flathead_sole","1_1",FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE
+"5",1,1,1,1,"AI","northern rockfish",30420,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rockfish","08_3",FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE
+"6",2,2,2,NA,"AI","northern rockfish",30420,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rockfish","1_1",FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE
+"7",3,3,NA,NA,"AI","northern rockfish",30420,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rockfish","08_3",FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE
+"8",4,NA,NA,NA,"AI","northern rockfish",30420,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","northern_rockfish","1_1",FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE
+"9",1,1,1,1,"AI","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","08_3",FALSE,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE
+"10",2,2,2,NA,"AI","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","1_1",FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE
+"11",3,3,NA,NA,"AI","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","08_3",FALSE,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE
+"12",4,NA,NA,NA,"AI","Pacific cod",21720,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_cod","1_1",FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE
+"13",1,1,1,1,"AI","Pacific ocean perch",30060,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_ocean_perch","08_3",FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE
+"14",2,2,2,NA,"AI","Pacific ocean perch",30060,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_ocean_perch","1_1",FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE
+"15",3,3,NA,NA,"AI","Pacific ocean perch",30060,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_ocean_perch","08_3",FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE
+"16",4,NA,NA,NA,"AI","Pacific ocean perch",30060,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","pacific_ocean_perch","1_1",FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE
+"17",1,1,1,1,"AI","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","08_3",TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE
+"18",2,2,2,NA,"AI","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","1_1",FALSE,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE
+"19",3,3,NA,NA,"AI","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","08_3",TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE
+"20",4,NA,NA,NA,"AI","walleye pollock",21740,NA,NA,NA,"total_catch_wt_kg ~ 0 + factor(year)","delta_gamma",TRUE,"iid, iid","walleye_pollock","1_1",FALSE,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE

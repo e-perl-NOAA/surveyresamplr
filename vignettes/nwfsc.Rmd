@@ -151,7 +151,6 @@ spp_list <- data.frame(
   )
 )
 
-spp_list <- spp_list[1:2, ] # for testing
 
 ### Load survey data -----------------------------------------------------------
 
@@ -201,7 +200,7 @@ sink()
 out <- plot_results(srvy = srvy, dir_out = dir_out, dir_final = dir_final)
 ```
 
-```{r results-run, eval = TRUE, echo = FALSE}
+```{r results-run, eval, echo = FALSE}
 load(file = paste0(dir_final, "analysisoutput.rdata"))
 ```
 
