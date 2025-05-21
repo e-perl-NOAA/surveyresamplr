@@ -28,7 +28,6 @@ PKG <- c(
 
   # tidyverse
   "dplyr",
-  "magrittr",
   "tidyr",
   "viridis",
   "ggplot2",
@@ -90,8 +89,8 @@ spp_list <-
     model_fn = "total_catch_wt_kg ~ 0 + factor(year)",
     model_family = "delta_gamma",
     model_anisotropy = TRUE,
-    model_spatiotemporal = c(c("iid, iid"))
-  ) %>%
+    model_spatiotemporal = "iid, iid"
+  ) |>
   dplyr::mutate(
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))
   )
@@ -126,7 +125,7 @@ dir_final <- paste0(dir_out, "NWA_SPRING_0results/")
 ```{r eval = FALSE}
 ### Load survey data -----------------------------------------------------------
 
-catch <- surveyresamplr::noaa_nefsc_catch %>% dplyr::filter(srvy == "FALL") # pulled data again to get 2024
+catch <- surveyresamplr::noaa_nefsc_catch |> dplyr::filter(srvy == "FALL")
 
 ### Variables ------------------------------------------------------------------
 
@@ -168,7 +167,6 @@ print(names(out$tables)[i])
 head(out$tables[i][[1]]) %>%
   flextable::flextable()
 ```
-
 
 ```{r results-tables-2}
 i <- 1 + i

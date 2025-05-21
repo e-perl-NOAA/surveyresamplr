@@ -34,7 +34,6 @@ p <- c(
 
   # tidyverse
   "dplyr",
-  "magrittr",
   "tidyr",
   "viridis",
   "ggplot2",
@@ -47,9 +46,6 @@ p <- c(
   "purrr",
   "furrr",
   "doParallel",
-
-  # sampling
-  "sampling",
 
   # modeling
   "arrow",
@@ -79,16 +75,16 @@ Walleye pollock are fairly well distributed across the area, very common in the 
 ```{r define-spp-list}
 spp_list <- data.frame(
   srvy = "EBS",
-  common_name = c("walleye pollock"),
-  file_name = c("simple_walleye_pollock"),
-  species_code = as.character(c(21740)),
+  common_name = "walleye pollock",
+  file_name = "simple_walleye_pollock",
+  species_code = as.character(21740),
   filter_lat_lt = NA,
   filter_lat_gt = NA,
   filter_depth = NA,
   model_fn = "total_catch_wt_kg ~ 0 + factor(year)",
   model_family = "delta_gamma",
   model_anisotropy = TRUE,
-  model_spatiotemporal = c(c("iid, iid"))
+  model_spatiotemporal = "iid, iid"
 )
 ```
 
@@ -333,8 +329,6 @@ out <- plot_results(srvy = paste0(srvy, "_simple"), dir_out = dir_out, dir_final
 
 ```{r results-run, eval = TRUE, echo = FALSE}
 load(file = paste0(dir_final, "analysisoutput.rdata"))
-library(flextable)
-library(magrittr)
 ```
 
 ```{r results-plots}
@@ -347,7 +341,7 @@ Parameter output:
 ```{r results-tables-1}
 i <- 1
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>%
+head(out$tables[i][[1]]) |>
   flextable::flextable()
 ```
 
@@ -355,7 +349,7 @@ head(out$tables[i][[1]]) %>%
 ```{r results-tables-2}
 i <- 1 + i
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>%
+head(out$tables[i][[1]]) |>
   flextable::flextable()
 ```
 
@@ -363,7 +357,7 @@ head(out$tables[i][[1]]) %>%
 ```{r results-tables-3}
 i <- 1 + i
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>%
+head(out$tables[i][[1]]) |>
   flextable::flextable()
 ```
 
@@ -371,6 +365,6 @@ head(out$tables[i][[1]]) %>%
 ```{r results-tables-4}
 i <- 1 + i
 print(names(out$tables)[i])
-head(out$tables[i][[1]]) %>%
+head(out$tables[i][[1]]) |>
   flextable::flextable()
 ```

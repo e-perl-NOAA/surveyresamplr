@@ -34,7 +34,6 @@ PKG <- c(
 
   # tidyverse
   "dplyr",
-  "magrittr",
   "tidyr",
   "viridis",
   "ggplot2",
@@ -95,8 +94,8 @@ spp_list <- data.frame(
   model_fn = "total_catch_wt_kg ~ 0 + factor(year) + bottom_temperature_c",
   model_family = "delta_gamma",
   model_anisotropy = TRUE,
-  model_spatiotemporal = c(c("iid, iid"))
-) %>%
+  model_spatiotemporal = "iid, iid"
+) |>
   dplyr::mutate(
     file_name = gsub(pattern = " ", replacement = "_", x = (tolower(common_name)))
   )
@@ -106,7 +105,7 @@ spp_list <- data.frame(
 # source(paste0(wd, "code/data_dl_ak.r"))
 
 load(file = paste0(wd, "/data/noaa_afsc_catch.rda"))
-catch <- noaa_afsc_catch %>% dplyr::filter(srvy == "EBS")
+catch <- noaa_afsc_catch |> dplyr::filter(srvy == "EBS")
 
 ### Load grid data -------------------------------------------------------------
 
@@ -119,11 +118,11 @@ load(paste0(wd, "grids/noaa_afsc_ebs_pred_grid_depth.rdata"), verbose = TRUE)
 grid_yrs <-
   dplyr::bind_cols(
     pred_grid_depth[, c("longitude_dd", "latitude_dd", "depth_m")],
-    terra::unwrap(coldpool::ebs_bottom_temperature) %>%
-      terra::project(crs_latlon) %>%
+    terra::unwrap(coldpool::ebs_bottom_temperature) |>
+      terra::project(crs_latlon) |>
       terra::extract(pred_grid_depth[, c("longitude_dd", "latitude_dd")])
   )
-grid_yrs <- grid_yrs %>%
+grid_yrs <- grid_yrs |>
   tidyr::pivot_longer(
     names_to = "year",
     values_to = "bottom_temperature_c",
@@ -132,7 +131,7 @@ grid_yrs <- grid_yrs %>%
 save(grid_yrs_depth_temperature, file = paste0("grids/grid_yr_temperature/noaa_afsc_ebs_pred_grid_depth_temperature.rdata"))
 
 # # test you extracted correctkt
-# ggplot(data = grid_yrs %>%
+# ggplot(data = grid_yrs |>
 #          dplyr::filter(year %in% c(2022:2024)),
 #        mapping = ggplot2::aes(x = longitude_dd, y = latitude_dd, color = bottom_temperature_c)) +
 #   geom_point() +
