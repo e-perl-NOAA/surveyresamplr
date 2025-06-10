@@ -1,10 +1,10 @@
 test_that("clean_and_resample works with valid inputs", {
   # Skip on CRAN to avoid long-running tests
   skip_on_cran()
-  
+
   # Create temporary directory for outputs
   temp_dir <- tempdir()
-  
+
   # Create minimal test data
   test_catch <- data.frame(
     year = rep(2020:2021, each = 5),
@@ -16,7 +16,7 @@ test_that("clean_and_resample works with valid inputs", {
     depth_m = runif(10, 100, 500),
     pass = sample(1:2, 10, replace = TRUE)
   )
-  
+
   # Create test species info
   test_spp_info <- data.frame(
     srvy = "TEST",
@@ -30,7 +30,7 @@ test_that("clean_and_resample works with valid inputs", {
     model_anisotropy = TRUE,
     model_spatiotemporal = "iid, iid"
   )
-  
+
   # Create test grid years
   test_grid_yrs <- data.frame(
     year = rep(2020:2021, each = 5),
@@ -40,7 +40,7 @@ test_that("clean_and_resample works with valid inputs", {
     depth_m = runif(10, 100, 500),
     area_km2 = rep(1, 10)
   )
-  
+
   # Test with test = TRUE to avoid running actual models
   # We're just testing that the function runs without errors
   # and returns the expected structure
@@ -71,7 +71,7 @@ test_that("clean_and_resample validates input variables", {
     longitude_dd = runif(10, -125, -120)
     # Missing depth_m and pass
   )
-  
+
   # Create test species info with variables not in catch
   test_spp_info <- data.frame(
     srvy = "TEST",
@@ -85,7 +85,7 @@ test_that("clean_and_resample validates input variables", {
     model_anisotropy = TRUE,
     model_spatiotemporal = "iid, iid"
   )
-  
+
   # Create test grid years
   test_grid_yrs <- data.frame(
     year = rep(2020:2021, each = 5),
@@ -93,7 +93,7 @@ test_that("clean_and_resample validates input variables", {
     longitude_dd = runif(10, -125, -120)
     # Missing pass and depth_m
   )
-  
+
   # Test that function errors when variables in model_fn are not in catch
   expect_error(
     clean_and_resample(
